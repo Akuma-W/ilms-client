@@ -1,0 +1,17 @@
+services:
+  testclient:
+    image: testclient
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    networks:
+      - test-network
+  
+networks:
+  test-network:
+    driver: bridge
+    external: true
