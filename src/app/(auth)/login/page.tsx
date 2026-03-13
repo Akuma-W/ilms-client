@@ -8,18 +8,22 @@ import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
 import { FaGoogle } from "react-icons/fa6";
+import { login } from "@/services/auth.service";
+import { API_URL, setAccessToken } from "@/services/api-client";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       // Call API to login
+      const result = await login({ email, password });
+      setAccessToken(result.accessToken);
 
       toast.success("Login successful!");
       setTimeout(() => {
@@ -33,13 +37,17 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google`;
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-8 px-4 py-12">
       {/* Logo & Header */}
       <div className="flex flex-col items-center gap-3 text-center">
         <Link href="/">
           <Image
-            src="/images/logo.jpg"
+            src="/images/logo.png"
             alt="LMS logo"
             width={48}
             height={48}
@@ -119,6 +127,7 @@ export default function LoginPage() {
             size="lg"
             className="h-10 w-full rounded-lg"
             type="button"
+            onClick={handleGoogleLogin}
           >
             <FaGoogle className="size-4" />
             <span>Sign in with Google</span>
