@@ -1,53 +1,52 @@
+import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/token-store";
 import { refreshToken } from "./auth.service";
-
-let accessToken: string | null = null;
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export const setAccessToken = (token: string) => {
-  accessToken = token;
-}
+let refreshPromise: Promise<string | null> | null = null;
 
 export const apiClient = async (
   url: string,
   options: RequestInit = {}
 ) => {
-  const res = await fetch(
-    `${API_URL}${url}`,
-    {
-      ...options,
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-        Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      },
-    }
-  );
+  const token = getAccessToken();
 
-  if (res.status === 401) {
-    const newToken = await refreshToken();
+  const res = await fetch(`${API_URL}${url}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  });
 
-    if (!newToken) {
-      window.location.href = "/login";
-      throw new Error("Unauthorized");
-    };
+  if (res.status !== 401) return res;
 
-    accessToken = newToken;
-
-    return fetch(
-      `${API_URL}${url}`,
-      {
-        ...options,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+  // avoid multiple refresh request at the same time
+  if (!refreshPromise) {
+    refreshPromise = refreshToken();
   }
 
-  return res;
-}
+  const newToken = await refreshPromise;
+  refreshPromise = null;
+
+  if (!newToken) {
+    clearAccessToken();
+    window.location.href = "/login";
+    throw new Error("Unauthorized");
+  };
+
+  setAccessToken(newToken);
+
+  // retry request
+  return fetch(`${API_URL}${url}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+      Authorization: `Bearer ${newToken}`,
+    },
+  });
+};
