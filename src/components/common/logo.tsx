@@ -32,9 +32,9 @@ export function Logo({
     lg: 'text-4xl',
   };
 
-  const textColor = variant === 'light' ? 'text-white' : 'text-slate-900';
+  const textColor = variant === 'light' ? 'text-galaxy-blue' : 'text-slate-900';
 
-  const sloganColor = variant === 'light' ? 'text-blue-200' : 'text-slate-500';
+  const sloganColor = variant === 'light' ? 'text-gray-500' : 'text-slate-500';
 
   return (
     <Link href="/" className={cn('flex items-center gap-1 select-none cursor-pointer', className)}>
@@ -50,19 +50,19 @@ export function Logo({
         {withText && (
           <div
             className={cn(
-              'font-heading font-extrabold tracking-tight flex items-baseline',
+              'font-bold leading-tight tracking-tight',
               textSizes[size],
               textColor,
             )}
           >
-            <span className="text-[#483d8b]">KEI</span>
-            <span className="text-[#3096d5]">Verse</span>
+            <span className={cn(textColor)}>KEI</span>
+            <span className="text-galaxy-purple">Verse</span>
           </div>
         )}
 
         {withSlogan && (
           <span
-            className={cn('text-[9px] md:text-[11px] font-bold leading-none mt-1', sloganColor)}
+            className={cn('text-[10px] text-gray-500 font-medium uppercase tracking-wider', sloganColor)}
           >
             {slogan}
           </span>

@@ -1,7 +1,6 @@
 import { Footer } from "@/components/common/footer";
 import { Header } from "@/components/common/header";
-import NavSidebar from "@/components/common/nav-sidebar";
-import Navbar from "@/components/common/navbar";
+import { Navbar } from "@/components/common/navbar";
 
 export default function AuthLayout({
   children,
