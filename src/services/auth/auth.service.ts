@@ -1,23 +1,26 @@
 import { LoginDto } from "@/types/auth.type";
-import { API_URL, apiClient } from "./api-client";
+import { API_URL, apiClient } from "../api-client";
 import { clearAccessToken, setAccessToken } from "@/lib/token-store";
+import { AUTH_ERROR_MAP } from "./auth.errors";
 
 export const login = async (dto: LoginDto) => {
   const res = await apiClient("/auth/login", {
     method: "POST",
     body: JSON.stringify(dto),
   });
-
-  if (!res.ok) {
-    throw new Error("Login failed");
-  }
-
   const result = await res.json();
-  console.debug(result);
+
+  if (!res.ok || !result.success) {
+    return {
+      success: false,
+      message: AUTH_ERROR_MAP[result.message] || 
+      'Có lỗi xảy ra, vui lòng thử lại',
+    };
+  }
 
   setAccessToken(result.data.accessToken);
 
-  return result.message;
+  return result;
 };
 
 export const refreshToken = async (): Promise<string | null> => {

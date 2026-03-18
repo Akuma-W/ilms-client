@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
 import { Button } from '../ui/button'
 import { Logo } from './logo'
-import { useAuth } from '@/hooks/useAuth'
 import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
 import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
-import { logout } from '@/services/auth.service';
+import { logout } from '@/services/auth/auth.service';
+import { useAuth } from '@/providers/auth-provider';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -20,6 +20,8 @@ export function Header() {
       console.error(error);
     }
   };
+
+  if (loading) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
+import AuthProvider from "@/providers/auth-provider";
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -31,8 +32,8 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`${inter.variable}`}>
       <body suppressHydrationWarning className="font-sans antialiased">
-        {children}
-        <Toaster position="top-center" richColors theme="light" />
+        <AuthProvider>{children}</AuthProvider>
+        <Toaster position="top-right" richColors theme="light" duration={2000} />
         <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
       </body>
     </html>
