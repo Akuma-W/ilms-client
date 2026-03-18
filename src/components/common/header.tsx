@@ -1,37 +1,61 @@
-import Link from 'next/link'
+'use client';
+
 import { Button } from '../ui/button'
+import { Logo } from './logo'
+import { useAuth } from '@/hooks/useAuth'
+import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
+import { AvatarDropdown } from './avatar-dropdown';
+import Link from 'next/link';
+import { logout } from '@/services/auth.service';
 
 export function Header() {
-  const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Features", href: "#" },
-    { name: "Pricing", href: "#" },
-  ]
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+
+      window.location.href = "/login";
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+      <div className="container mx-auto flex px-4 py-3 max-w-6xl items-center justify-between">
         {/* <SiteLogo /> */}
+        <Logo withText withSlogan />
 
-        {/* Navigation */}
-        <nav className="hidden items-center gap-6 md:flex">
-          {navItems.map((item, index) => (
-            <Link
-            key={index}
-              href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Tool bar */}
+        {/* Toolbar */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Log In</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/signup">Sign Up</Link>
+          {!user ? (
+            <div className="hidden sm:flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" className="text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Đăng nhập
+                </Button>
+              </Link>
+              <Button variant="default" className="bg-galaxy hover:opacity-90 text-white shadow-md">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Đăng ký
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" className="relative text-gray-600 hover:bg-gray-100">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+              </Button>
+              <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100">
+                <MessageCircle className="w-5 h-5" />
+              </Button>
+              <AvatarDropdown user={user} logout={handleLogout} />
+            </div>
+          )}
+          <Button variant="ghost" size="icon" className="md:hidden text-gray-600">
+            <Menu className="w-6 h-6" />
           </Button>
         </div>
       </div>
