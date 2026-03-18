@@ -1,4 +1,4 @@
-import { ProtectedRoute } from "@/components/common/protected-route";
+import { ProtectedRoute } from "@/components/route/protected-route";
 
 export default function Dashboard() {
   return (

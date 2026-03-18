@@ -32,7 +32,8 @@ export function Logo({
     lg: 'text-4xl',
   };
 
-  const textColor = variant === 'light' ? 'text-galaxy-blue' : 'text-slate-900';
+  const textColor1 = variant === 'light' ? 'text-galaxy-blue' : 'text-blue-400';
+  const textColor2 = variant === 'light' ? 'text-galaxy-purple' : 'text-purple-400';
 
   const sloganColor = variant === 'light' ? 'text-gray-500' : 'text-slate-500';
 
@@ -52,11 +53,10 @@ export function Logo({
             className={cn(
               'font-bold leading-tight tracking-tight',
               textSizes[size],
-              textColor,
             )}
           >
-            <span className={cn(textColor)}>KEI</span>
-            <span className="text-galaxy-purple">Verse</span>
+            <span className={cn(textColor1)}>KEI</span>
+            <span className={cn(textColor2)}>Verse</span>
           </div>
         )}
 

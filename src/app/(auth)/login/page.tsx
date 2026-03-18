@@ -17,7 +17,7 @@ import { useAuth } from "@/providers/auth-provider";
 
 export default function Login() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { fetchUser } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [loginForm, setLoginForm] = useState({
@@ -44,7 +44,7 @@ export default function Login() {
         description: result.message,
       });
 
-      console.log(user);
+      await fetchUser();
       setTimeout(() => {
         router.push('/dashboard');
       }, 2000);
