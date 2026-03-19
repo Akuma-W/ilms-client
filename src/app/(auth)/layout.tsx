@@ -1,5 +1,4 @@
 import { Footer } from "@/components/common/footer";
-import { Header } from "@/components/common/header";
 import { Navbar } from "@/components/common/navbar";
 
 export default function AuthLayout({
@@ -9,11 +8,6 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
-      <Header
-        // isLoggedIn={isLoggedIn}
-        // onOpenSidebar={() => setOpenSidebar(true)}
-        // showSign={false}
-      />
       <Navbar />
       {/* <NavSidebar open={openSidebar} onClose={() => setOpenSidebar(false)} /> */}
 

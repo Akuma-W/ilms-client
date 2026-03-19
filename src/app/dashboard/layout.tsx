@@ -9,8 +9,10 @@ export default function ClassLayout({
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <Header />
-      <Navbar />
+      <div className="sticky top-0 z-50">
+        <Header />
+        <Navbar />
+      </div>
       <main className="flex-1">{children}</main>
       <Footer />
     </div>
