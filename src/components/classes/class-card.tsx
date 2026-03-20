@@ -19,7 +19,7 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
 
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 border-gray-100 overflow-hidden relative h-full cursor-pointer">
-      <Link href={`/class/${classItem.id}`}>
+      <Link href={`/classes/${classItem.id}`}>
         <div className="absolute top-0 left-0 w-1 h-full bg-galaxy opacity-0 group-hover:opacity-100 transition-opacity" />
 
         <CardHeader className="pb-2">

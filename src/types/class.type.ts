@@ -1,6 +1,13 @@
 import { School } from "./school.type";
 import { User } from "./user.type";
 
+// type ClassStatus = {
+//   find: "find",
+//   joined: "joined",
+//   pending: "pending",
+//   created: "created",
+// }
+
 export interface Class {
   id: string;
   title: string;
@@ -15,4 +22,11 @@ export interface Class {
 
   school: School;
   teacher: User;
+}
+
+export interface ClassClient extends Class {
+  schoolName: string;
+  teacherName: string;
+  status: string;
+  isOwner: boolean;
 }

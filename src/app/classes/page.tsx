@@ -1,20 +1,33 @@
+'use client';
+
 import { ClassCard } from "@/components/classes/class-card";
 import { JoinConfirmModal } from "@/components/modals/join-confirm-modal";
 import { SearchBar } from "@/components/common/search-bar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
-import { Class } from "@/types/class.type";
-import { Search, Users, Clock, BookOpen, Star, Link, ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Class, ClassClient } from "@/types/class.type";
+import { Search, Users, Clock, BookOpen, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Enrollment } from "@/types/enrollment.type";
+import { getAllClasses } from "@/services/class/class.service";
+import { getMyEnrollments } from "@/services/enrollment/enrollment.service";
+import { FindClassModal } from "@/components/modals/find-class-modal";
+import { CreateClassModal } from "@/components/modals/create-class-modal";
+import Link from "next/link";
 
 type ActiveTabs = 'find' | 'joined' | 'pending' | 'created';
+const ITEMS_PER_PAGE = 6;
 
 export default function Classes() {
   const { user } = useAuth();
-
+  // Data
+  const [allClasses, setAllClasses] = useState<Class[]>([]);
+  const [myEnrollments, setMyEnrollments] = useState<Enrollment[]>([]);
+  const [loading, setLoading] = useState(true);
   // SEO
   const [searchQuery, setSearchQuery] = useState('');
+  const starredClasses: Class[] = [];
   // List
   const [activeTab, setActiveTab] = useState<ActiveTabs>('joined');
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,9 +35,129 @@ export default function Classes() {
   const [isJoinConfirmOpen, setIsJoinConfirmOpen] = useState(false);
   const [selectedClassForJoin, setSelectedClassForJoin] = useState<Class | null>(null);
 
-  // Filler classes by tab and search
-  const filteredClasses = useMemo(() => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const [classesRes, enrollmentsRes] = await Promise.all([
+          getAllClasses(),
+          getMyEnrollments(),
+        ]);
+
+        setAllClasses(classesRes.data);
+        setMyEnrollments(enrollmentsRes.data);
+      } catch (err) {
+        console.error('Fetch classes error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  const classesFromEnrollments: ClassClient[] = useMemo(() => {
+    return myEnrollments.map((e) => ({
+      ...e.class,
+      schoolName: e.class.school.name,
+      teacherName: e.class.teacher.fullName,
+      status:
+        e.status === 'approved'
+          ? 'joined'
+          : e.status === 'pending'
+          ? 'pending'
+          : 'joined',
+      isOwner: e.roleIn === 'teacher',
+    }));
+  }, [myEnrollments]);
+
+  const mergedClasses: ClassClient[] = useMemo(() => {
+    const map = new Map();
+
+    // từ enrollments
+    classesFromEnrollments.forEach((c) => {
+      map.set(c.id, c);
+    });
+
+    // từ all classes (discover)
+    allClasses.forEach((c) => {
+      if (!map.has(c.id)) {
+        map.set(c.id, {
+          ...c,
+          schoolName: c.school?.name,
+          teacherName: c.teacher?.fullName,
+          status: 'find',
+          isOwner: false,
+        });
+      }
+    });
+
+    return Array.from(map.values());
+  }, [classesFromEnrollments, allClasses]);
+
+  // Filter classes by tab and search
+  const filteredClasses = useMemo(() => {
+    let list = mergedClasses;
+
+    // Filter by Tab
+    switch (activeTab) {
+      case 'find':
+        list = list.filter((c) => c.status === 'find');
+        break;
+      case 'joined':
+        list = list.filter((c) => c.status === 'joined');
+        break;
+      case 'pending':
+        list = list.filter((c) => c.status === 'pending');
+        break;
+      case 'created':
+        list = list.filter((c) => c.isOwner);
+        break;
+    }
+
+    // Filter by query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      list = list.filter(c => 
+        c.title.toLowerCase().includes(query) || 
+        c.subject.toLowerCase().includes(query) ||
+        c.teacherName.toLowerCase().includes(query)
+      );
+    }
+
+    return list;
+  }, [activeTab, searchQuery, mergedClasses]);
+
+  // Pagination Page
+  const totalPages = Math.ceil(filteredClasses.length / ITEMS_PER_PAGE);
+  const paginatedClasses = filteredClasses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handleJoinClass = (classItem: Class) => {
+    setSelectedClassForJoin(classItem);
+    setIsJoinConfirmOpen(true);
+  };
+
+  const confirmJoin = () => {
+    if (selectedClassForJoin) {
+      console.log('Joining class:', selectedClassForJoin.id);
+      // In a real app, update the status to 'pending'
+      setIsJoinConfirmOpen(false);
+      setSelectedClassForJoin(null);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-10 text-center">Loading classes...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -34,7 +167,7 @@ export default function Classes() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Danh sách lớp học</h1>
-              <p className="text-gray-500 mt-1">Trường: <span className="font-bold text-galaxy-blue">{user?.school || 'Đại học Bách Khoa'}</span></p>
+              <p className="text-gray-500 mt-1">Trường: <span className="font-bold text-galaxy-blue">{user?.school.name}</span></p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -44,9 +177,9 @@ export default function Classes() {
                 placeholder="Tìm lớp theo tên, môn học, mã..." 
               />
 
-              <FindClassModal 
-                onJoinClass={handleJoinClass} 
-                mockClasses={MOCK_CLASSES} 
+              <FindClassModal
+                onJoinClass={handleJoinClass}
+                classes={mergedClasses}
               />
 
               {user?.role === 'teacher' && (
@@ -100,10 +233,10 @@ export default function Classes() {
               <div className="space-y-3">
                 {starredClasses.length > 0 ? (
                   starredClasses.map(c => (
-                    <Link key={c.id} href={`/class/${c.id}`} className="block group">
+                    <Link key={c.id} href={`/classes/${c.id}`} className="block group">
                       <div className="p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
                         <p className="text-sm font-bold text-gray-900 group-hover:text-galaxy-blue transition-colors line-clamp-1">{c.title}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{c.code}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{c.courseCode}</p>
                       </div>
                     </Link>
                   ))
@@ -111,13 +244,6 @@ export default function Classes() {
                   <p className="text-xs text-gray-400 italic">Chưa có lớp học nào được lưu.</p>
                 )}
               </div>
-            </div>
-
-            <div className="bg-galaxy/5 rounded-2xl p-6 border border-galaxy/10">
-              <h3 className="font-bold text-galaxy-blue mb-2">Mẹo nhỏ</h3>
-              <p className="text-xs text-galaxy-blue/70 leading-relaxed">
-                Bạn có thể tìm kiếm lớp học nhanh chóng bằng mã lớp 6 ký tự. Đừng quên đánh dấu sao các lớp quan trọng để truy cập nhanh từ thanh bên này.
-              </p>
             </div>
           </div>
 
@@ -135,7 +261,7 @@ export default function Classes() {
                         if (activeTab === 'find') {
                           handleJoinClass(classItem);
                         } else {
-                          window.location.href = `/class/${id}`;
+                          window.location.href = `/classes/${id}`;
                         }
                       }}
                     />
@@ -202,5 +328,30 @@ export default function Classes() {
         onConfirm={confirmJoin}
       />
     </div>
-  )
+  );
 }
+
+interface TabButtonProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}
+
+const TabButton: React.FC<TabButtonProps> = ({ active, onClick, icon, label }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all border-b-2 relative",
+      active 
+        ? "text-galaxy-blue border-galaxy-blue" 
+        : "text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50"
+    )}
+  >
+    {icon}
+    {label}
+    {active && (
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-galaxy-blue animate-in fade-in duration-300" />
+    )}
+  </button>
+);
