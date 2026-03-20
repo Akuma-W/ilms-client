@@ -10,7 +10,7 @@ export function Navbar() {
 
   const navItems = [
     { label: 'Trang chủ', href: '/' },
-    { label: 'Lớp học', href: '/dashboard' },
+    { label: 'Lớp học', href: '/classes' },
     { label: 'Quiz', href: '/quizzes' },
     { label: 'Công cụ', href: '/tools' },
     { label: 'Liên hệ', href: '/contact' },

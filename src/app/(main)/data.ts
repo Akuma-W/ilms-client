@@ -15,7 +15,7 @@ const banners = [
     subtitle: 'Tham gia các lớp học trực tuyến và thảo luận sôi nổi.',
     image: 'https://picsum.photos/seed/banner2/1920/600',
     cta: 'Xem lớp học',
-    href: '/dashboard',
+    href: '/classes',
   },
   {
     id: '3',

@@ -11,7 +11,7 @@ export function Footer() {
 
   const quickLinks = [
     { label: 'Tham gia ngay', href: '/login', },
-    { label: 'Lớp học', href: '/dashboard', },
+    { label: 'Lớp học', href: '/classes', },
     { label: 'Ôn tập Quiz', href: '/quizzes', },
     { label: 'Liên hệ', href: '/contact', },
   ];

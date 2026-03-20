@@ -46,7 +46,7 @@ export default function Login() {
 
       await fetchUser();
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/classes');
       }, 2000);
     } catch (error) {
       toast.error(

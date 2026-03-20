@@ -1,6 +1,7 @@
 import { Footer } from "@/components/common/footer";
 import { Header } from "@/components/common/header";
 import { Navbar } from "@/components/common/navbar";
+import { ProtectedRoute } from "@/components/route/protected-route";
 
 export default function ClassLayout({
   children,
@@ -13,7 +14,11 @@ export default function ClassLayout({
         <Header />
         <Navbar />
       </div>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <ProtectedRoute>
+          {children}
+        </ProtectedRoute>
+      </main>
       <Footer />
     </div>
   )
