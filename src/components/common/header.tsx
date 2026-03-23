@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Button } from '../ui/button'
-import { Logo } from './logo'
+import { Button } from '../ui/button';
+import { Logo } from './logo';
 import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
 import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ export function Header() {
     try {
       await logout();
 
-      router.push("/login");
+      router.push('/login');
     } catch (error) {
       console.error(error);
     }
@@ -36,7 +36,10 @@ export function Header() {
           {!user ? (
             <div className="hidden sm:flex items-center gap-2">
               <Link href="/login">
-                <Button variant="ghost" className="text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors">
+                <Button
+                  variant="ghost"
+                  className="text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors"
+                >
                   <LogIn className="w-4 h-4 mr-2" />
                   Đăng nhập
                 </Button>
@@ -48,7 +51,11 @@ export function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative text-gray-600 hover:bg-gray-100">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-gray-600 hover:bg-gray-100"
+              >
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
               </Button>
@@ -64,5 +71,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

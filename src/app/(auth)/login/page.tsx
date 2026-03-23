@@ -1,19 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { login } from "@/services/auth/auth.service";
-import { API_URL } from "@/services/api-client";
-import { Logo } from "@/components/common/logo";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock, LogIn, Mail } from "lucide-react";
-import Link from "next/link";
-import { FaGoogle } from "react-icons/fa";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/auth-provider";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { login } from '@/services/auth/auth.service';
+import { API_URL } from '@/services/api-client';
+import { Logo } from '@/components/common/logo';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Lock, LogIn, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { FaGoogle } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/auth-provider';
 
 export default function Login() {
   const router = useRouter();
@@ -21,8 +28,8 @@ export default function Login() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [loginForm, setLoginForm] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -34,13 +41,13 @@ export default function Login() {
       const result = await login(loginForm);
 
       if (!result.success) {
-        toast.error("Đăng nhập thất bại", {
+        toast.error('Đăng nhập thất bại', {
           description: result.message,
         });
         return;
       }
 
-      toast.success("Đăng nhập thành công", {
+      toast.success('Đăng nhập thành công', {
         description: result.message,
       });
 
@@ -49,10 +56,9 @@ export default function Login() {
         router.push('/classes');
       }, 2000);
     } catch (error) {
-      toast.error(
-        "Đăng nhập thất bại",
-        { description: error instanceof Error ? error.message : "Đăng nhập thất bại" },
-      );
+      toast.error('Đăng nhập thất bại', {
+        description: error instanceof Error ? error.message : 'Đăng nhập thất bại',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -80,17 +86,19 @@ export default function Login() {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <Input 
-                  id="email" 
+                <Input
+                  id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="Nhập email của bạn" 
+                  placeholder="Nhập email của bạn"
                   className="pl-10"
                   value={loginForm.email}
-                  onChange={(e) => setLoginForm({
-                    ...loginForm,
-                    email: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setLoginForm({
+                      ...loginForm,
+                      email: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
@@ -98,28 +106,32 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Mật khẩu</Label>
-                <Link href="#" className="text-xs text-galaxy-blue hover:underline">Quên mật khẩu?</Link>
+                <Link href="#" className="text-xs text-galaxy-blue hover:underline">
+                  Quên mật khẩu?
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <Input 
-                  id="password" 
+                <Input
+                  id="password"
                   type="password"
                   autoComplete="current-password"
-                  placeholder="Nhập mật khẩu của bạn" 
+                  placeholder="Nhập mật khẩu của bạn"
                   className="pl-10"
                   value={loginForm.password}
-                  onChange={(e) => setLoginForm({
-                    ...loginForm,
-                    password: e.target.value,
-                  })}
+                  onChange={(e) =>
+                    setLoginForm({
+                      ...loginForm,
+                      password: e.target.value,
+                    })
+                  }
                   required
                 />
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-galaxy hover:opacity-90 text-white font-bold py-6 rounded-xl shadow-lg transition-all"
               disabled={isLoading}
             >
@@ -137,8 +149,8 @@ export default function Login() {
             </div>
           </div>
 
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
             onClick={handleGoogleLogin}
             disabled={isLoading}
@@ -148,8 +160,10 @@ export default function Login() {
           </Button>
         </CardContent>
         <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-gray-500 pb-8">
-          Chưa có tài khoản? 
-          <Link href="/register" className="font-bold text-galaxy-blue hover:underline">Đăng ký ngay</Link>
+          Chưa có tài khoản?
+          <Link href="/register" className="font-bold text-galaxy-blue hover:underline">
+            Đăng ký ngay
+          </Link>
         </CardFooter>
       </Card>
     </div>

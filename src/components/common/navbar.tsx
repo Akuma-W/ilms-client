@@ -1,9 +1,14 @@
-'use client'
+'use client';
 
-import { usePathname } from "next/navigation"
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "../ui/navigation-menu";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { usePathname } from 'next/navigation';
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from '../ui/navigation-menu';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -30,9 +35,9 @@ export function Navbar() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "text-sm font-medium transition-colors",
-                        "hover:text-blue-400",
-                        isActive ? "text-blue-400" : "text-gray-300"
+                        'text-sm font-medium transition-colors',
+                        'hover:text-blue-400',
+                        isActive ? 'text-blue-400' : 'text-gray-300',
                       )}
                     >
                       {item.label}
@@ -45,5 +50,5 @@ export function Navbar() {
         </NavigationMenu>
       </div>
     </nav>
-  )
+  );
 }

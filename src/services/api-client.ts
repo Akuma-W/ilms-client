@@ -1,24 +1,21 @@
-import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/token-store";
-import { refreshToken } from "./auth/auth.service";
+import { clearAccessToken, getAccessToken, setAccessToken } from '@/lib/token-store';
+import { refreshToken } from './auth/auth.service';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 let refreshPromise: Promise<string | null> | null = null;
 
-export const apiClient = async (
-  url: string,
-  options: RequestInit = {}
-) => {
+export const apiClient = async (url: string, options: RequestInit = {}) => {
   try {
     const token = getAccessToken();
 
     const res = await fetch(`${API_URL}${url}`, {
       ...options,
-      credentials: "include",
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...options.headers,
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: token ? `Bearer ${token}` : '',
       },
     });
 
@@ -35,16 +32,16 @@ export const apiClient = async (
     if (!newToken) {
       clearAccessToken();
       return res;
-    };
+    }
 
     setAccessToken(newToken);
 
     // retry request
     return fetch(`${API_URL}${url}`, {
       ...options,
-      credentials: "include",
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...options.headers,
         Authorization: `Bearer ${newToken}`,
       },

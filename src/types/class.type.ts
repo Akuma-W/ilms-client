@@ -1,5 +1,5 @@
-import { School } from "./school.type";
-import { User } from "./user.type";
+import { School } from './school.type';
+import { User } from './user.type';
 
 // type ClassStatus = {
 //   find: "find",

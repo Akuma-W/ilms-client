@@ -1,19 +1,22 @@
 'use client';
 
-import { Class, ClassClient } from "@/types/class.type";
-import { Search, User } from "lucide-react";
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog } from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { Class, ClassClient } from '@/types/class.type';
+import { Search, User } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '../ui/button';
+import { DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog } from '../ui/dialog';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 interface FindClassModalProps {
   onJoinClass: (classItem: Class) => void;
   classes: ClassClient[];
 }
 
-export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, classes: mockClasses }) => {
+export const FindClassModal: React.FC<FindClassModalProps> = ({
+  onJoinClass,
+  classes: mockClasses,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [courseCodeInput, setCourseCodeInput] = useState('');
   const [findResult, setFindResult] = useState<ClassClient | null>(null);
@@ -27,7 +30,7 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, cla
       return;
     }
 
-    const found = mockClasses.find(c => c.courseCode === code);
+    const found = mockClasses.find((c) => c.courseCode === code);
     if (found) {
       setFindResult(found);
       setFindError('');
@@ -40,7 +43,10 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, cla
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="h-11 px-6 border-galaxy-blue text-galaxy-blue hover:bg-galaxy-blue/5">
+        <Button
+          variant="outline"
+          className="h-11 px-6 border-galaxy-blue text-galaxy-blue hover:bg-galaxy-blue/5"
+        >
           <Search className="w-4 h-4 mr-2" />
           Tìm lớp học
         </Button>
@@ -48,20 +54,26 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, cla
 
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-galaxy-blue">Tìm lớp học theo mã</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-galaxy-blue">
+            Tìm lớp học theo mã
+          </DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="courseCode" className="font-bold">Nhập mã lớp (6 ký tự, viết hoa)</Label>
+            <Label htmlFor="courseCode" className="font-bold">
+              Nhập mã lớp (6 ký tự, viết hoa)
+            </Label>
             <div className="flex gap-2">
-              <Input 
-                id="courseCode" 
-                placeholder="VD: IT4440" 
+              <Input
+                id="courseCode"
+                placeholder="VD: IT4440"
                 value={courseCodeInput}
                 onChange={(e) => setCourseCodeInput(e.target.value.toUpperCase())}
                 maxLength={6}
               />
-              <Button onClick={handleFindClass} className="bg-galaxy text-white">Tìm kiếm</Button>
+              <Button onClick={handleFindClass} className="bg-galaxy text-white">
+                Tìm kiếm
+              </Button>
             </div>
             {findError && <p className="text-sm text-red-500 mt-1">{findError}</p>}
           </div>
@@ -71,7 +83,9 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, cla
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-bold text-gray-900">{findResult.title}</h4>
-                  <p className="text-xs text-gray-500">{findResult.subject} • {findResult.courseCode}</p>
+                  <p className="text-xs text-gray-500">
+                    {findResult.subject} • {findResult.courseCode}
+                  </p>
                 </div>
                 {/* <Star className={cn("w-4 h-4", findResult.isStarred ? "fill-yellow-400 text-yellow-400" : "text-gray-300")} /> */}
               </div>
@@ -80,7 +94,7 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({ onJoinClass, cla
                 <User className="w-3.5 h-3.5" />
                 <span>{findResult.teacherName}</span>
               </div>
-              <Button 
+              <Button
                 className="w-full bg-galaxy text-white mt-2"
                 onClick={() => {
                   onJoinClass(findResult);

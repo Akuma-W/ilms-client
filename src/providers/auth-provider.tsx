@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { clearAccessToken, getAccessToken } from "@/lib/token-store";
-import { getProfile } from "@/services/user.service";
-import { User } from "@/types/user.type";
-import { createContext, useContext, useEffect, useState } from "react";
+import { clearAccessToken, getAccessToken } from '@/lib/token-store';
+import { getProfile } from '@/services/user.service';
+import { User } from '@/types/user.type';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
   user: User | null;
@@ -19,11 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   fetchUser: async () => {},
 });
 
-export default function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +29,7 @@ export default function AuthProvider({
 
       if (!accessToken) {
         setUser(null);
-        return ;
+        return;
       }
 
       const { data } = await getProfile();

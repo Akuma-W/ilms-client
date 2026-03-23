@@ -1,20 +1,30 @@
 'use client';
 
-import { ClassCard } from "@/components/classes/class-card";
-import { JoinConfirmModal } from "@/components/modals/join-confirm-modal";
-import { SearchBar } from "@/components/common/search-bar";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/providers/auth-provider";
-import { Class, ClassClient } from "@/types/class.type";
-import { Search, Users, Clock, BookOpen, Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { Enrollment } from "@/types/enrollment.type";
-import { getAllClasses } from "@/services/class/class.service";
-import { getMyEnrollments } from "@/services/enrollment/enrollment.service";
-import { FindClassModal } from "@/components/modals/find-class-modal";
-import { CreateClassModal } from "@/components/modals/create-class-modal";
-import Link from "next/link";
+import { ClassCard } from '@/components/classes/class-card';
+import { JoinConfirmModal } from '@/components/modals/join-confirm-modal';
+import { SearchBar } from '@/components/common/search-bar';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/providers/auth-provider';
+import { Class, ClassClient } from '@/types/class.type';
+import { Search, Users, Clock, BookOpen, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Enrollment } from '@/types/enrollment.type';
+import { getAllClasses } from '@/services/class/class.service';
+import { getMyEnrollments } from '@/services/enrollment/enrollment.service';
+import { FindClassModal } from '@/components/modals/find-class-modal';
+import { CreateClassModal } from '@/components/modals/create-class-modal';
+import Link from 'next/link';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 type ActiveTabs = 'find' | 'joined' | 'pending' | 'created';
 const ITEMS_PER_PAGE = 6;
@@ -37,9 +47,9 @@ export default function Classes() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
+      setLoading(true);
 
+      try {
         const [classesRes, enrollmentsRes] = await Promise.all([
           getAllClasses(),
           getMyEnrollments(),
@@ -49,6 +59,7 @@ export default function Classes() {
         setMyEnrollments(enrollmentsRes.data);
       } catch (err) {
         console.error('Fetch classes error:', err);
+        toast.error('Không thể tải danh sách lớp học');
       } finally {
         setLoading(false);
       }
@@ -62,12 +73,7 @@ export default function Classes() {
       ...e.class,
       schoolName: e.class.school.name,
       teacherName: e.class.teacher.fullName,
-      status:
-        e.status === 'approved'
-          ? 'joined'
-          : e.status === 'pending'
-          ? 'pending'
-          : 'joined',
+      status: e.status === 'approved' ? 'joined' : e.status === 'pending' ? 'pending' : 'joined',
       isOwner: e.roleIn === 'teacher',
     }));
   }, [myEnrollments]);
@@ -119,10 +125,11 @@ export default function Classes() {
     // Filter by query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      list = list.filter(c => 
-        c.title.toLowerCase().includes(query) || 
-        c.subject.toLowerCase().includes(query) ||
-        c.teacherName.toLowerCase().includes(query)
+      list = list.filter(
+        (c) =>
+          c.title.toLowerCase().includes(query) ||
+          c.subject.toLowerCase().includes(query) ||
+          c.teacherName.toLowerCase().includes(query),
       );
     }
 
@@ -133,7 +140,7 @@ export default function Classes() {
   const totalPages = Math.ceil(filteredClasses.length / ITEMS_PER_PAGE);
   const paginatedClasses = filteredClasses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const handleTabChange = (tab: typeof activeTab) => {
@@ -146,18 +153,34 @@ export default function Classes() {
     setIsJoinConfirmOpen(true);
   };
 
-  const confirmJoin = () => {
+  const confirmJoin = async () => {
     if (selectedClassForJoin) {
-      console.log('Joining class:', selectedClassForJoin.id);
-      // In a real app, update the status to 'pending'
-      setIsJoinConfirmOpen(false);
-      setSelectedClassForJoin(null);
+      try {
+        // await apiService.post(`/classes/${selectedClassForJoin.id}/join`);
+        setAllClasses((prev) =>
+          prev.map((c) => (c.id === selectedClassForJoin.id ? { ...c, status: 'pending' } : c)),
+        );
+        toast.success('Đã gửi yêu cầu tham gia lớp học');
+      } catch (error) {
+        console.error(error);
+        toast.error('Không thể tham gia lớp học');
+      } finally {
+        setIsJoinConfirmOpen(false);
+        setSelectedClassForJoin(null);
+      }
     }
   };
 
-  if (loading) {
-    return <div className="p-10 text-center">Loading classes...</div>;
-  }
+  const handleCreateClass = async (data: Class) => {
+    try {
+      // const newClass = await apiService.post<Class>('/classes', data);
+      // setAllClasses(prev => [newClass, ...prev]);
+      toast.success('Đã tạo lớp học mới');
+    } catch (error) {
+      console.error(error);
+      toast.error('Không thể tạo lớp học');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -167,55 +190,67 @@ export default function Classes() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Danh sách lớp học</h1>
-              <p className="text-gray-500 mt-1">Trường: <span className="font-bold text-galaxy-blue">{user?.school.name}</span></p>
+              <p className="text-gray-500 mt-1">
+                Trường: <span className="font-bold text-galaxy-blue">{user?.school.name}</span>
+                {' - '}
+                <span className="font-semibold text-galaxy-blue">{user?.school.shortname}</span>
+              </p>
+              <p className="text-gray-500 mt-1 text-sm">
+                Address:{' '}
+                <span className="font-bold text-galaxy-blue/70">{user?.school.address}</span>
+              </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <SearchBar 
-                value={searchQuery} 
-                onChange={setSearchQuery} 
-                placeholder="Tìm lớp theo tên, môn học, mã..." 
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Tìm lớp theo tên, môn học, giảng viên..."
               />
 
-              <FindClassModal
-                onJoinClass={handleJoinClass}
-                classes={mergedClasses}
-              />
+              <FindClassModal onJoinClass={handleJoinClass} classes={mergedClasses} />
 
-              {user?.role === 'teacher' && (
-                <CreateClassModal onCreateClass={(data) => console.log('Create class:', data)} />
-              )}
+              {user?.role === 'teacher' && <CreateClassModal onCreateClass={handleCreateClass} />}
             </div>
           </div>
 
           {/* Tabs */}
           <div className="flex items-center gap-1 mt-10 border-b border-gray-100">
-            <TabButton 
-              active={activeTab === 'find'} 
-              onClick={() => handleTabChange('find')}
-              icon={<Search className="w-4 h-4" />}
-              label="Khám phá"
-            />
-            <TabButton 
-              active={activeTab === 'joined'} 
-              onClick={() => handleTabChange('joined')}
-              icon={<Users className="w-4 h-4" />}
-              label="Đã tham gia"
-            />
-            <TabButton 
-              active={activeTab === 'pending'} 
-              onClick={() => handleTabChange('pending')}
-              icon={<Clock className="w-4 h-4" />}
-              label="Chờ duyệt"
-            />
-            {user?.role === 'teacher' && (
-              <TabButton 
-                active={activeTab === 'created'} 
-                onClick={() => handleTabChange('created')}
-                icon={<BookOpen className="w-4 h-4" />}
-                label="Đã tạo"
-              />
-            )}
+            <Tabs
+              value={activeTab}
+              defaultValue="joined"
+              className="w-full"
+              onValueChange={(v) => handleTabChange(v as ActiveTabs)}
+            >
+              <TabsList className="bg-transparent h-auto p-0 gap-2">
+                <TabsTrigger
+                  value="find"
+                  className="data-[state=active]:text-galaxy-blue data-[state=active]:border-galaxy-blue flex items-center gap-2 px-6 py-3 text-sm font-bold"
+                >
+                  <Search className="w-4 h-4 mr-2" /> Khám phá
+                </TabsTrigger>
+                <TabsTrigger
+                  value="joined"
+                  className="data-[state=active]:text-galaxy-blue data-[state=active]:border-galaxy-blue flex items-center gap-2 px-6 py-3 text-sm font-bold"
+                >
+                  <Users className="w-4 h-4" /> Đã tham gia
+                </TabsTrigger>
+                <TabsTrigger
+                  value="pending"
+                  className="data-[state=active]:text-galaxy-blue data-[state=active]:border-galaxy-blue flex items-center gap-2 px-6 py-3 text-sm font-bold"
+                >
+                  <Clock className="w-4 h-4" /> Chờ duyệt
+                </TabsTrigger>
+                {user?.role === 'teacher' && (
+                  <TabsTrigger
+                    value="created"
+                    className="data-[state=active]:text-galaxy-blue data-[state=active]:border-galaxy-blue flex items-center gap-2 px-6 py-3 text-sm font-bold"
+                  >
+                    <BookOpen className="w-4 h-4" /> Đã tạo
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </Tabs>
           </div>
         </div>
       </div>
@@ -232,10 +267,12 @@ export default function Classes() {
               </div>
               <div className="space-y-3">
                 {starredClasses.length > 0 ? (
-                  starredClasses.map(c => (
+                  starredClasses.map((c) => (
                     <Link key={c.id} href={`/classes/${c.id}`} className="block group">
                       <div className="p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                        <p className="text-sm font-bold text-gray-900 group-hover:text-galaxy-blue transition-colors line-clamp-1">{c.title}</p>
+                        <p className="text-sm font-bold text-gray-900 group-hover:text-galaxy-blue transition-colors line-clamp-1">
+                          {c.title}
+                        </p>
                         <p className="text-xs text-gray-500 mt-0.5">{c.courseCode}</p>
                       </div>
                     </Link>
@@ -253,9 +290,9 @@ export default function Classes() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {paginatedClasses.map((classItem) => (
-                    <ClassCard 
-                      key={classItem.id} 
-                      classItem={classItem} 
+                    <ClassCard
+                      key={classItem.id}
+                      classItem={classItem}
                       actionLabel={activeTab === 'find' ? 'Tham gia lớp' : 'Vào lớp học'}
                       onAction={(id) => {
                         if (activeTab === 'find') {
@@ -270,41 +307,67 @@ export default function Classes() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-12">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(prev => prev - 1)}
-                      className="rounded-xl border-gray-200"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    
-                    {Array.from({ length: totalPages }).map((_, i) => (
-                      <Button
-                        key={i}
-                        variant={currentPage === i + 1 ? 'default' : 'outline'}
-                        onClick={() => setCurrentPage(i + 1)}
-                        className={cn(
-                          "w-10 h-10 rounded-xl font-bold",
-                          currentPage === i + 1 ? "bg-galaxy text-white" : "border-gray-200 text-gray-600"
-                        )}
-                      >
-                        {i + 1}
-                      </Button>
-                    ))}
+                  <Pagination className="mt-12">
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage((prev) => prev - 1)}
+                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                      {Array.from({ length: totalPages }).map((_, idx) => (
+                        <PaginationItem key={idx}>
+                          <PaginationLink
+                            isActive={currentPage === idx + 1}
+                            onClick={() => setCurrentPage(idx + 1)}
+                          >
+                            {idx + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage((prev) => prev + 1)}
+                          className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                  // <div className="flex items-center justify-center gap-2 mt-12">
+                  //   <Button
+                  //     variant="outline"
+                  //     size="icon"
+                  //     disabled={currentPage === 1}
+                  //     onClick={() => setCurrentPage(prev => prev - 1)}
+                  //     className="rounded-xl border-gray-200"
+                  //   >
+                  //     <ChevronLeft className="w-4 h-4" />
+                  //   </Button>
 
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage(prev => prev + 1)}
-                      className="rounded-xl border-gray-200"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  //   {Array.from({ length: totalPages }).map((_, i) => (
+                  //     <Button
+                  //       key={i}
+                  //       variant={currentPage === i + 1 ? 'default' : 'outline'}
+                  //       onClick={() => setCurrentPage(i + 1)}
+                  //       className={cn(
+                  //         "w-10 h-10 rounded-xl font-bold",
+                  //         currentPage === i + 1 ? "bg-galaxy text-white" : "border-gray-200 text-gray-600"
+                  //       )}
+                  //     >
+                  //       {i + 1}
+                  //     </Button>
+                  //   ))}
+
+                  //   <Button
+                  //     variant="outline"
+                  //     size="icon"
+                  //     disabled={currentPage === totalPages}
+                  //     onClick={() => setCurrentPage(prev => prev + 1)}
+                  //     className="rounded-xl border-gray-200"
+                  //   >
+                  //     <ChevronRight className="w-4 h-4" />
+                  //   </Button>
+                  // </div>
                 )}
               </>
             ) : (
@@ -313,7 +376,9 @@ export default function Classes() {
                   <Search className="w-10 h-10 text-gray-300" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">Không tìm thấy lớp học nào</h3>
-                <p className="text-gray-500 mt-2 max-w-xs">Thử thay đổi từ khóa tìm kiếm hoặc chuyển sang tab khác.</p>
+                <p className="text-gray-500 mt-2 max-w-xs">
+                  Thử thay đổi từ khóa tìm kiếm hoặc chuyển sang tab khác.
+                </p>
               </div>
             )}
           </div>
@@ -321,7 +386,7 @@ export default function Classes() {
       </div>
 
       {/* Join Confirmation Modal */}
-      <JoinConfirmModal 
+      <JoinConfirmModal
         isOpen={isJoinConfirmOpen}
         onOpenChange={setIsJoinConfirmOpen}
         selectedClass={selectedClassForJoin}
@@ -330,28 +395,3 @@ export default function Classes() {
     </div>
   );
 }
-
-interface TabButtonProps {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}
-
-const TabButton: React.FC<TabButtonProps> = ({ active, onClick, icon, label }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all border-b-2 relative",
-      active 
-        ? "text-galaxy-blue border-galaxy-blue" 
-        : "text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50"
-    )}
-  >
-    {icon}
-    {label}
-    {active && (
-      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-galaxy-blue animate-in fade-in duration-300" />
-    )}
-  </button>
-);

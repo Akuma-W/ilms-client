@@ -1,11 +1,11 @@
-import { LoginDto } from "@/types/auth.type";
-import { API_URL, apiClient } from "../api-client";
-import { clearAccessToken, setAccessToken } from "@/lib/token-store";
-import { AUTH_ERROR_MAP } from "./auth.errors";
+import { LoginDto } from '@/types/auth.type';
+import { API_URL, apiClient } from '../api-client';
+import { clearAccessToken, setAccessToken } from '@/lib/token-store';
+import { AUTH_ERROR_MAP } from './auth.errors';
 
 export const login = async (dto: LoginDto) => {
-  const res = await apiClient("/auth/login", {
-    method: "POST",
+  const res = await apiClient('/auth/login', {
+    method: 'POST',
     body: JSON.stringify(dto),
   });
   const result = await res.json();
@@ -13,8 +13,7 @@ export const login = async (dto: LoginDto) => {
   if (!res.ok || !result.success) {
     return {
       success: false,
-      message: AUTH_ERROR_MAP[result.message] || 
-      'Có lỗi xảy ra, vui lòng thử lại',
+      message: AUTH_ERROR_MAP[result.message] || 'Có lỗi xảy ra, vui lòng thử lại',
     };
   }
 
@@ -26,14 +25,14 @@ export const login = async (dto: LoginDto) => {
 export const refreshToken = async (): Promise<string | null> => {
   try {
     const res = await fetch(`${API_URL}/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
+      method: 'POST',
+      credentials: 'include',
     });
 
     if (!res.ok) {
       clearAccessToken();
       return null;
-    };
+    }
 
     const { data } = await res.json();
 
@@ -48,9 +47,9 @@ export const refreshToken = async (): Promise<string | null> => {
 
 export const logout = async () => {
   try {
-    await apiClient("/auth/logout", {
-      method: "POST",
-      credentials: "include",
+    await apiClient('/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
     });
   } finally {
     clearAccessToken();

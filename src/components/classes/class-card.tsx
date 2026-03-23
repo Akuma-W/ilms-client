@@ -1,8 +1,8 @@
-import { Class } from "@/types/class.type";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Calendar, User } from "lucide-react";
-import { Button } from "../ui/button";
+import { Class } from '@/types/class.type';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Calendar, User } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface ClassCardProps {
   classItem: Class;
@@ -39,9 +39,7 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-10">
-            {classItem.description}
-          </p>
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-10">{classItem.description}</p>
 
           <div className="flex flex-wrap gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
             <div className="flex items-center gap-1 5">
@@ -65,5 +63,5 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
         </Button>
       )}
     </Card>
-  )
+  );
 }

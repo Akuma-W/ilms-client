@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import Script from "next/script";
-import AuthProvider from "@/providers/auth-provider";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
+import Script from 'next/script';
+import AuthProvider from '@/providers/auth-provider';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "KEIVerse",
-  description: "Kết nối tri thức. Khám phá hành trình học tập!",
+  title: 'KEIVerse',
+  description: 'Kết nối tri thức. Khám phá hành trình học tập!',
   icons: {
     icon: [
       {
