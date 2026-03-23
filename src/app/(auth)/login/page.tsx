@@ -40,15 +40,8 @@ export default function Login() {
       // Call API to login
       const result = await login(loginForm);
 
-      if (!result.success) {
-        toast.error('Đăng nhập thất bại', {
-          description: result.message,
-        });
-        return;
-      }
-
-      toast.success('Đăng nhập thành công', {
-        description: result.message,
+      toast.success(result.message, {
+        description: `Chào mừng ${result.data.fullName} trở lại`,
       });
 
       await fetchUser();
