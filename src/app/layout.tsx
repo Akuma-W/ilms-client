@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "KEIVerse",
-  description: "Kết nối tri thức. Khám phá hành trình học tập!",
+  title: 'KEIVerse',
+  description: 'Kết nối tri thức. Khám phá hành trình học tập!',
   icons: {
     icon: [
       {

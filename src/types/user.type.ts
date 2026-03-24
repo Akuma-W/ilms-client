@@ -1,5 +1,5 @@
-import { Role, UserStatus } from "./enum";
-import { School } from "./school.type";
+import { Role, UserStatus } from './enum';
+import { School } from './school.type';
 
 export interface User {
   id: string;
@@ -12,6 +12,7 @@ export interface User {
   avatarUrl: string | null;
   identityCode: string | null;
   status: UserStatus | null;
+  avatar: string | null;
 
   school: School;
 }

@@ -1,8 +1,8 @@
-import { useWebsiteConfig } from "@/hooks/useConfig";
-import { Logo } from "./logo";
-import Link from "next/link";
-import { Facebook, Github, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useWebsiteConfig } from '@/hooks/useConfig';
+import { Logo } from './logo';
+import Link from 'next/link';
+import { Facebook, Github, Linkedin, Mail, MapPin, Phone, Youtube } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function Footer() {
   const { name, introduction } = useWebsiteConfig();
@@ -10,10 +10,10 @@ export function Footer() {
   const headingStyle = 'text-white font-semibold mb-4 uppercase tracking-wider text-sm';
 
   const quickLinks = [
-    { label: 'Tham gia ngay', href: '/login', },
-    { label: 'Lớp học', href: '/classes', },
-    { label: 'Ôn tập Quiz', href: '/quizzes', },
-    { label: 'Liên hệ', href: '/contact', },
+    { label: 'Tham gia ngay', href: '/login' },
+    { label: 'Lớp học', href: '/classes' },
+    { label: 'Ôn tập Quiz', href: '/quizzes' },
+    { label: 'Liên hệ', href: '/contact' },
   ];
 
   const contacts = [
@@ -48,10 +48,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm">
               {quickLinks.map((item, idx) => (
                 <li key={idx}>
-                  <Link
-                    href={item.href}
-                    className="hover:text-blue-400 transition-colors"
-                  >
+                  <Link href={item.href} className="hover:text-blue-400 transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -81,7 +78,7 @@ export function Footer() {
                   key={idx}
                   href={item.href}
                   className={cn(
-                    "w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center transition-all",
+                    'w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center transition-all',
                     item.hover,
                   )}
                 >
@@ -93,7 +90,9 @@ export function Footer() {
         </div>
 
         <div className="pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
-          <p>&#169; {new Date().getFullYear()} {name}. All rights reserved. Designed for students.</p>
+          <p>
+            &#169; {new Date().getFullYear()} {name}. All rights reserved. Designed for students.
+          </p>
         </div>
       </div>
     </footer>

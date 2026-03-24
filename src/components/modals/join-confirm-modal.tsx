@@ -1,13 +1,13 @@
-import { Class } from "@/types/class.type";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
+import { Class } from '@/types/class.type';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Button } from '../ui/button';
 
 interface JoinConfirmModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   selectedClass: Class | null;
   onConfirm: () => void;
-};
+}
 
 export function JoinConfirmModal({
   isOpen,
@@ -19,9 +19,7 @@ export function JoinConfirmModal({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-100">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-gray-900">
-            Xác nhận tham gia
-          </DialogTitle>
+          <DialogTitle className="text-xl font-bold text-gray-900">Xác nhận tham gia</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <p className="text-gray-600">
@@ -33,20 +31,14 @@ export function JoinConfirmModal({
           </p>
         </div>
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Hủy
           </Button>
-          <Button
-            className="bg-galaxy text-white"
-            onClick={onConfirm}
-          >
+          <Button className="bg-galaxy text-white" onClick={onConfirm}>
             Xác nhận tham gia
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
+}
