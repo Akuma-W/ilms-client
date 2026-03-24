@@ -48,7 +48,8 @@ export function LoginForm() {
         <div className="relative">
           <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input 
-            id="password" 
+            id="password"
+            name="password"
             type="password"
             autoComplete="current-password"
             placeholder="Nhập mật khẩu của bạn" 

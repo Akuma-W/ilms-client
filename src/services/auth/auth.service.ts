@@ -1,10 +1,36 @@
-import { LoginDto } from "@/types/auth.type";
+import { LoginDto, RegisterDto } from "@/types/auth.type";
 import { API_URL, apiClient } from "../api-client";
 import { AUTH_ERROR_MAP } from "./auth.errors";
+import { setAccessToken } from "../token-store";
 
 export const authService = {
   async login(payload: LoginDto) {
     const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      credentials: "include",
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      return {
+        success: false,
+        message: AUTH_ERROR_MAP[result.message] || 
+        'Có lỗi xảy ra, vui lòng thử lại',
+      };
+    }
+
+    setAccessToken(result.data.accessToken);
+
+    return result;
+  },
+
+  async register(payload: RegisterDto) {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,6 +73,12 @@ export const authService = {
       credentials: "include",
     });
 
-    return res.json();
+    if (!res.ok) return null;
+
+    const { data } = await res.json();
+
+    setAccessToken(data.accessToken);
+
+    return data.accessToken;
   }
 };

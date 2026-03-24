@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { API_URL } from "@/services/api-client";
 import { Logo } from "@/components/common/logo";

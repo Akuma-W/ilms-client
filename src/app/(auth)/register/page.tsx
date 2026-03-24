@@ -8,7 +8,6 @@ import { useForm, useWatch } from 'react-hook-form';
 import { RegisterFormValues, registerSchema } from './register.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'motion/react';
-import { register } from '@/services/auth/auth.service';
 import { toast } from 'sonner';
 import { API_URL } from '@/services/api-client';
 import { Logo } from '@/components/common/logo';
@@ -21,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { FaGoogle } from 'react-icons/fa';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { authService } from '@/services/auth/auth.service';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await register({
+      await authService.register({
         email: values.email,
         password: values.password,
         fullName: values.fullName,
