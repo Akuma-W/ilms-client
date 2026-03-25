@@ -1,13 +1,18 @@
-import { BannerCarousel } from '@/components/others/banner-carousel';
-import { useWebsiteConfig } from '@/hooks/useConfig';
+import { BannerCarousel } from '@/features/home/components/banner-carousel';
 import { banners, features, steps } from './data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { FeedbackSection } from '@/components/others/feedback-section';
+import { FeedbackSection } from '@/components/common/feedback-section';
+import { siteConfig } from '@/config';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Welcome',
+};
 
 export default function Home() {
-  const { slogan } = useWebsiteConfig();
+  const { slogan } = siteConfig;
 
   return (
     <section className="flex flex-col w-full overflow-x-hidden">
