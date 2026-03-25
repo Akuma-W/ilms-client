@@ -5,6 +5,7 @@ export const useWebsiteConfig = () => {
     name: 'KEIVerse',
     slogan: 'Kết nối tri thức. Khám phá hành trình học tập!',
     logo: Logo,
-    introduction: 'là nền tảng học tập trực tuyến hiện đại, giúp sinh viên và giảng viên kết nối với nhau và khám phá hành trình học tập một cách hiệu quả nhất.',
+    introduction:
+      'là nền tảng học tập trực tuyến hiện đại, giúp sinh viên và giảng viên kết nối với nhau và khám phá hành trình học tập một cách hiệu quả nhất.',
   };
-}
+};

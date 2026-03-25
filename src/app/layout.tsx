@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import Script from "next/script";
 import AuthProvider from "@/providers/auth-provider";
 
 const inter = Inter({
@@ -11,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "KEIVerse",
-  description: "Kết nối tri thức. Khám phá hành trình học tập!",
+  title: 'KEIVerse',
+  description: 'Kết nối tri thức. Khám phá hành trình học tập!',
   icons: {
     icon: [
       {
@@ -33,8 +32,8 @@ export default function RootLayout({
     <html lang="vi" className={`${inter.variable}`}>
       <body suppressHydrationWarning className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>
+        {/* {children} */}
         <Toaster position="top-right" richColors theme="light" duration={2000} />
-        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
       </body>
     </html>
   );

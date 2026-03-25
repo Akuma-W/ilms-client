@@ -1,58 +1,84 @@
-import { LoginDto } from "@/types/auth.type";
+import { LoginDto, RegisterDto } from "@/types/auth.type";
 import { API_URL, apiClient } from "../api-client";
-import { clearAccessToken, setAccessToken } from "@/lib/token-store";
 import { AUTH_ERROR_MAP } from "./auth.errors";
+import { setAccessToken } from "../token-store";
 
-export const login = async (dto: LoginDto) => {
-  const res = await apiClient("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(dto),
-  });
-  const result = await res.json();
+export const authService = {
+  async login(payload: LoginDto) {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      credentials: "include",
+    });
 
-  if (!res.ok || !result.success) {
-    return {
-      success: false,
-      message: AUTH_ERROR_MAP[result.message] || 
-      'Có lỗi xảy ra, vui lòng thử lại',
-    };
-  }
+    const result = await res.json();
 
-  setAccessToken(result.data.accessToken);
+    if (!res.ok || !result.success) {
+      return {
+        success: false,
+        message: AUTH_ERROR_MAP[result.message] || 
+        'Có lỗi xảy ra, vui lòng thử lại',
+      };
+    }
 
-  return result;
-};
+    setAccessToken(result.data.accessToken);
 
-export const refreshToken = async (): Promise<string | null> => {
-  try {
+    return result;
+  },
+
+  async register(payload: RegisterDto) {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      credentials: "include",
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      return {
+        success: false,
+        message: AUTH_ERROR_MAP[result.message] || 
+        'Có lỗi xảy ra, vui lòng thử lại',
+      };
+    }
+
+    return result;
+  },
+
+  async logout() {
+    const res = await apiClient("/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    return res.json();
+  },
+
+  async getProfile() {
+    const res = await apiClient("/users/me");
+
+    return res.json();
+  },
+
+  async refresh() {
     const res = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
       credentials: "include",
     });
 
-    if (!res.ok) {
-      clearAccessToken();
-      return null;
-    };
+    if (!res.ok) return null;
 
     const { data } = await res.json();
 
     setAccessToken(data.accessToken);
 
     return data.accessToken;
-  } catch {
-    clearAccessToken();
-    return null;
-  }
-};
-
-export const logout = async () => {
-  try {
-    await apiClient("/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-  } finally {
-    clearAccessToken();
   }
 };

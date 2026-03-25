@@ -1,6 +1,6 @@
-import { Class } from "./class.type";
-import { EnrollmentStatus, Role } from "./enum";
-import { User } from "./user.type";
+import { Class } from './class.type';
+import { EnrollmentStatus, Role } from './enum';
+import { User } from './user.type';
 
 export interface Enrollment {
   classId: string;

@@ -1,8 +1,8 @@
-import { Class } from "@/types/class.type";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Calendar, User } from "lucide-react";
-import { Button } from "../ui/button";
+import { Class } from '@/types/class.type';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Calendar, User } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface ClassCardProps {
   classItem: Class;
@@ -19,7 +19,7 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
 
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 border-gray-100 overflow-hidden relative h-full cursor-pointer">
-      <Link href={`/class/${classItem.id}`}>
+      <Link href={`/classes/${classItem.id}`}>
         <div className="absolute top-0 left-0 w-1 h-full bg-galaxy opacity-0 group-hover:opacity-100 transition-opacity" />
 
         <CardHeader className="pb-2">
@@ -39,9 +39,7 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-10">
-            {classItem.description}
-          </p>
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-10">{classItem.description}</p>
 
           <div className="flex flex-wrap gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
             <div className="flex items-center gap-1 5">
@@ -65,5 +63,5 @@ export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) 
         </Button>
       )}
     </Card>
-  )
+  );
 }

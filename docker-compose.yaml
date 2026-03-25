@@ -4,13 +4,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     environment:
       NODE_ENV: production
     ports:
       - 3000:3000
     networks:
       - test-network
-  
+
 networks:
   test-network:
     driver: bridge

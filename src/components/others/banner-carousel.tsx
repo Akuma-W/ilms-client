@@ -1,7 +1,13 @@
-import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
-import { Button } from "../ui/button";
-import Link from "next/link";
+import Image from 'next/image';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '../ui/carousel';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 interface Banner {
   id: string;
@@ -10,11 +16,11 @@ interface Banner {
   image: string;
   cta: string;
   href: string;
-};
+}
 
 interface BannerCarouselProps {
   banners: Banner[];
-};
+}
 
 export function BannerCarousel({ banners }: BannerCarouselProps) {
   return (
@@ -54,7 +60,10 @@ function BannerSlide({ banner }: { banner: Banner }) {
           {banner.subtitle}
         </p>
         <Link href={banner.href}>
-          <Button size="lg" className="bg-galaxy hover:scale-105 text-white px-8 animate-in fade-in slide-in-from-bottom-8">
+          <Button
+            size="lg"
+            className="bg-galaxy hover:scale-105 text-white px-8 animate-in fade-in slide-in-from-bottom-8"
+          >
             {banner.cta}
           </Button>
         </Link>

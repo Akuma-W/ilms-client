@@ -5,17 +5,19 @@ import { Logo } from './logo'
 import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
 import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
-import { logout } from '@/services/auth/auth.service';
 import { useAuth } from '@/providers/auth-provider';
+import { authService } from '@/services/auth/auth.service';
+import { useRouter } from 'next/navigation';
 
 export function Header() {
   const { user, loading } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await authService.logout();
 
-      window.location.href = "/login";
+      router.push("/login");
     } catch (error) {
       console.error(error);
     }

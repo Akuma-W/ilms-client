@@ -1,7 +1,6 @@
 "use client";
 
-import { clearAccessToken, getAccessToken } from "@/lib/token-store";
-import { getProfile } from "@/services/user.service";
+import { userService } from "@/services/user.service";
 import { User } from "@/types/user.type";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -29,17 +28,9 @@ export default function AuthProvider({
 
   const fetchUser = async () => {
     try {
-      const accessToken = getAccessToken();
-
-      if (!accessToken) {
-        setUser(null);
-        return ;
-      }
-
-      const { data } = await getProfile();
+      const { data } = await userService.getProfile();
       setUser(data);
     } catch {
-      clearAccessToken();
       setUser(null);
     }
   };
