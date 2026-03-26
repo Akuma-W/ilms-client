@@ -1,4 +1,4 @@
-import { useWebsiteConfig } from '@/hooks/useConfig';
+import { siteConfig } from '@/config';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ export function Logo({
   withSlogan = false,
   className,
 }: LogoProps) {
-  const { slogan, logo } = useWebsiteConfig();
+  const { name, slogan, logo } = siteConfig;
 
   const sizeClasses = {
     sm: 'h-8 w-8',
@@ -40,7 +40,12 @@ export function Logo({
   return (
     <Link href="/" className={cn('flex items-center gap-1 select-none cursor-pointer', className)}>
       <div className={cn('relative flex items-center justify-center shrink-0', sizeClasses[size])}>
-        <Image src={logo} alt="Logo" className="w-full h-full object-contain" />
+        <Image
+          src={logo}
+          fill
+          alt={name}
+          className="w-full h-full object-contain"
+        />
       </div>
 
       <div className="flex flex-col leading-tight">

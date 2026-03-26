@@ -1,7 +1,7 @@
 'use client';
 
 import { getSchools } from '@/services/school/school.service';
-import { School } from '@/types/school.type';
+import { School } from '@/types/school';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -11,15 +11,37 @@ import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { API_URL } from '@/services/api-client';
 import { Logo } from '@/components/common/logo';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, BookOpen, GraduationCap, IdCard, Lock, Mail, SchoolIcon, UserIcon } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  ArrowRight,
+  BookOpen,
+  GraduationCap,
+  IdCard,
+  Lock,
+  Mail,
+  SchoolIcon,
+  UserIcon,
+} from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { FaGoogle } from 'react-icons/fa';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { authService } from '@/services/auth/auth.service';
 
 export default function RegisterPage() {
@@ -69,7 +91,7 @@ export default function RegisterPage() {
         schoolId: values.schoolId,
         identityCode: values.identityCode,
       });
-      toast.success("Đăng ký thành công");
+      toast.success('Đăng ký thành công');
       setTimeout(() => {
         router.push('/register');
       }, 1500);
@@ -82,16 +104,17 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = () => {
     window.location.href = `${API_URL}/auth/google`;
-  }
+  };
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   // Lọc trường dựa vào input
   const filteredSchools = useMemo(() => {
     if (!search) return schools;
-    return schools.filter(s =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.shortname?.toLowerCase().includes(search.toLowerCase())
+    return schools.filter(
+      (s) =>
+        s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.shortname?.toLowerCase().includes(search.toLowerCase()),
     );
   }, [search, schools]);
 
@@ -103,7 +126,7 @@ export default function RegisterPage() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-100/50 rounded-full blur-[120px]" />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -127,11 +150,11 @@ export default function RegisterPage() {
               <div className="p-1 bg-gray-100 rounded-xl flex gap-1">
                 <button
                   type="button"
-                  onClick={() => form.setValue("role", "student")}
+                  onClick={() => form.setValue('role', 'student')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all font-bold text-sm ${
-                    selectedRole === "student" 
-                      ? "bg-galaxy-blue text-white shadow-md" 
-                      : "text-gray-500 hover:text-gray-700"
+                    selectedRole === 'student'
+                      ? 'bg-galaxy-blue text-white shadow-md'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <BookOpen className="w-4 h-4" />
@@ -139,11 +162,11 @@ export default function RegisterPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => form.setValue("role", "teacher")}
+                  onClick={() => form.setValue('role', 'teacher')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all font-bold text-sm ${
-                    selectedRole === "teacher" 
-                      ? "bg-galaxy-purple text-white shadow-md" 
-                      : "text-gray-500 hover:text-gray-700"
+                    selectedRole === 'teacher'
+                      ? 'bg-galaxy-purple text-white shadow-md'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -153,14 +176,16 @@ export default function RegisterPage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-sm font-bold text-gray-700">Họ và tên</Label>
+                  <Label htmlFor="fullName" className="text-sm font-bold text-gray-700">
+                    Họ và tên
+                  </Label>
                   <div className="relative">
                     <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       id="fullName"
                       placeholder="Nguyễn Văn A"
                       className="pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-                      {...form.register("fullName")}
+                      {...form.register('fullName')}
                     />
                   </div>
                   {form.formState.errors.fullName && (
@@ -171,7 +196,9 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-bold text-gray-700">Email</Label>
+                  <Label htmlFor="email" className="text-sm font-bold text-gray-700">
+                    Email
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
@@ -179,7 +206,7 @@ export default function RegisterPage() {
                       type="email"
                       placeholder="name@university.edu.vn"
                       className="pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-                      {...form.register("email")}
+                      {...form.register('email')}
                     />
                   </div>
                   {form.formState.errors.email && (
@@ -190,27 +217,31 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="schoolId" className="text-sm font-bold text-gray-700">Trường đại học</Label>
+                  <Label htmlFor="schoolId" className="text-sm font-bold text-gray-700">
+                    Trường đại học
+                  </Label>
                   <div className="relative">
                     <SchoolIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-                    <Select onValueChange={(value) => form.setValue("schoolId", value as string)}>
+                    <Select onValueChange={(value) => form.setValue('schoolId', value as string)}>
                       <SelectTrigger className="pl-10 w-full h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50">
                         <SelectValue placeholder="Chọn trường học" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <Command>
-                          <CommandInput 
+                          <CommandInput
                             placeholder="Tìm kiếm trường ..."
                             value={search}
                             onValueChange={setSearch}
                           />
                           <CommandList className="max-h-64 overflow-y-auto">
-                            {filteredSchools.length === 0 && <CommandEmpty>Không tìm thấy</CommandEmpty>}
+                            {filteredSchools.length === 0 && (
+                              <CommandEmpty>Không tìm thấy</CommandEmpty>
+                            )}
                             {filteredSchools.map((school) => (
                               <CommandItem
                                 key={school.id}
                                 value={school.id}
-                                onSelect={(value) => form.setValue("schoolId", value)}
+                                onSelect={(value) => form.setValue('schoolId', value)}
                               >
                                 <span className="font-bold mr-2">{school.shortname}</span>
                                 <span>{school.name}</span>
@@ -228,16 +259,18 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {selectedRole === "student" && (
+                {selectedRole === 'student' && (
                   <div className="space-y-2">
-                    <Label htmlFor="identityCode" className="text-sm font-bold text-gray-700">Mã số sinh viên</Label>
+                    <Label htmlFor="identityCode" className="text-sm font-bold text-gray-700">
+                      Mã số sinh viên
+                    </Label>
                     <div className="relative">
                       <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         id="identityCode"
                         placeholder="MSSV123456"
                         className="pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-                        {...form.register("identityCode")}
+                        {...form.register('identityCode')}
                       />
                     </div>
                     {form.formState.errors.identityCode && (
@@ -250,40 +283,53 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password" title="Mật khẩu" className="text-sm font-bold text-gray-700">Mật khẩu</Label>
+                    <Label
+                      htmlFor="password"
+                      title="Mật khẩu"
+                      className="text-sm font-bold text-gray-700"
+                    >
+                      Mật khẩu
+                    </Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         id="password"
                         type="password"
                         className="pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-                        {...form.register("password")}
+                        {...form.register('password')}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" title="Xác nhận" className="text-sm font-bold text-gray-700">Xác nhận</Label>
+                    <Label
+                      htmlFor="confirmPassword"
+                      title="Xác nhận"
+                      className="text-sm font-bold text-gray-700"
+                    >
+                      Xác nhận
+                    </Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         id="confirmPassword"
                         type="password"
                         className="pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-                        {...form.register("confirmPassword")}
+                        {...form.register('confirmPassword')}
                       />
                     </div>
                   </div>
                 </div>
                 {(form.formState.errors.password || form.formState.errors.confirmPassword) && (
                   <p className="text-xs text-destructive font-medium">
-                    {form.formState.errors.password?.message || form.formState.errors.confirmPassword?.message}
+                    {form.formState.errors.password?.message ||
+                      form.formState.errors.confirmPassword?.message}
                   </p>
                 )}
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-12 rounded-xl bg-galaxy hover:opacity-90 transition-all text-white font-bold text-lg shadow-lg shadow-blue-900/20" 
+              <Button
+                type="submit"
+                className="w-full h-12 rounded-xl bg-galaxy hover:opacity-90 transition-all text-white font-bold text-lg shadow-lg shadow-blue-900/20"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -304,7 +350,9 @@ export default function RegisterPage() {
                   <span className="w-full border-t border-gray-100" />
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase">
-                  <span className="bg-white px-2 text-muted-foreground font-bold tracking-wider">Hoặc tiếp tục với</span>
+                  <span className="bg-white px-2 text-muted-foreground font-bold tracking-wider">
+                    Hoặc tiếp tục với
+                  </span>
                 </div>
               </div>
 
@@ -321,7 +369,7 @@ export default function RegisterPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 pb-8">
             <div className="text-sm text-center text-muted-foreground">
-              Đã có tài khoản?{" "}
+              Đã có tài khoản?{' '}
               <Link href="/login" className="text-galaxy-blue font-bold hover:underline">
                 Đăng nhập
               </Link>

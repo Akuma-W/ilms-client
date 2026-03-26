@@ -1,5 +1,5 @@
-import { Footer } from '@/components/common/footer';
-import { Navbar } from '@/components/common/navbar';
+import { Footer } from '@/components/layout/footer';
+import { Navbar } from '@/components/layout/navbar';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

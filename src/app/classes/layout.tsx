@@ -1,7 +1,7 @@
-import { Footer } from '@/components/common/footer';
-import { Header } from '@/components/common/header';
-import { Navbar } from '@/components/common/navbar';
-import { ProtectedRoute } from '@/components/route/protected-route';
+import { Footer } from '@/components/layout/footer';
+import { Header } from '@/components/header/header';
+import { Navbar } from '@/components/layout/navbar';
+// import { ProtectedRoute } from '@/components/route/protected-route';
 
 export default function ClassLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +11,8 @@ export default function ClassLayout({ children }: { children: React.ReactNode })
         <Navbar />
       </div>
       <main className="flex-1">
-        <ProtectedRoute>{children}</ProtectedRoute>
+        {/* <ProtectedRoute>{children}</ProtectedRoute> */}
+        {children}
       </main>
       <Footer />
     </div>
