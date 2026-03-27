@@ -1,14 +1,13 @@
 import { API_URL } from '@/config';
 import { LoginFormSchema } from '../schemas/auth.schema';
-import { redirect } from 'next/navigation';
 import { FormState } from '@/types/action';
 import { AUTH_ERROR_MAP } from '../errors/auth.errors';
 
 export type LoginState = FormState<
   { email?: string },
   {
-    email?: string[],
-    password?: string[],
+    email?: string[];
+    password?: string[];
   }
 >;
 
@@ -52,6 +51,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
     };
   }
 
-  // Redirect
-  redirect('/classes');
+  return {
+    message: 'Đăng nhập thành công',
+  };
 }

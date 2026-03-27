@@ -1,67 +1,71 @@
+'use client';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Class } from '@/types/class';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Calendar, User } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
+import { Users, Calendar } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface ClassCardProps {
-  classItem: Class;
-  onAction?: (id: string) => void;
-  actionLabel?: string;
+  classData: Class;
 }
 
-export function ClassCard({ classItem, onAction, actionLabel }: ClassCardProps) {
-  const handleActionLabel = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onAction?.(classItem.id);
-  };
-
+export function ClassCard({ classData }: ClassCardProps) {
   return (
-    <Card className="group hover:shadow-xl transition-all duration-300 border-gray-100 overflow-hidden relative h-full cursor-pointer">
-      <Link href={`/classes/${classItem.id}`}>
-        <div className="absolute top-0 left-0 w-1 h-full bg-galaxy opacity-0 group-hover:opacity-100 transition-opacity" />
-
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-galaxy-blue transition-colors">
-                  {classItem.title}
-                </CardTitle>
-                {/* Star */}
-              </div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {classItem.subject}
-              </p>
+    <motion.div
+      whileHover={{ y: -5 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+    >
+      <Card className="h-full overflow-hidden border-none shadow-md hover:shadow-xl transition-all bg-white/80 backdrop-blur-sm group">
+        <CardHeader className="pb-2 relative">
+          {/* For Starred Classes */}
+          {/* <div className="absolute top-4 right-4 z-10">
+            {classData.isStarred && (
+              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            )}
+          </div> */}
+          <div className="w-full h-32 bg-galaxy rounded-xl mb-4 overflow-hidden relative">
+            <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 to-purple-600/20 group-hover:scale-110 transition-transform duration-500" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-4xl font-bold text-white/20">{classData.courseCode}</span>
             </div>
           </div>
+          <Badge variant="secondary" className="w-fit mb-2 bg-blue-50 text-blue-600 border-none font-bold">
+            {classData.subject}
+          </Badge>
+          <CardTitle className="text-xl font-bold line-clamp-1 text-gray-900 group-hover:text-galaxy-blue transition-colors">
+            {classData.title}
+          </CardTitle>
         </CardHeader>
-
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-10">{classItem.description}</p>
-
-          <div className="flex flex-wrap gap-4 text-xs text-gray-500 pt-2 border-t border-gray-50">
-            <div className="flex items-center gap-1 5">
-              <Calendar className="w-3 5 h-3 5" />
-              <span>{classItem.semester ?? 'Đang mở'}</span>
+        <CardContent className="pb-4">
+          <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">
+            {classData.description}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+              <Users className="w-4 h-4 text-galaxy-blue" />
+              <span>{classData.teacher.fullName}</span>
             </div>
-            <div className="flex items-center gap-1 5">
-              <User className="w-3 5 h-3 5" />
-              <span>{classItem.teacher.fullName}</span>
+            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+              <Calendar className="w-4 h-4 text-galaxy-blue" />
+              <span>{classData.semester}</span>
             </div>
           </div>
         </CardContent>
-      </Link>
 
-      {onAction && actionLabel && (
-        <Button
-          onClick={(e) => handleActionLabel(e)}
-          className="w-full mt-2 py-2 text-sm font-bold text-white bg-galaxy rounded-lg hover:opacity-90 transition-opacity"
-        >
-          {actionLabel}
-        </Button>
-      )}
-    </Card>
+        {/* For Enrollment Status */}
+        <CardFooter className="pt-0 flex justify-between items-center border-t border-gray-50 mt-2 py-4">
+          {/* <div className="flex gap-4">
+            <div className="flex items-center gap-1 text-xs font-bold text-gray-400">
+              <BookOpen className="w-3 h-3" />
+              <span>{classData.topicsCount || 0}</span>
+            </div>
+          </div> */}
+          {/* <Badge className="bg-green-50 text-green-600 border-none font-bold capitalize">
+            {classData.status}
+          </Badge> */}
+        </CardFooter>
+      </Card>
+    </motion.div>
   );
 }

@@ -20,3 +20,9 @@ export interface GoogleRegisterDto {
   schoolId: string;
   identityCode?: string;
 }
+
+export interface GoogleUser {
+  email: string;
+  avatar?: string;
+  fullName: string;
+}

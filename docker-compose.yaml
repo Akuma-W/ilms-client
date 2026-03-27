@@ -8,6 +8,13 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     environment:
       NODE_ENV: production
+    env_file:
+      - .env
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.services.ilms.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.ilms.rule=Host(`ilms.gzrcloud.com`)'
+      - 'traefik.http.routers.ilms.entryPoints=web,websecure'
     ports:
       - 3000:3000
     networks:
