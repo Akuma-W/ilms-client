@@ -1,33 +1,13 @@
 import { Logo } from '../common/logo';
 import Link from 'next/link';
-import { Facebook, Github, Linkedin, Mail, MapPin, Phone, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/config';
+import { quickLinks, contacts, socials } from '@/config/layout';
 
 export function Footer() {
   const { name, introduction } = siteConfig;
 
   const headingStyle = 'text-white font-semibold mb-4 uppercase tracking-wider text-sm';
-
-  const quickLinks = [
-    { label: 'Tham gia ngay', href: '/login' },
-    { label: 'Lớp học', href: '/classes' },
-    { label: 'Ôn tập Quiz', href: '/quizzes' },
-    { label: 'Liên hệ', href: '/contact' },
-  ];
-
-  const contacts = [
-    { icon: Phone, content: '+84 961 243 758' },
-    { icon: Mail, content: 'keiverse41@gmail.com' },
-    { icon: MapPin, content: 'Thành phố Hồ Chí Minh, Việt Nam' },
-  ];
-
-  const socials = [
-    { icon: Facebook, href: 'https://www.facebook.com', hover: 'hover:bg-blue-500' },
-    { icon: Linkedin, href: 'https://www.linkedin.com', hover: 'hover:bg-blue-700' },
-    { icon: Github, href: 'https://www.github.com', hover: 'hover:bg-gray-600' },
-    { icon: Youtube, href: 'https://www.youtube.com', hover: 'hover:bg-red-600' },
-  ];
 
   return (
     <footer className="bg-galaxy-dark text-gray-300 pt-12 pb-8">
@@ -45,7 +25,7 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h4 className={headingStyle}>Liên kết nhanh</h4>
-            <ul className="space-y-4 text-sm">
+            <ul className="text-sm grid grid-cols-2 gap-4 sm:block sm:space-y-4">
               {quickLinks.map((item, idx) => (
                 <li key={idx}>
                   <Link href={item.href} className="hover:text-blue-400 transition-colors">
@@ -59,7 +39,7 @@ export function Footer() {
           {/* Contact Info */}
           <div>
             <h4 className={headingStyle}>Thông tin liên hệ</h4>
-            <ul className="space-y-4 text-sm">
+            <ul className="text-sm space-y-2 sm:space-y-4 ">
               {contacts.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <item.icon className="w-4 h-4 text-blue-400 mt-1" />

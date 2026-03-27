@@ -1,10 +1,9 @@
+'use server';
+
 import { API_URL } from '@/config';
 import { cookies } from 'next/headers';
 
-export async function serverFetch(
-  url: string,
-  options?: RequestInit,
-): Promise<Response> {
+export async function serverFetch(url: string, options?: RequestInit): Promise<Response> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
@@ -12,8 +11,7 @@ export async function serverFetch(
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${accessToken}`,
-      cookie: cookieStore.toString(),
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
     },
   });
 
@@ -21,21 +19,20 @@ export async function serverFetch(
   if (res.status === 401) {
     const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
       method: 'POST',
-      headers: {
-        cookie: cookieStore.toString(),
-      },
+      credentials: 'include',
     });
-    
+
     // If refresh successful
     if (refreshRes.ok) {
       // Get new token after refresh
-      const newToken = cookieStore.get('access_token')?.value;
-      
+      const refreshData = await refreshRes.json();
+      const newToken = refreshData.access_token;
+
       res = await fetch(`${API_URL}${url}`, {
         ...options,
         headers: {
           ...options?.headers,
-          Authorization: newToken ? `Bearer ${newToken}` : '',
+          Authorization: `Bearer ${newToken}`,
         },
       });
     }
