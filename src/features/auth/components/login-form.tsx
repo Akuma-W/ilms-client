@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 const initialState: LoginState = {
-  success: false,
+  success: null,
   message: '',
   errors: {},
   data: {},
@@ -22,6 +22,8 @@ export function LoginForm() {
   const [state, action, pending] = useActionState(loginAction, initialState);
 
   useEffect(() => {
+    if (state.success === null) return;
+
     if (state.success === false) {
       toast.error(state.message, { duration: 1000 });
     } else if (state.message) {
