@@ -1,6 +1,6 @@
 services:
-  testclient:
-    image: testclient
+  ilms-client:
+    image: ilms-client
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -12,15 +12,16 @@ services:
       - .env
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.services.ilms.loadbalancer.server.port=3000'
-      - 'traefik.http.routers.ilms.rule=Host(`ilms.gzrcloud.com`)'
-      - 'traefik.http.routers.ilms.entryPoints=web,websecure'
+      - 'traefik.http.services.ilms_fe.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.ilms_fe.rule=Host(`ilms.gzrcloud.com`)'
+      - 'traefik.http.routers.ilms_fe.entryPoints=web,websecure'
+      - 'traefik.http.routers.ilms_fe.priority=100'
     ports:
       - 3000:3000
     networks:
-      - test-network
+      - ilms-network
 
 networks:
-  test-network:
+  ilms-network:
     driver: bridge
     external: true
