@@ -1,4 +1,4 @@
-import { API_URL } from '@/config';
+import { CLIENT_API_URL } from '@/config';
 import { LoginFormSchema } from '../schemas/auth.schema';
 import { FormState } from '@/types/action';
 import { AUTH_ERROR_MAP } from '../errors/auth.errors';
@@ -30,7 +30,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
   }
 
   // Call Login API
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${CLIENT_API_URL}/auth/login`, {
     method: 'POST',
     body: JSON.stringify(validatedFields.data),
     headers: {

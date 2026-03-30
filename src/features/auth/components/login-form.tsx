@@ -25,7 +25,11 @@ export function LoginForm() {
       toast.error(state.message, { duration: 1000 });
     } else if (state.message) {
       toast.success(state.message, { duration: 1000 });
-      router.push('/classes');
+
+      setTimeout(() => {
+        router.push('/classes');
+        router.refresh();
+      }, 1000)
     }
   }, [state, router]);
 

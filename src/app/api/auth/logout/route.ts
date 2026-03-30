@@ -1,4 +1,4 @@
-import { API_URL } from '@/config';
+import { CLIENT_API_URL } from '@/config';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +9,7 @@ export async function POST() {
   if (accessToken) {
     try {
       // If have accessToken, call BE to logout in BE
-      await fetch(`${API_URL}/auth/logout`, {
+      await fetch(`${CLIENT_API_URL}/auth/logout`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,

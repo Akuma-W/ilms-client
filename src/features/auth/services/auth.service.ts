@@ -1,4 +1,4 @@
-import { API_URL } from '@/config';
+import { CLIENT_API_URL } from '@/config';
 import { clientFetch } from '@/lib/api/client-fetcher';
 import { PromiseResponse } from '@/types/api';
 import { GoogleRegisterDto, GoogleUser, RegisterDto } from '@/types/auth';
@@ -16,7 +16,7 @@ export const authService = {
   },
 
   googleLogin(): void {
-    window.location.href = `${API_URL}/auth/google`;
+    window.location.href = `${CLIENT_API_URL}/auth/google`;
   },
 
   async getGoogleUser(): Promise<GoogleUser | null> {

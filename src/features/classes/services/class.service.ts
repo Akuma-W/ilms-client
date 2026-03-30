@@ -16,8 +16,6 @@ export const classService = {
 
     const result = await clientFetch<QueryResponse<Class[]>>(`/classes?${query}`);
 
-    console.log(result);
-
     if (!result.data) {
       throw new Error('Data is invalid');
     }
