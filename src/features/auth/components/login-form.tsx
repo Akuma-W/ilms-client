@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 const initialState: LoginState = {
+  success: false,
   message: '',
   errors: {},
   data: {},
@@ -21,11 +22,15 @@ export function LoginForm() {
   const [state, action, pending] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state.errors && state?.message) {
+    if (state.success === false) {
       toast.error(state.message, { duration: 1000 });
     } else if (state.message) {
       toast.success(state.message, { duration: 1000 });
-      router.push('/classes');
+
+      setTimeout(() => {
+        router.push('/classes');
+        router.refresh();
+      }, 1000)
     }
   }, [state, router]);
 
@@ -89,9 +94,6 @@ export function LoginForm() {
           )}
         </div>
       </div>
-      {state.message && state.errors && (
-        <p className="mt-2 text-sm text-red-500">{state.message}</p>
-      )}
       {/* Submit Button */}
       <Button
         type="submit"

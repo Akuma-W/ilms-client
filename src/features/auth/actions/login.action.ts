@@ -1,4 +1,4 @@
-import { API_URL } from '@/config';
+import { CLIENT_API_URL } from '@/config';
 import { LoginFormSchema } from '../schemas/auth.schema';
 import { FormState } from '@/types/action';
 import { AUTH_ERROR_MAP } from '../errors/auth.errors';
@@ -21,6 +21,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
     return {
+      success: false,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Dữ liệu không hợp lệ.',
       data: {
@@ -30,7 +31,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
   }
 
   // Call Login API
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${CLIENT_API_URL}/auth/login`, {
     method: 'POST',
     body: JSON.stringify(validatedFields.data),
     headers: {
@@ -44,6 +45,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
   // Handle error
   if (!res.ok || !result.success) {
     return {
+      success: result.success,
       message: AUTH_ERROR_MAP[result.message] || 'Đăng nhập thất bại',
       data: {
         email: formData.get('email') as string,
@@ -51,7 +53,5 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
     };
   }
 
-  return {
-    message: 'Đăng nhập thành công',
-  };
+  return result;
 }

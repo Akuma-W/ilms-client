@@ -1,8 +1,8 @@
-import { API_URL } from '@/config';
+import { CLIENT_API_URL } from '@/config';
 import { PromiseResponse } from '@/types/api';
 
 export async function clientFetch<T>(url: string, options?: RequestInit): PromiseResponse<T> {
-  const res = await fetch(`${API_URL}${url}`, {
+  const res = await fetch(`${CLIENT_API_URL}${url}`, {
     ...options,
     credentials: 'include',
     headers: {

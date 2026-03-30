@@ -8,6 +8,7 @@ export const siteConfig = {
     'là nền tảng học tập trực tuyến hiện đại, giúp sinh viên và giảng viên kết nối với nhau và khám phá hành trình học tập một cách hiệu quả nhất.',
 } as const;
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+export const CLIENT_API_URL = process.env.NEXT_PUBLIC_CLIENT_API_URL!;
+export const SERVER_API_URL = process.env.NEXT_PUBLIC_SERVER_API_URL!;
 
-export const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_EB3FORMS_ACCESS_KEY!;
+export const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY!;
