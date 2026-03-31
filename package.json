@@ -13,6 +13,7 @@
     "shadcn": "shadcn@latest add"
   },
   "dependencies": {
+    "@base-ui/react": "^1.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/postcss": "^4.2.2",
     "class-variance-authority": "^0.7.1",
@@ -37,6 +38,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@iconify/react": "^6.0.2",
     "@types/node": "20.19.37",
     "@types/react": "^19",
     "@types/react-dom": "^19",

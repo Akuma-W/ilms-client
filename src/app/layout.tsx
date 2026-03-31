@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
+import { SWRProvider } from '@/features/providers/swr-provider';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -31,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <SWRProvider>{children}</SWRProvider>
         <Toaster position="top-right" richColors theme="light" duration={2000} />
       </body>
     </html>

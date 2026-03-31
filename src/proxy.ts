@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ROUTES } from './config/route';
+
+const isMatchRoute = (pathname: string, routes: readonly string[]) => {
+  return routes.some((route) => pathname.startsWith(route));
+};
 
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get('access_token');
+  const token = request.cookies.get('access_token')?.value;
   const { pathname } = request.nextUrl;
 
-  // Protected routes
-  const protectedRoutes = ['/classes', '/profile', '/complete-profile'];
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isLoggedIn = !!token;
 
-  // Auth Page
-  const authRoutes = ['/login', '/register'];
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = isMatchRoute(pathname, ROUTES.PROTECTED);
+  const isAuthRoute = isMatchRoute(pathname, ROUTES.AUTH);
 
-  if (!token && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (!isLoggedIn && isProtectedRoute) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (token && isAuthRoute) {
-    return NextResponse.redirect(new URL('classes', request.url));
+  if (isLoggedIn && isAuthRoute) {
+    return NextResponse.redirect(new URL('/classes', request.url));
   }
 
   return NextResponse.next();

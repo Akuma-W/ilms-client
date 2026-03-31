@@ -1,24 +1,25 @@
-import { API_URL } from "@/config";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { CLIENT_API_URL } from '@/config';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 export async function POST() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
-  if (!accessToken) {
-    // If don't have token, return OK
-    return NextResponse.json({ ok: true });
+  if (accessToken) {
+    try {
+      // If have accessToken, call BE to logout in BE
+      await fetch(`${CLIENT_API_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Backend logout failed: ', error);
+    }
   }
-
-  // Call BE to logout in BE
-  await fetch(`${API_URL}/auth/logout`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    credentials: 'include',
-  });
 
   const response = NextResponse.json({ ok: true });
 

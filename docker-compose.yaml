@@ -1,19 +1,30 @@
 services:
-  testclient:
-    image: testclient
+  ilms-client:
+    image: ilms-client
+    container_name: ilms-client
     build:
       context: .
       dockerfile: ./Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_CLIENT_API_URL=${NEXT_PUBLIC_CLIENT_API_URL}
+        - NEXT_PUBLIC_SERVER_API_URL=${NEXT_PUBLIC_SERVER_API_URL}
     environment:
       NODE_ENV: production
+    env_file:
+      - .env
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.services.ilms_fe.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.ilms_fe.rule=Host(`ilms.gzrcloud.com`)'
+      - 'traefik.http.routers.ilms_fe.entryPoints=web,websecure'
+      - 'traefik.http.routers.ilms_fe.tls=true'
+      - 'traefik.http.routers.ilms_fe.tls.certresolver=letsencrypt'
     ports:
       - 3000:3000
     networks:
-      - test-network
+      - ilms-network
 
 networks:
-  test-network:
+  ilms-network:
     driver: bridge
     external: true

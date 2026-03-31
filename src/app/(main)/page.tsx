@@ -1,5 +1,5 @@
 import { BannerCarousel } from '@/features/home/components/banner-carousel';
-import { banners, features, steps } from './data';
+import { banners, features, steps } from '@/config/home';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
