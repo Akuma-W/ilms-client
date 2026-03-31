@@ -1,6 +1,6 @@
-import { clientFetch } from "@/lib/api/client-fetcher";
-import { QueryResponse } from "@/types/api";
-import { Class } from "@/types/class";
+import { apiClient } from '@/lib/api/api-client';
+import { QueryResponse } from '@/types/api';
+import { Class } from '@/types/class';
 
 export const classService = {
   async getClasses(params: {
@@ -14,7 +14,7 @@ export const classService = {
       search: params.search,
     });
 
-    const result = await clientFetch<QueryResponse<Class[]>>(`/classes?${query}`);
+    const result = await apiClient<QueryResponse<Class[]>>(`/classes?${query}`);
 
     if (!result.data) {
       throw new Error('Data is invalid');

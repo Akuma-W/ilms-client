@@ -2,7 +2,14 @@
 
 import { Logo } from '@/components/common/logo';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
 import { GoogleIcon } from '@/features/auth/components/google-icon';
 import { RegisterForm } from '@/features/auth/components/register-form';
 import { authService } from '@/features/auth/services/auth.service';
@@ -18,7 +25,7 @@ export default function RegisterClient() {
         <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-100/50 rounded-full blur-[120px]" />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -42,30 +49,30 @@ export default function RegisterClient() {
             {/* Register Form */}
             <RegisterForm />
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-200"></span>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Hoặc tiếp tục với</span>
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Hoặc tiếp tục với</span>
-            </div>
-          </div>
 
-          <Button
-            variant="outline"
-            className="w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
-            onClick={authService.googleLogin}
-          >
-            <GoogleIcon className="w-5 h-5" />
-            Đăng ký với Google
-          </Button>
-        </CardContent>
-        <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-gray-500 pb-8">
-          Đã có tài khoản?{' '}
-          <Link href="/login" className="font-bold text-galaxy-blue hover:underline">
-            Đăng nhập
-          </Link>
-        </CardFooter>
+            <Button
+              variant="outline"
+              className="w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
+              onClick={authService.googleLogin}
+            >
+              <GoogleIcon className="w-5 h-5" />
+              Đăng ký với Google
+            </Button>
+          </CardContent>
+          <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-gray-500 pb-8">
+            Đã có tài khoản?{' '}
+            <Link href="/login" className="font-bold text-galaxy-blue hover:underline">
+              Đăng nhập
+            </Link>
+          </CardFooter>
         </Card>
       </motion.div>
     </div>

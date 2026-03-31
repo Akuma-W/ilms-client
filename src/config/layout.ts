@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Facebook, Linkedin, Github, Youtube } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Linkedin, Github, Youtube, Clock } from 'lucide-react';
 
 const navItems = [
   { label: 'Trang chủ', href: '/' },
@@ -16,9 +16,53 @@ const quickLinks = [
 ];
 
 const contacts = [
-  { icon: Phone, content: '+84 961 243 758' },
-  { icon: Mail, content: 'keiverse41@gmail.com' },
-  { icon: MapPin, content: 'Thành phố Hồ Chí Minh, Việt Nam' },
+  {
+    key: 'phone',
+    icon: Phone,
+    title: 'Điện thoại',
+    items: [
+      {
+        label: 'Hotline',
+        value: '+84 961 243 758',
+        href: 'tel:+84961243758',
+      },
+    ],
+    color: 'blue',
+  },
+  {
+    key: 'email',
+    icon: Mail,
+    title: 'Email',
+    items: [
+      {
+        label: 'Support',
+        value: 'keiverse41@gmail.com',
+        href: 'mailto:keiverse41@gmail.com',
+      },
+    ],
+    color: 'purple',
+  },
+  {
+    key: 'address',
+    icon: MapPin,
+    title: 'Địa chỉ',
+    items: [
+      {
+        value: 'Thành phố Hồ Chí Minh, Việt Nam',
+      },
+    ],
+    color: 'orange',
+  },
+  {
+    key: 'working-time',
+    icon: Clock,
+    title: 'Giờ làm việc',
+    items: [
+      { value: 'Thứ 2 - Thứ 6: 08:00 - 18:00' },
+      // { value: 'Thứ 7: 08:00 - 12:00' },
+    ],
+    color: 'green',
+  },
 ];
 
 const socials = [

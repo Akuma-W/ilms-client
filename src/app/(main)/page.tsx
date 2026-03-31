@@ -3,7 +3,7 @@ import { banners, features, steps } from '@/config/home';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { FeedbackSection } from '@/components/common/feedback-section';
+import { ContactSection } from '@/components/common/contact-section';
 import { siteConfig } from '@/config';
 import { Metadata } from 'next';
 
@@ -153,7 +153,9 @@ export default function Home() {
       </section>
 
       {/* Feedback Section */}
-      <FeedbackSection />
+      <section className="bg-white py-16">
+        <ContactSection defaultType="feedback" />
+      </section>
     </section>
   );
 }

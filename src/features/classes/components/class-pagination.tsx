@@ -1,6 +1,13 @@
 'use client';
 
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationLink,
+  PaginationNext,
+} from '@/components/ui/pagination';
 import { useSearchParams } from 'next/navigation';
 
 interface Props {
@@ -40,10 +47,7 @@ export function ClassPagination({ total, page, limit }: Props) {
 
           return (
             <PaginationItem key={p}>
-              <PaginationLink
-                href={createPageLink(p)}
-                isActive={p === page}
-              >
+              <PaginationLink href={createPageLink(p)} isActive={p === page}>
                 {p}
               </PaginationLink>
             </PaginationItem>

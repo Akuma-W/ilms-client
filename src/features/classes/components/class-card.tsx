@@ -12,10 +12,7 @@ interface ClassCardProps {
 
 export function ClassCard({ classData }: ClassCardProps) {
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ type: 'spring', stiffness: 300 }}
-    >
+    <motion.div whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 300 }}>
       <Card className="h-full overflow-hidden border-none shadow-md hover:shadow-xl transition-all bg-white/80 backdrop-blur-sm group">
         <CardHeader className="pb-2 relative">
           {/* For Starred Classes */}
@@ -30,7 +27,10 @@ export function ClassCard({ classData }: ClassCardProps) {
               <span className="text-4xl font-bold text-white/20">{classData.courseCode}</span>
             </div>
           </div>
-          <Badge variant="secondary" className="w-fit mb-2 bg-blue-50 text-blue-600 border-none font-bold">
+          <Badge
+            variant="secondary"
+            className="w-fit mb-2 bg-blue-50 text-blue-600 border-none font-bold"
+          >
             {classData.subject}
           </Badge>
           <CardTitle className="text-xl font-bold line-clamp-1 text-gray-900 group-hover:text-galaxy-blue transition-colors">
@@ -38,9 +38,7 @@ export function ClassCard({ classData }: ClassCardProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="pb-4">
-          <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">
-            {classData.description}
-          </p>
+          <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">{classData.description}</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
               <Users className="w-4 h-4 text-galaxy-blue" />

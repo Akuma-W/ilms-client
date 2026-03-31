@@ -7,17 +7,17 @@ import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/use-current-user';
-import { authService } from '@/features/auth/services/auth.service';
 import { Sheet, SheetTrigger } from '../ui/sheet';
 import { MobileSidebar } from '../layout/mobile-sidebar';
 import { AvatarSkeleton } from './avatar-skeleton';
+import { logoutAction } from '@/features/auth/actions/logout.action';
 
 export function Header() {
   const router = useRouter();
   const { user, isLoading, mutateUser } = useCurrentUser();
 
   const handleLogout = async () => {
-    await authService.logout();
+    await logoutAction();
 
     // clear cache user
     await mutateUser(undefined, false);
@@ -49,7 +49,10 @@ export function Header() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button variant="default" className="bg-galaxy hover:opacity-90 text-white shadow-md">
+                <Button
+                  variant="default"
+                  className="bg-galaxy hover:opacity-90 text-white shadow-md"
+                >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Đăng ký
                 </Button>

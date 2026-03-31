@@ -1,18 +1,18 @@
 'use client';
 
-import { useSchools } from "@/features/school/hooks/use-schools";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { RegisterFormValues, RegisterSchema } from "../schemas/auth.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, IdCard, Lock, BookOpen, GraduationCap, UserIcon, ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { authService } from "../services/auth.service";
-import { SchoolSelect } from "./school-select";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { useSchools } from '@/features/school/hooks/use-schools';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { RegisterFormValues, RegisterSchema } from '../schemas/auth.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Mail, IdCard, Lock, BookOpen, GraduationCap, UserIcon, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { authService } from '../services/auth.service';
+import { SchoolSelect } from './school-select';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -51,7 +51,7 @@ export function RegisterForm() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setLoading(true);
-    
+
     try {
       const payload = {
         role: values.role,
@@ -70,8 +70,7 @@ export function RegisterForm() {
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
-      }
-      else {
+      } else {
         toast.error('Đăng ký thất bại');
       }
     } finally {
@@ -124,15 +123,15 @@ export function RegisterForm() {
           />
         </div>
         {errors.fullName && (
-          <p className="text-xs text-destructive font-medium">
-            {errors.fullName.message}
-          </p>
+          <p className="text-xs text-destructive font-medium">{errors.fullName.message}</p>
         )}
       </div>
 
       {/* Email */}
-      <div  className="space-y-2">
-        <Label htmlFor="email" className="font-bold text-gray-700">Email</Label>
+      <div className="space-y-2">
+        <Label htmlFor="email" className="font-bold text-gray-700">
+          Email
+        </Label>
         <div className="relative">
           <Mail className="absolute left-3 top-4 w-4 h-4 text-gray-400" />
           <Input
@@ -145,9 +144,7 @@ export function RegisterForm() {
           />
         </div>
         {errors.email && (
-          <p className="text-xs text-destructive font-medium">
-            {errors.email.message}
-          </p>
+          <p className="text-xs text-destructive font-medium">{errors.email.message}</p>
         )}
       </div>
 
@@ -181,15 +178,15 @@ export function RegisterForm() {
           />
         </div>
         {selectedRole === 'student' && errors.identityCode && (
-          <p className="text-xs text-destructive font-medium">
-            {errors.identityCode?.message}
-          </p>
+          <p className="text-xs text-destructive font-medium">{errors.identityCode?.message}</p>
         )}
       </div>
 
       {/* Password */}
       <div className="space-y-2">
-        <Label htmlFor="password" title="Mật khẩu" className="text-sm font-bold text-gray-700">Mật khẩu</Label>
+        <Label htmlFor="password" title="Mật khẩu" className="text-sm font-bold text-gray-700">
+          Mật khẩu
+        </Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -197,7 +194,7 @@ export function RegisterForm() {
             type="password"
             placeholder="Nhập mật khẩu"
             className="text-sm pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-            {...register("password")}
+            {...register('password')}
           />
         </div>
       </div>
@@ -205,16 +202,24 @@ export function RegisterForm() {
         <div className="text-xs text-destructive font-medium">
           <p>Mật khẩu phải:</p>
           <ul>
-            {Object.values(errors.password?.types).flat().map((error, idx) => (
-              <li key={idx}>- {error}</li>
-            ))}
+            {Object.values(errors.password?.types)
+              .flat()
+              .map((error, idx) => (
+                <li key={idx}>- {error}</li>
+              ))}
           </ul>
         </div>
       )}
 
       {/* Confirm password */}
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword" title="Xác nhận" className="text-sm font-bold text-gray-700">Xác nhận</Label>
+        <Label
+          htmlFor="confirmPassword"
+          title="Xác nhận"
+          className="text-sm font-bold text-gray-700"
+        >
+          Xác nhận
+        </Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -222,19 +227,17 @@ export function RegisterForm() {
             type="password"
             placeholder="Xác nhận lại mật khẩu"
             className="text-sm pl-10 h-11 rounded-xl border-gray-200 focus:ring-galaxy-blue bg-white/50"
-            {...register("confirmPassword")}
+            {...register('confirmPassword')}
           />
         </div>
       </div>
       {errors.confirmPassword && (
-        <p className="text-xs text-destructive font-medium">
-          {errors.confirmPassword?.message}
-        </p>
+        <p className="text-xs text-destructive font-medium">{errors.confirmPassword?.message}</p>
       )}
 
-      <Button 
-        type="submit" 
-        className="w-full h-12 rounded-xl bg-galaxy hover:opacity-90 transition-all text-white font-bold text-lg shadow-lg shadow-blue-900/20" 
+      <Button
+        type="submit"
+        className="w-full h-12 rounded-xl bg-galaxy hover:opacity-90 transition-all text-white font-bold text-lg shadow-lg shadow-blue-900/20"
         disabled={loading}
       >
         {loading ? (

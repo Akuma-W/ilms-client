@@ -1,12 +1,19 @@
+'use server';
+
 import { CLIENT_API_URL } from '@/config';
 import { PromiseResponse } from '@/types/api';
+import { cookies } from 'next/headers';
 
-export async function clientFetch<T>(url: string, options?: RequestInit): PromiseResponse<T> {
+export async function apiClient<T>(url: string, options?: RequestInit): PromiseResponse<T> {
+  const cookiesStore = await cookies();
+  const accessToken = cookiesStore.get('access_token')?.value;
+
   const res = await fetch(`${CLIENT_API_URL}${url}`, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
       ...options?.headers,
     },
   });

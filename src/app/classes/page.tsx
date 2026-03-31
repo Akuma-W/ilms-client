@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { ClassList } from "@/features/classes/components/class-list";
-import { ClassSkeleton } from "@/features/classes/components/modals/class-skeleton";
-import { LayoutDashboard, BookOpen, GraduationCap, Settings, LogOut, Plus } from "lucide-react";
-import { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
+import { Button } from '@/components/ui/button';
+import { ClassList } from '@/features/classes/components/class-list';
+import { ClassSkeleton } from '@/features/classes/components/modals/class-skeleton';
+import { LayoutDashboard, BookOpen, GraduationCap, Settings, LogOut, Plus } from 'lucide-react';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Danh sách lớp',
@@ -26,19 +26,31 @@ export default function Classes({ searchParams }: ClassesProps) {
       {/* Sidebar - Technical Dashboard Style */}
       <aside className="w-64 bg-white border-r border-gray-100 hidden lg:flex flex-col p-6 sticky top-0 h-screen">
         <nav className="flex-1 space-y-2">
-          <Link href="/classes" className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 text-galaxy-blue font-bold transition-all">
+          <Link
+            href="/classes"
+            className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 text-galaxy-blue font-bold transition-all"
+          >
             <LayoutDashboard className="w-5 h-5" />
             <span>Tổng quan</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all">
+          <Link
+            href="#"
+            className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all"
+          >
             <BookOpen className="w-5 h-5" />
             <span>Khóa học</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all">
+          <Link
+            href="#"
+            className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all"
+          >
             <GraduationCap className="w-5 h-5" />
             <span>Điểm số</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all">
+          <Link
+            href="#"
+            className="flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all"
+          >
             <Settings className="w-5 h-5" />
             <span>Cài đặt</span>
           </Link>
@@ -82,5 +94,5 @@ export default function Classes({ searchParams }: ClassesProps) {
         </Suspense>
       </main>
     </div>
-  )
+  );
 }

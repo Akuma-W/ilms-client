@@ -1,3 +1,5 @@
+'use client';
+
 import { Search, X } from 'lucide-react';
 import { Input } from '../ui/input';
 
@@ -6,6 +8,7 @@ interface SearchBarProps {
   onChange: (value: string) => void;
   onDelete: () => void;
   placeholder?: string;
+  className?: string;
 }
 
 export function SearchBar({ value, onChange, onDelete, placeholder }: SearchBarProps) {

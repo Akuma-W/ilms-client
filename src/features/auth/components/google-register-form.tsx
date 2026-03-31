@@ -35,7 +35,14 @@ export function GoogleRegisterForm({ user }: GoogleRegisterFormProps) {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = googleRegisterForm;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = googleRegisterForm;
 
   useEffect(() => {
     if (user) {
@@ -129,9 +136,7 @@ export function GoogleRegisterForm({ user }: GoogleRegisterFormProps) {
             />
           </div>
           {errors.fullName && (
-            <p className="text-xs text-destructive font-medium">
-              {errors.fullName.message}
-            </p>
+            <p className="text-xs text-destructive font-medium">{errors.fullName.message}</p>
           )}
         </div>
 
@@ -163,9 +168,7 @@ export function GoogleRegisterForm({ user }: GoogleRegisterFormProps) {
             />
           </div>
           {selectedRole === 'student' && errors.identityCode && (
-            <p className="text-xs text-destructive font-medium">
-              {errors.identityCode?.message}
-            </p>
+            <p className="text-xs text-destructive font-medium">{errors.identityCode?.message}</p>
           )}
         </div>
       </div>
