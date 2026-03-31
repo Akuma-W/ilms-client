@@ -16,14 +16,9 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.services.ilms-fe.loadbalancer.server.port=3000'
       - 'traefik.http.routers.ilms-fe.rule=Host(`ilms.gzrcloud.com`)'
-      - 'traefik.http.routers.ilms-fe.entryPoints=websecure'
+      - 'traefik.http.routers.ilms-fe.entryPoints=web,websecure'
       - 'traefik.http.routers.ilms-fe.tls=true'
       - 'traefik.http.routers.ilms-fe.tls.certresolver=letsencrypt'
-
-      - 'traefik.http.routers.ilms-fe-http.rule=Host(`ilms.gzrcloud.com`)'
-      - 'traefik.http.routers.ilms-fe-http.entrypoints=web'
-      - 'traefik.http.routers.ilms-fe-http.middlewares=https-redirect'
-      - 'traefik.http.middlewares.https-redirect.redirectscheme.scheme=https'
     ports:
       - 3000:3000
     networks:
