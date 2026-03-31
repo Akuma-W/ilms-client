@@ -8,21 +8,33 @@ import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const initialState: LoginState = {
+  success: null,
   message: '',
   errors: {},
   data: {},
 };
 
 export function LoginForm() {
+  const router = useRouter();
   const [state, action, pending] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state?.message) {
+    if (state.success === null) return;
+
+    if (state.success === false) {
       toast.error(state.message, { duration: 1000 });
+    } else if (state.message) {
+      toast.success(state.message, { duration: 1000 });
+
+      setTimeout(() => {
+        router.push('/classes');
+        router.refresh();
+      }, 1000)
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <form action={action} className="space-y-4">
@@ -84,9 +96,6 @@ export function LoginForm() {
           )}
         </div>
       </div>
-      {state.message && (
-        <p className="mt-2 text-sm text-red-500">{state.message}</p>
-      )}
       {/* Submit Button */}
       <Button
         type="submit"

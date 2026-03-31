@@ -6,14 +6,17 @@ import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
 import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useCurrentUser } from '@/hooks/use-current-user';
 import { authService } from '@/features/auth/services/auth.service';
+import { Sheet, SheetTrigger } from '../ui/sheet';
+import { MobileSidebar } from '../layout/mobile-sidebar';
+import { AvatarSkeleton } from './avatar-skeleton';
 
 export function Header() {
   const router = useRouter();
   const { user, isLoading, mutateUser } = useCurrentUser();
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await authService.logout();
 
     // clear cache user
@@ -21,19 +24,20 @@ export function Header() {
 
     // Redirect to login
     router.push('/login');
-  }
-
-  if (isLoading) return <div className="h-10">Loading ...</div>;
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
       <div className="container mx-auto flex px-4 py-3 max-w-7xl items-center justify-between">
         {/* <SiteLogo /> */}
-        <Logo withText withSlogan />
+        <Logo withText withSlogan className="hidden sm:flex" />
+        <Logo withText size="md" className="flex sm:hidden" />
 
         {/* Toolbar */}
         <div className="flex items-center gap-3">
-          {!user ? (
+          {isLoading ? (
+            <AvatarSkeleton />
+          ) : !user ? (
             <div className="hidden sm:flex items-center gap-2">
               <Link href="/login">
                 <Button
@@ -44,10 +48,12 @@ export function Header() {
                   Đăng nhập
                 </Button>
               </Link>
-              <Button variant="default" className="bg-galaxy hover:opacity-90 text-white shadow-md">
-                <UserPlus className="w-4 h-4 mr-2" />
-                Đăng ký
-              </Button>
+              <Link href="/register">
+                <Button variant="default" className="bg-galaxy hover:opacity-90 text-white shadow-md">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Đăng ký
+                </Button>
+              </Link>
             </div>
           ) : (
             <div className="flex items-center gap-3">
@@ -65,9 +71,14 @@ export function Header() {
               <AvatarDropdown user={user} onLogout={handleLogout} />
             </div>
           )}
-          <Button variant="ghost" size="icon" className="md:hidden text-gray-600">
-            <Menu className="w-6 h-6" />
-          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden text-gray-600">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <MobileSidebar user={user} logout={handleLogout} />
+          </Sheet>
         </div>
       </div>
     </header>

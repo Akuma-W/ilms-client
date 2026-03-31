@@ -6,10 +6,7 @@ export async function GET() {
   const result = await res.json();
 
   if (!res.ok || !result.success) {
-    return Response.json(
-      { message: 'Unauthorized' },
-      { status: 401 },
-    );
+    return Response.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   return Response.json(result, {

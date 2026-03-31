@@ -1,41 +1,38 @@
-import { API_URL } from '@/config';
+'use server';
+
+import { SERVER_API_URL } from '@/config';
 import { cookies } from 'next/headers';
 
-export async function serverFetch(
-  url: string,
-  options?: RequestInit,
-): Promise<Response> {
+export async function serverFetch(url: string, options?: RequestInit): Promise<Response> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
 
-  let res = await fetch(`${API_URL}${url}`, {
+  let res = await fetch(`${SERVER_API_URL}${url}`, {
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${accessToken}`,
-      cookie: cookieStore.toString(),
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
     },
   });
 
   // Auto refresh if 401
   if (res.status === 401) {
-    const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+    const refreshRes = await fetch(`${SERVER_API_URL}/auth/refresh`, {
       method: 'POST',
-      headers: {
-        cookie: cookieStore.toString(),
-      },
+      credentials: 'include',
     });
-    
+
     // If refresh successful
     if (refreshRes.ok) {
       // Get new token after refresh
-      const newToken = cookieStore.get('access_token')?.value;
-      
-      res = await fetch(`${API_URL}${url}`, {
+      const refreshData = await refreshRes.json();
+      const newToken = refreshData.access_token;
+
+      res = await fetch(`${SERVER_API_URL}${url}`, {
         ...options,
         headers: {
           ...options?.headers,
-          Authorization: newToken ? `Bearer ${newToken}` : '',
+          Authorization: `Bearer ${newToken}`,
         },
       });
     }
