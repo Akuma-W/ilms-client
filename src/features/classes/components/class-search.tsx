@@ -1,15 +1,15 @@
 'use client';
 
-import { SearchBar } from "@/components/common/search-bar";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { SearchBar } from '@/components/shared/search-bar';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export function ClassSearch() {
   const router = useRouter();
   const params = useSearchParams();
 
   const searchParam = params.get('search') || '';
-  
+
   const [value, setValue] = useState(searchParam);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function ClassSearch() {
       }, 1000);
 
       return () => clearTimeout(timeout);
-    }
+    };
 
     handleSearch();
   }, [value, params, router]);

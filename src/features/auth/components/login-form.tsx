@@ -27,12 +27,12 @@ export function LoginForm() {
     if (state.success === false) {
       toast.error(state.message, { duration: 1000 });
     } else if (state.message) {
-      toast.success(state.message, { duration: 1000 });
+      toast.success('Đăng nhập thành công', { duration: 1000 });
 
       setTimeout(() => {
         router.push('/classes');
         router.refresh();
-      }, 1000)
+      }, 1000);
     }
   }, [state, router]);
 

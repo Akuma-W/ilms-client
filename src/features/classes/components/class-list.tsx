@@ -1,10 +1,10 @@
 'use client';
 
-import { useClasses } from "../hooks/use-classes";
-import { ClassSearch } from "./class-search";
-import { ClassSkeleton } from "./modals/class-skeleton";
-import { ClassCard } from "./class-card";
-import { ClassPagination } from "./class-pagination";
+import { useClasses } from '../hooks/use-classes';
+import { ClassSearch } from './class-search';
+import { ClassSkeleton } from './modals/class-skeleton';
+import { ClassCard } from './class-card';
+import { ClassPagination } from './class-pagination';
 
 interface ClassListProps {
   searchParams: {
@@ -42,19 +42,13 @@ export function ClassList({ searchParams }: ClassListProps) {
               <ClassCard key={c.id} classData={c} />
             ))}
           </div>
-          
-          {meta && (
-            <ClassPagination total={meta?.total} page={meta?.page} limit={meta?.limit} />
-          )}
+
+          {meta && <ClassPagination total={meta?.total} page={meta?.page} limit={meta?.limit} />}
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">
-            Không tìm thấy lớp học nào
-          </h3>
-          <p className="text-gray-500">
-            Thử tìm kiếm với từ khóa khác hoặc tham gia lớp học mới
-          </p>
+          <h3 className="text-xl font-bold text-gray-900">Không tìm thấy lớp học nào</h3>
+          <p className="text-gray-500">Thử tìm kiếm với từ khóa khác hoặc tham gia lớp học mới</p>
         </div>
       )}
     </div>

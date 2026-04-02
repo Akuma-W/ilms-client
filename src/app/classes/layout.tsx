@@ -9,9 +9,7 @@ export default function ClassLayout({ children }: { children: React.ReactNode })
         <Header />
         <Navbar />
       </div>
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

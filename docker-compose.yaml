@@ -14,11 +14,11 @@ services:
       - .env
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.services.ilms_fe.loadbalancer.server.port=3000'
-      - 'traefik.http.routers.ilms_fe.rule=Host(`ilms.gzrcloud.com`)'
-      - 'traefik.http.routers.ilms_fe.entryPoints=web,websecure'
-      - 'traefik.http.routers.ilms_fe.tls=true'
-      - 'traefik.http.routers.ilms_fe.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.ilms-fe.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.ilms-fe.rule=Host(`ilms.gzrcloud.com`)'
+      - 'traefik.http.routers.ilms-fe.entryPoints=web,websecure'
+      - 'traefik.http.routers.ilms-fe.tls=true'
+      - 'traefik.http.routers.ilms-fe.tls.certresolver=letsencrypt'
     ports:
       - 3000:3000
     networks:

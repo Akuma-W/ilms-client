@@ -1,11 +1,14 @@
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function ClassSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <Card key={i} className="h-full overflow-hidden border-none shadow-md bg-white/80 backdrop-blur-sm">
+        <Card
+          key={i}
+          className="h-full overflow-hidden border-none shadow-md bg-white/80 backdrop-blur-sm"
+        >
           <CardHeader className="pb-2">
             <Skeleton className="w-full h-32 rounded-xl mb-4" />
             <Skeleton className="w-20 h-6 mb-2 rounded-full" />

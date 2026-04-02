@@ -22,7 +22,13 @@ interface SchoolSelectProps {
   error?: string;
 }
 
-export function SchoolSelect({ schools = [], isLoading, value, onChange, error }: SchoolSelectProps) {
+export function SchoolSelect({
+  schools = [],
+  isLoading,
+  value,
+  onChange,
+  error,
+}: SchoolSelectProps) {
   const [open, setOpen] = useState(false);
 
   const selectedSchool = schools?.find((s) => s.id === value);

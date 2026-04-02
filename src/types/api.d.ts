@@ -15,5 +15,5 @@ export interface QueryResponse<T> {
     limit: number;
     total: number;
     totalPages: number;
-  }
+  };
 }
