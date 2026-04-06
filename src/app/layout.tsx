@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { SWRProvider } from '@/features/providers/swr-provider';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -32,7 +33,9 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SWRProvider>{children}</SWRProvider>
+        <SWRProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </SWRProvider>
         <Toaster position="top-right" richColors theme="light" duration={2000} />
       </body>
     </html>

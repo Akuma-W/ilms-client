@@ -1,4 +1,4 @@
-import { BannerCarousel } from '@/features/home/components/banner-carousel';
+import { BannerCarousel } from '@/components/home/banner-carousel';
 import { banners, features, steps } from '@/config/home';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';

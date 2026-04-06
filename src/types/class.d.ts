@@ -20,6 +20,7 @@ export interface Class {
   teacherId: string;
   createdAt: Date;
 
+  isStarred?: boolean;
   school: School;
   teacher: User;
 }

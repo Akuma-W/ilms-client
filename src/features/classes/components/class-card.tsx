@@ -1,69 +1,129 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Class } from '@/types/class';
-import { Users, Calendar } from 'lucide-react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
+import { BookOpen, ChevronRight, Star } from 'lucide-react';
+import Image from 'next/image';
+import { ClassTabs } from '@/types';
+import { Class } from '@/types/class';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { getGradientFromTitle } from '@/lib/ui/utils';
 
 interface ClassCardProps {
   classData: Class;
+  index: number;
+  tab?: ClassTabs;
 }
 
-export function ClassCard({ classData }: ClassCardProps) {
+export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) {
+  const isDiscovery = tab === 'discovery';
+  const ctaText = isDiscovery ? 'Tham gia' : 'Vào học';
+  const gradient = getGradientFromTitle(classData.title);
+
   return (
-    <motion.div whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 300 }}>
-      <Card className="h-full overflow-hidden border-none shadow-md hover:shadow-xl transition-all bg-white/80 backdrop-blur-sm group">
-        <CardHeader className="pb-2 relative">
-          {/* For Starred Classes */}
-          {/* <div className="absolute top-4 right-4 z-10">
-            {classData.isStarred && (
-              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-            )}
-          </div> */}
-          <div className="w-full h-32 bg-galaxy rounded-xl mb-4 overflow-hidden relative">
-            <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 to-purple-600/20 group-hover:scale-110 transition-transform duration-500" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl font-bold text-white/20">{classData.courseCode}</span>
-            </div>
-          </div>
-          <Badge
-            variant="secondary"
-            className="w-fit mb-2 bg-blue-50 text-blue-600 border-none font-bold"
-          >
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ y: -5 }}
+      className={
+        'group relative border border-gray-200 rounded-3xl overflow-hidden flex flex-col h-full transition-all hover:shadow-lg'
+      }
+    >
+      {/* Card Header / Banner */}
+      <div className={cn('h-28 relative overflow-hidden bg-linear-to-br', gradient)}>
+        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/20 blur-2xl" />
+
+        {/* Starred */}
+        <div className="absolute top-4 right-4 z-10">
+          {tab === 'joined' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-lg bg-white/50 hover:bg-white/80 text-gray-900 shadow-sm"
+            >
+              <Star
+                className={cn('w-4 h-4', classData.isStarred && 'fill-yellow-400 text-yellow-400')}
+              />
+            </Button>
+          )}
+        </div>
+
+        {/* Title */}
+        <div className="absolute bottom-4 left-6 z-10">
+          <Badge className="bg-white/80 text-gray-900 border-gray-200 backdrop-blur-md mb-2">
             {classData.subject}
           </Badge>
-          <CardTitle className="text-xl font-bold line-clamp-1 text-gray-900 group-hover:text-galaxy-blue transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 truncate max-w-55 line-clamp-2">
             {classData.title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <p className="text-sm text-gray-500 line-clamp-2 mb-4 h-10">{classData.description}</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-              <Users className="w-4 h-4 text-galaxy-blue" />
-              <span>{classData.teacher.fullName}</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-              <Calendar className="w-4 h-4 text-galaxy-blue" />
+          </h3>
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="p-5 flex-1 flex flex-col space-y-4">
+        <div className="flex items-center justify-between text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{classData.courseCode}</span>
+          </div>
+
+          {classData.semester && (
+            <div className="flex items-center gap-2">
               <span>{classData.semester}</span>
             </div>
-          </div>
-        </CardContent>
+          )}
+        </div>
 
-        {/* For Enrollment Status */}
-        <CardFooter className="pt-0 flex justify-between items-center border-t border-gray-50 mt-2 py-4">
-          {/* <div className="flex gap-4">
-            <div className="flex items-center gap-1 text-xs font-bold text-gray-400">
-              <BookOpen className="w-3 h-3" />
-              <span>{classData.topicsCount || 0}</span>
-            </div>
-          </div> */}
-          {/* <Badge className="bg-green-50 text-green-600 border-none font-bold capitalize">
-            {classData.status}
-          </Badge> */}
-        </CardFooter>
-      </Card>
+        {classData.description && (
+          <p className="text-xs text-gray-500 line-clamp-2 min-h-8">
+            {classData.description.length > 100
+              ? `${classData.description.substring(0, 100)}...`
+              : classData.description}
+          </p>
+        )}
+
+        <div className="flex items-center gap-3 pt-2">
+          <div className="relative w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-900 font-bold border border-gray-200 overflow-hidden">
+            {classData.teacher.avatar ? (
+              <Image
+                src={classData.teacher.avatar}
+                alt={classData.teacher.fullName}
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-gray-700">
+                {classData.teacher.fullName.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-gray-900">{classData.teacher.fullName}</span>
+            <span className="text-[9px] font-medium text-gray-400 uppercase tracking-widest">
+              Giảng viên
+            </span>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <div className="pt-4 mt-auto flex items-center justify-between">
+          <Link href={`/classes/${classData.id}`} className="w-full">
+            <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-10 group/btn">
+              {ctaText}
+              <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Decorative Glow */}
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100">
+        <div className="absolute inset-0 bg-linear-to-br from-white/0 to-black/5" />
+      </div>
     </motion.div>
   );
 }
