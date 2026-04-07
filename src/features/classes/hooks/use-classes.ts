@@ -1,18 +1,47 @@
 'use client';
 
 import useSWR from 'swr';
-import { classService } from '../services/class.service';
-export function useClasses(params: { page: number; limit: number; search: string }) {
-  const key = ['classes', params];
+import { Class, ClassParams } from '@/types/class';
+import { fetchClasses } from '../utils/classes.utils';
+import { QueryResponse } from '@/types/api';
 
-  const { data, error, isLoading } = useSWR(key, () => classService.getClasses(params), {
-    keepPreviousData: true,
-  });
+interface UseClassesParams extends ClassParams {
+  initialData?: QueryResponse<Class[]>;
+  initialParams?: ClassParams;
+}
+
+export function useClasses({
+  tab,
+  search,
+  page,
+  limit,
+  initialData,
+  initialParams,
+}: UseClassesParams) {
+  const key = `classes-${tab}-${search}-${page}-${limit}`;
+
+  const isInitial =
+    initialParams &&
+    tab === initialParams.tab &&
+    search === initialParams.search &&
+    page === initialParams.page &&
+    limit === initialParams.limit;
+
+  const { data, isLoading, mutate } = useSWR(
+    key,
+    () => fetchClasses(tab, { search, page, limit }),
+    {
+      fallbackData: isInitial ? initialData : undefined,
+      keepPreviousData: true,
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
+    },
+  );
 
   return {
     classes: data?.data || [],
     meta: data?.meta,
     isLoading,
-    isError: error,
+    mutate,
   };
 }

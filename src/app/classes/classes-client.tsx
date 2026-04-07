@@ -3,106 +3,38 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ClassCard } from '@/features/classes/components/class-card';
+import { ClassEmpty } from '@/features/classes/components/class-empty';
 import { ClassSearch } from '@/features/classes/components/class-search';
-import { classService } from '@/features/classes/services/class.service';
-import { enrollmentService } from '@/features/classes/services/enrollment.service';
-import { ClassTabs as ClassesTabs } from '@/types';
-import { Class } from '@/types/class';
-import { Plus, BookOpen } from 'lucide-react';
+import { useClasses } from '@/features/classes/hooks/use-classes';
+import { ClassTabs } from '@/types';
+import { QueryResponse } from '@/types/api';
+import { Class, ClassParams } from '@/types/class';
+import { Plus } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import useSWR from 'swr';
 
 interface ClassesClientProps {
-  classesData: Class[] | undefined;
-  initialParams: {
-    tab?: string;
-    page?: string;
-    limit?: string;
-    search?: string;
-  };
+  initialData: QueryResponse<Class[]>;
+  initialParams: ClassParams;
 }
 
-async function fetchClasses({
-  tab,
-  search,
-  page,
-  limit,
-}: {
-  tab: ClassesTabs;
-  search: string;
-  page: string;
-  limit: string;
-}) {
-  switch (tab) {
-    case 'joined': {
-      const res = await enrollmentService.getMyEnrollments({
-        status: 'approved',
-      });
-
-      return res.data;
-    }
-
-    case 'pending': {
-      const res = await enrollmentService.getMyEnrollments({
-        status: 'pending',
-      });
-
-      return res.data;
-    }
-
-    case 'created': {
-      const res = await classService.getMyCreatedClasses({ search, page, limit });
-      return res.data;
-    }
-
-    default: {
-      const res = await classService.getClasses({ search, page, limit });
-      return res.data;
-    }
-  }
-}
-
-function EmptyState({ tab }: { tab: ClassesTabs }) {
-  const map: Record<ClassesTabs, string> = {
-    discovery: 'Không tìm thấy lớp học',
-    joined: 'Bạn chưa tham gia lớp nào',
-    pending: 'Không có yêu cầu nào',
-    created: 'Bạn chưa tạo lớp nào',
-  };
-
-  return (
-    <div className="flex flex-col items-center py-20 text-gray-500">
-      <BookOpen className="w-10 h-10 mb-3" />
-      <p>{map[tab]}</p>
-    </div>
-  );
-}
-
-export default function ClassesClient({ classesData, initialParams }: ClassesClientProps) {
+export default function ClassesClient({ initialData, initialParams }: ClassesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tab: ClassesTabs =
-    (searchParams.get('tab') as ClassesTabs) || initialParams.tab || ClassesTabs.DISCOVERY;
-  const search = searchParams.get('search') || '';
+  const tab = Object.values(ClassTabs).includes(searchParams.get('tab') as ClassTabs)
+    ? (searchParams.get('tab') as ClassTabs)
+    : initialParams.tab || ClassTabs.DISCOVERY;
+  const search = searchParams.get('search') ?? initialParams.search ?? '';
   const page = searchParams.get('page') || '1';
   const limit = searchParams.get('limit') || '8';
 
-  const key = ['classes', tab, search, page, limit];
-
-  const isInitial =
-    tab === initialParams.tab &&
-    search === (initialParams.search || '') &&
-    page === (initialParams.page || '1') &&
-    limit === (initialParams.limit || '8');
-
-  const { data, isLoading } = useSWR(key, () => fetchClasses({ tab, search, page, limit }), {
-    fallbackData: isInitial ? classesData : undefined,
-    keepPreviousData: true,
-    revalidateOnMount: false,
-    revalidateOnFocus: false,
-    refreshInterval: 10000, // 10 seconds
-    dedupingInterval: 10000, // 10 seconds
+  const { classes } = useClasses({
+    tab,
+    search,
+    page,
+    limit,
+    initialData,
+    initialParams,
   });
 
   const updateQuery = (params: Record<string, string>) => {
@@ -113,11 +45,8 @@ export default function ClassesClient({ classesData, initialParams }: ClassesCli
       else newParams.set(k, v);
     });
 
-    const newUrl = `/classes?${newParams.toString()}`;
-    const currentUrl = window.location.pathname + window.location.search;
-
-    if (newUrl !== currentUrl) {
-      router.push(newUrl);
+    if (newParams.toString() !== searchParams.toString()) {
+      router.replace(`/classes?${newParams.toString()}`);
     }
   };
 
@@ -174,10 +103,10 @@ export default function ClassesClient({ classesData, initialParams }: ClassesCli
 
         <TabsContent value={tab} className="mt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {!data || data.length === 0 ? (
-              <EmptyState tab={tab} />
+            {classes.length === 0 ? (
+              <ClassEmpty tab={tab} />
             ) : (
-              data.map((cls, index) => (
+              classes.map((cls, index) => (
                 <ClassCard key={cls.id} classData={cls} index={index} tab={tab} />
               ))
             )}

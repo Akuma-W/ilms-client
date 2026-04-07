@@ -11,6 +11,14 @@ export async function apiClient<T>(
   const cookiesStore = await cookies();
   const accessToken = cookiesStore.get('access_token')?.value;
 
+  if (!accessToken && options?.ignoreAuthError) {
+    return {
+      success: false,
+      message: 'Unauthorized',
+      data: null,
+    };
+  }
+
   const res = await fetch(`${CLIENT_API_URL}${url}`, {
     ...options,
     credentials: 'include',
@@ -21,7 +29,7 @@ export async function apiClient<T>(
     },
   });
 
-  if (res.status === 401 && !options?.ignoreAuthError) {
+  if (res.status === 401) {
     throw new Error('Unauthorized');
   }
 

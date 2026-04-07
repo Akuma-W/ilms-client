@@ -31,3 +31,10 @@ export interface ClassClient extends Class {
   status: string;
   isOwner: boolean;
 }
+
+export interface ClassParams {
+  tab: ClassTabs;
+  search?: string;
+  page?: string;
+  limit?: string;
+}

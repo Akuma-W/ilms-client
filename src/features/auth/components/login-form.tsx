@@ -77,6 +77,7 @@ export function LoginForm() {
             id="password"
             name="password"
             type="password"
+            defaultValue={state.data?.password}
             autoComplete="current-password"
             placeholder="Nhập mật khẩu của bạn"
             className="pl-10"

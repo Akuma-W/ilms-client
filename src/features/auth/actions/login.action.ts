@@ -4,7 +4,10 @@ import { FormState } from '@/types/action';
 import { AUTH_ERROR_MAP } from '../errors/auth.errors';
 
 export type LoginState = FormState<
-  { email?: string },
+  {
+    email?: string;
+    password?: string;
+  },
   {
     email?: string[];
     password?: string[];
@@ -49,9 +52,17 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
       message: AUTH_ERROR_MAP[result.message] || 'Đăng nhập thất bại',
       data: {
         email: formData.get('email') as string,
+        password: formData.get('password') as string,
       },
     };
   }
 
-  return result;
+  return {
+    success: result.success,
+    message: result.message,
+    data: {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    },
+  };
 }

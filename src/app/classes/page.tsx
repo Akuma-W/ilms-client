@@ -1,10 +1,7 @@
-import { classService } from '@/features/classes/services/class.service';
-import { enrollmentService } from '@/features/classes/services/enrollment.service';
 import { ClassTabs } from '@/types';
-import { QueryResponse } from '@/types/api';
-import { Class } from '@/types/class';
 import { Metadata } from 'next';
 import ClassesClient from './classes-client';
+import { fetchClasses } from '@/features/classes/utils/classes.utils';
 
 export const metadata: Metadata = {
   title: 'Tổng quan lớp',
@@ -13,9 +10,9 @@ export const metadata: Metadata = {
 interface ClassesProps {
   searchParams: Promise<{
     tab?: ClassTabs;
+    search?: string;
     page?: string;
     limit?: string;
-    search?: string;
   }>;
 }
 
@@ -26,34 +23,7 @@ export default async function Classes({ searchParams }: ClassesProps) {
   const page = params.page || '1';
   const limit = params.limit || '10';
 
-  let initialData: QueryResponse<Class[]>;
+  const initialData = await fetchClasses(tab, { search, page, limit });
 
-  switch (tab) {
-    case 'joined':
-      initialData = await enrollmentService.getMyEnrollments({
-        status: 'approved',
-      });
-      break;
-    case 'pending':
-      initialData = await enrollmentService.getMyEnrollments({
-        status: 'pending',
-      });
-      break;
-    case 'created':
-      initialData = await classService.getMyCreatedClasses({
-        page: page,
-        limit: limit,
-        search,
-      });
-      break;
-    default:
-      initialData = await classService.getClasses({
-        page: page,
-        limit: limit,
-        search,
-      });
-      break;
-  }
-
-  return <ClassesClient classesData={initialData.data} initialParams={{ tab, page, limit, search }} />;
+  return <ClassesClient initialData={initialData} initialParams={{ tab, page, limit, search }} />;
 }
