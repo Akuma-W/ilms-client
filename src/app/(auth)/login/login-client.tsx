@@ -51,7 +51,7 @@ export default function LoginClient() {
 
             <Button
               variant="outline"
-              className="w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
+              className="cursor-pointer w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
               onClick={authService.googleLogin}
             >
               <GoogleIcon className="w-5 h-5" />

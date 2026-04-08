@@ -41,7 +41,7 @@ export function SchoolSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-11 pl-10 relative"
+            className="cursor-pointer w-full justify-between h-11 pl-10 relative"
           >
             <SchoolIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <span className="pl-8 font-normal truncate">
@@ -61,6 +61,7 @@ export function SchoolSelect({
                 <CommandItem
                   key={school.id}
                   value={`${school.name} ${school.shortname}`}
+                  className="cursor-pointer"
                   onSelect={() => {
                     onChange(school.id);
                     setOpen(false);

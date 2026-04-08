@@ -29,7 +29,7 @@ export default function RegisterClient() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md relative z-10"
+        className="w-2/3 lg:w-1/2 relative z-10"
       >
         <Card className="border-none shadow-2xl shadow-gray-200/50 rounded-3xl overflow-hidden bg-white/80 backdrop-blur-sm">
           <div className="h-2 bg-galaxy" />
@@ -60,7 +60,7 @@ export default function RegisterClient() {
 
             <Button
               variant="outline"
-              className="w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
+              className="cursor-pointer w-full py-6 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition-all"
               onClick={authService.googleLogin}
             >
               <GoogleIcon className="w-5 h-5" />

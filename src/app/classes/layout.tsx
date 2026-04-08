@@ -1,14 +1,8 @@
-'use client';
-
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { ClassSidebar } from '@/features/classes/components/sidebar/class-sidebar';
-import useSidebarStore from '@/stores/sidebar-store';
-import { cn } from '@/lib/utils';
 
 export default function ClassLayout({ children }: { children: React.ReactNode }) {
-  const { isCollapsed } = useSidebarStore();
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -25,7 +19,7 @@ export default function ClassLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Content */}
-        <div className={cn('flex flex-col flex-1 transition-all duration-300')}>
+        <div className="flex flex-col flex-1 transition-all duration-300">
           <main className="flex-1 custom-scrollbar">{children}</main>
         </div>
       </div>

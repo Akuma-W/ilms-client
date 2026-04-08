@@ -13,6 +13,7 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
             return res.json();
           }),
         revalidateOnFocus: false,
+        revalidateOnReconnect: false,
         shouldRetryOnError: false,
         refreshInterval: 10000, // 10 seconds
         dedupingInterval: 10000, // 10 seconds

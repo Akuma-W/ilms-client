@@ -63,7 +63,7 @@ export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) 
       </div>
 
       {/* Card Content */}
-      <div className="p-5 flex-1 flex flex-col space-y-4">
+      <div className="p-5 flex-1 flex flex-col space-y-2">
         <div className="flex items-center justify-between text-gray-500 text-[10px] font-bold uppercase tracking-widest">
           <div className="flex items-center gap-2">
             <BookOpen className="w-3.5 h-3.5" />
@@ -85,7 +85,7 @@ export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) 
           </p>
         )}
 
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex items-center gap-3">
           <div className="relative w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-900 font-bold border border-gray-200 overflow-hidden">
             {classData.teacher.avatar ? (
               <Image
@@ -112,7 +112,7 @@ export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) 
         {/* CTA Button */}
         <div className="pt-4 mt-auto flex items-center justify-between">
           <Link href={`/classes/${classData.id}`} className="w-full">
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-10 group/btn">
+            <Button className="cursor-pointer w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-10 group/btn">
               {ctaText}
               <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </Button>

@@ -14,16 +14,16 @@ export async function fetchClasses(
 ): Promise<QueryResponse<Class[]>> {
   switch (tab) {
     case 'joined':
-      return await enrollmentService.getMyEnrollments({
+      return enrollmentService.getMyEnrollments({
         status: 'approved',
       });
     case 'pending':
-      return await enrollmentService.getMyEnrollments({
+      return enrollmentService.getMyEnrollments({
         status: 'pending',
       });
     case 'created':
-      return await classService.getMyCreatedClasses(params);
+      return classService.getMyCreatedClasses(params);
     default:
-      return await classService.getClasses(params);
+      return classService.getClasses(params);
   }
 }

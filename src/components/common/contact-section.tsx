@@ -95,73 +95,91 @@ export function ContactSection({ defaultType = 'contact' }: ContactSectionProps)
           </div>
 
           {/* Form Feedback */}
-          <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/10">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4 bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/10"
-              >
-                {/* Switch type */}
-                <div className="grid grid-cols-2 gap-2 p-1 bg-white/20 rounded-xl mb-4">
-                  {(['contact', 'feedback'] as const).map((t) => (
-                    <Button
-                      key={t}
-                      type="button"
-                      variant={type === t ? 'default' : 'ghost'}
-                      onClick={() => form.setValue('type', t)}
-                      className="py-2 text-sm font-medium rounded-lg transition-all"
-                    >
-                      {t === 'contact' ? 'Liên hệ' : 'Góp ý'}
-                    </Button>
-                  ))}
-                </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/10"
+            >
+              {/* Switch type */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-white/20 rounded-xl mb-4">
+                {(['contact', 'feedback'] as const).map((t) => (
+                  <Button
+                    key={t}
+                    variant={type === t ? 'default' : 'ghost'}
+                    onClick={() => form.setValue('type', t)}
+                    className="cursor-pointer py-2 text-sm font-medium rounded-lg transition-all"
+                  >
+                    {t === 'contact' ? 'Liên hệ' : 'Góp ý'}
+                  </Button>
+                ))}
+              </div>
 
-                {/* Name */}
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Họ và tên</FormLabel>
-                      <Input {...field} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Name */}
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="name" className="text-blue-100">
+                      Họ và tên
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      id="name"
+                      autoComplete="name"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                {/* Email */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <Input {...field} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Email */}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="email" className="text-blue-100">
+                      Email
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      id="email"
+                      autoComplete="email"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                {/* Message */}
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nội dung</FormLabel>
-                      <Textarea {...field} rows={4} />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Message */}
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="message" className="text-blue-100">
+                      Nội dung
+                    </FormLabel>
+                    <Textarea
+                      {...field}
+                      id="message"
+                      rows={4}
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <Button type="submit" className="w-full">
-                  {config.submitLabel}
-                  <Send className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
-            </Form>
-          </div>
+              <Button type="submit" className="cursor-pointer w-full">
+                {config.submitLabel}
+                <Send className="ml-2 h-4 w-4" />
+              </Button>
+            </form>
+          </Form>
         </div>
       </div>
     </div>
