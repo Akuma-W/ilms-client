@@ -27,12 +27,9 @@ export function LoginForm() {
     if (state.success === false) {
       toast.error(state.message, { duration: 1000 });
     } else if (state.message) {
-      toast.success('Đăng nhập thành công', { duration: 1000 });
-
-      setTimeout(() => {
-        router.push('/classes');
-        router.refresh();
-      }, 1000);
+      toast.success('Đăng nhập thành công', { duration: 3000 });
+      router.push('/classes');
+      router.refresh();
     }
   }, [state, router]);
 
@@ -77,6 +74,7 @@ export function LoginForm() {
             id="password"
             name="password"
             type="password"
+            defaultValue={state.data?.password}
             autoComplete="current-password"
             placeholder="Nhập mật khẩu của bạn"
             className="pl-10"
@@ -100,7 +98,7 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={pending}
-        className="w-full bg-galaxy hover:opacity-90 text-white font-bold py-6 rounded-xl shadow-lg transition-all"
+        className="cursor-pointer w-full bg-galaxy hover:opacity-90 text-white font-bold py-6 rounded-xl shadow-lg transition-all"
       >
         {pending ? 'Đang xử lý...' : 'Đăng nhập'}
         {!pending && <LogIn className="ml-2 h-4 w-4" />}

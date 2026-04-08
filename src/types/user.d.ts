@@ -13,6 +13,7 @@ export interface User {
   identityCode: string | null;
   status: UserStatus | null;
   avatar: string | null;
+  createdAt: Date;
 
   school: School;
 }

@@ -1,15 +1,28 @@
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
-import { Navbar } from '@/components/layout/navbar';
+import { ClassSidebar } from '@/features/classes/components/sidebar/class-sidebar';
 
 export default function ClassLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Header */}
       <div className="sticky top-0 z-50">
         <Header />
-        <Navbar />
+        <div className="bg-galaxy-dark w-full py-2" />
       </div>
-      <main className="flex-1">{children}</main>
+
+      {/* Main layout */}
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <div className="hidden md:block">
+          <ClassSidebar />
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col flex-1 transition-all duration-300">
+          <main className="flex-1 custom-scrollbar">{children}</main>
+        </div>
+      </div>
       <Footer />
     </div>
   );

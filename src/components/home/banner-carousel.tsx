@@ -5,8 +5,8 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '../../../components/ui/carousel';
-import { Button } from '../../../components/ui/button';
+} from '../ui/carousel';
+import { Button } from '../ui/button';
 import Link from 'next/link';
 
 interface Banner {
@@ -62,7 +62,7 @@ function BannerSlide({ banner }: { banner: Banner }) {
         <Link href={banner.href}>
           <Button
             size="lg"
-            className="bg-galaxy hover:scale-105 text-white px-8 animate-in fade-in slide-in-from-bottom-8"
+            className="cursor-pointer bg-galaxy hover:scale-105 text-white px-8 animate-in fade-in slide-in-from-bottom-8"
           >
             {banner.cta}
           </Button>

@@ -8,14 +8,15 @@ export function ClassSearch() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const searchParam = params.get('search') || '';
+  const search = params.get('search') || '';
+  const paramsString = params.toString();
 
-  const [value, setValue] = useState(searchParam);
+  const [value, setValue] = useState(search);
 
   useEffect(() => {
     const handleSearch = () => {
       const timeout = setTimeout(() => {
-        const query = new URLSearchParams(params.toString());
+        const query = new URLSearchParams(paramsString);
 
         if (value) {
           query.set('search', value);
@@ -24,15 +25,20 @@ export function ClassSearch() {
         }
 
         query.set('page', '1'); // reset page
+        const newUrl = `?${query.toString()}`;
+        const currentUrl = `?${paramsString}`;
 
-        router.push(`?${query.toString()}`);
-      }, 1000);
+        // ✅ tránh push loop
+        if (newUrl !== currentUrl) {
+          router.push(newUrl);
+        }
+      }, 500); // 500ms debounce
 
       return () => clearTimeout(timeout);
     };
 
     handleSearch();
-  }, [value, params, router]);
+  }, [value, paramsString, router]);
 
   return (
     <SearchBar
