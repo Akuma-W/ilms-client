@@ -1,20 +1,44 @@
-import { clientFetch } from "@/lib/api/client-fetcher";
-import { QueryResponse } from "@/types/api";
-import { Class } from "@/types/class";
+import { apiClient } from '@/lib/api/api-client';
+import { QueryResponse } from '@/types/api';
+import { Class } from '@/types/class';
 
 export const classService = {
   async getClasses(params: {
-    page: number;
-    limit: number;
-    search: string;
+    page?: string;
+    limit?: string;
+    search?: string;
   }): Promise<QueryResponse<Class[]>> {
-    const query = new URLSearchParams({
-      page: params.page.toString(),
-      limit: params.limit.toString(),
-      search: params.search,
-    });
+    const query = new URLSearchParams();
 
-    const result = await clientFetch<QueryResponse<Class[]>>(`/classes?${query}`);
+    if (params.page) query.set('page', params.page);
+    if (params.limit) query.set('limit', params.limit);
+    if (params.search) query.set('search', params.search);
+
+    const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
+    const result = await apiClient<QueryResponse<Class[]>>(url);
+
+    if (!result.data) {
+      throw new Error('Data is invalid');
+    }
+
+    return result.data;
+  },
+
+  async getMyCreatedClasses(params: {
+    page?: string;
+    limit?: string;
+    search?: string;
+  }): Promise<QueryResponse<Class[]>> {
+    const query = new URLSearchParams();
+
+    if (params.page) query.set('page', params.page);
+    if (params.limit) query.set('limit', params.limit);
+    if (params.search) query.set('search', params.search);
+
+    const url = query.toString()
+      ? `/classes/me/created?${query.toString()}`
+      : '/classes/me/created';
+    const result = await apiClient<QueryResponse<Class[]>>(url);
 
     if (!result.data) {
       throw new Error('Data is invalid');

@@ -41,11 +41,15 @@ export default function GoogleRegisterClient() {
           </CardHeader>
 
           <CardContent className="flex flex-col gap-3">
-            <Button className="w-full" onClick={() => router.replace('/login')}>
+            <Button className="w-full cursor-pointer" onClick={() => router.replace('/login')}>
               Đăng nhập lại
             </Button>
 
-            <Button variant="outline" className="w-full" onClick={() => router.back()}>
+            <Button
+              variant="outline"
+              className="w-full cursor-pointer"
+              onClick={() => router.back()}
+            >
               Quay lại
             </Button>
           </CardContent>

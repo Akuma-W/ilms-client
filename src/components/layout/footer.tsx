@@ -40,10 +40,27 @@ export function Footer() {
           <div>
             <h4 className={headingStyle}>Thông tin liên hệ</h4>
             <ul className="text-sm space-y-2 sm:space-y-4 ">
-              {contacts.map((item, idx) => (
+              {contacts.map((contact, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <item.icon className="w-4 h-4 text-blue-400 mt-1" />
-                  <span>{item.content}</span>
+                  <contact.icon className="w-4 h-4 text-blue-400 mt-1" />
+
+                  <div className="space-y-1 flex gap-1">
+                    <span className="font-semibold">{contact.title} :</span>
+                    {contact.items.map((item, idx) => (
+                      <div key={idx}>
+                        {'href' in item && item.href ? (
+                          <Link
+                            href={item.href}
+                            className="text-gray-300 hover:text-white transition"
+                          >
+                            {item.value}
+                          </Link>
+                        ) : (
+                          <span className="text-gray-300">{item.value}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </li>
               ))}
             </ul>

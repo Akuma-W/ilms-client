@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { navItems } from '@/config/layout';
 
 export function Navbar() {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(/\/$/, '');
 
   return (
     <nav className="hidden sm:block w-full bg-galaxy-dark py-2">
@@ -20,16 +20,20 @@ export function Navbar() {
         <NavigationMenu>
           <NavigationMenuList className="gap-6">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = item.href === '/' ? pathname === '' : pathname.startsWith(item.href);
 
               return (
                 <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild>
                     <Link
                       href={item.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      onClick={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).blur();
+                      }}
                       className={cn(
                         'text-sm font-medium transition-colors',
-                        'hover:text-blue-400',
+                        'hover:text-blue-600',
                         isActive ? 'text-blue-400' : 'text-gray-300',
                       )}
                     >

@@ -1,8 +1,8 @@
-import { Metadata } from "next";
-import RegisterClient from "./register-client";
+import { Metadata } from 'next';
+import RegisterClient from './register-client';
 
 export const metadata: Metadata = {
-  title: 'Đăng nhập',
+  title: 'Đăng ký tài khoản',
 };
 
 export default function Register() {

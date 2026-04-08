@@ -22,7 +22,13 @@ interface SchoolSelectProps {
   error?: string;
 }
 
-export function SchoolSelect({ schools = [], isLoading, value, onChange, error }: SchoolSelectProps) {
+export function SchoolSelect({
+  schools = [],
+  isLoading,
+  value,
+  onChange,
+  error,
+}: SchoolSelectProps) {
   const [open, setOpen] = useState(false);
 
   const selectedSchool = schools?.find((s) => s.id === value);
@@ -35,7 +41,7 @@ export function SchoolSelect({ schools = [], isLoading, value, onChange, error }
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-11 pl-10 relative"
+            className="cursor-pointer w-full justify-between h-11 pl-10 relative"
           >
             <SchoolIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <span className="pl-8 font-normal truncate">
@@ -55,6 +61,7 @@ export function SchoolSelect({ schools = [], isLoading, value, onChange, error }
                 <CommandItem
                   key={school.id}
                   value={`${school.name} ${school.shortname}`}
+                  className="cursor-pointer"
                   onSelect={() => {
                     onChange(school.id);
                     setOpen(false);

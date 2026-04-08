@@ -9,11 +9,11 @@ export interface APIResponse<T> {
 export type PromiseResponse<T> = Promise<APIResponse<T>>;
 
 export interface QueryResponse<T> {
-  data: T;
+  data?: T;
   meta?: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
-  }
+  };
 }

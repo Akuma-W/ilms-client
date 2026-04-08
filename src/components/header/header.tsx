@@ -7,17 +7,17 @@ import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/use-current-user';
-import { authService } from '@/features/auth/services/auth.service';
 import { Sheet, SheetTrigger } from '../ui/sheet';
 import { MobileSidebar } from '../layout/mobile-sidebar';
 import { AvatarSkeleton } from './avatar-skeleton';
+import { logoutAction } from '@/features/auth/actions/logout.action';
 
 export function Header() {
   const router = useRouter();
   const { user, isLoading, mutateUser } = useCurrentUser();
 
   const handleLogout = async () => {
-    await authService.logout();
+    await logoutAction();
 
     // clear cache user
     await mutateUser(undefined, false);
@@ -42,14 +42,17 @@ export function Header() {
               <Link href="/login">
                 <Button
                   variant="ghost"
-                  className="text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors"
+                  className="cursor-pointer text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
                   Đăng nhập
                 </Button>
               </Link>
               <Link href="/register">
-                <Button variant="default" className="bg-galaxy hover:opacity-90 text-white shadow-md">
+                <Button
+                  variant="default"
+                  className="cursor-pointer bg-galaxy hover:opacity-90 text-white shadow-md"
+                >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Đăng ký
                 </Button>
@@ -60,12 +63,16 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative text-gray-600 hover:bg-gray-100"
+                className="cursor-pointer relative text-gray-600 hover:bg-gray-100"
               >
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
               </Button>
-              <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="cursor-pointer text-gray-600 hover:bg-gray-100"
+              >
                 <MessageCircle className="w-5 h-5" />
               </Button>
               <AvatarDropdown user={user} onLogout={handleLogout} />
