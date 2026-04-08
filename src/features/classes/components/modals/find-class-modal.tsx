@@ -1,6 +1,6 @@
 'use client';
 
-import { Class, ClassClient } from '@/types/class';
+import { Class } from '@/types/class';
 import { Search, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../../../../components/ui/button';
@@ -16,7 +16,7 @@ import { Label } from '../../../../components/ui/label';
 
 interface FindClassModalProps {
   onJoinClass: (classItem: Class) => void;
-  classes: ClassClient[];
+  classes: Class[];
 }
 
 export const FindClassModal: React.FC<FindClassModalProps> = ({
@@ -25,7 +25,7 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [courseCodeInput, setCourseCodeInput] = useState('');
-  const [findResult, setFindResult] = useState<ClassClient | null>(null);
+  const [findResult, setFindResult] = useState<Class | null>(null);
   const [findError, setFindError] = useState('');
 
   const handleFindClass = () => {
@@ -98,7 +98,7 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({
               <p className="text-sm text-gray-600 line-clamp-2">{findResult.description}</p>
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <User className="w-3.5 h-3.5" />
-                <span>{findResult.teacherName}</span>
+                <span>{findResult.teacher.fullName}</span>
               </div>
               <Button
                 className="w-full bg-galaxy text-white mt-2"

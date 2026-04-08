@@ -7,4 +7,11 @@ const classNavItems = [
   { icon: MessageSquare, label: 'Tin nhắn', href: '/chats' },
 ];
 
-export { classNavItems };
+const classTabItems = [
+  { value: 'discovery', label: 'Khám phá' },
+  { value: 'joined', label: 'Đã tham gia' },
+  { value: 'pending', label: 'Đang duyệt' },
+  { value: 'created', label: 'Đã tạo' },
+];
+
+export { classNavItems, classTabItems };

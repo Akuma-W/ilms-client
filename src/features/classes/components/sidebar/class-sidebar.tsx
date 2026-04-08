@@ -30,7 +30,7 @@ export function ClassSidebar() {
       initial={false}
       animate={{ width: isCollapsed ? 80 : 250 }}
       className={cn(
-        'relative h-full flex flex-col py-10 border-r bg-white border-white/10 z-50 transition-all duration-100',
+        'relative h-full flex flex-col py-10 border-r bg-white border-white/10 z-40 transition-all duration-100',
         isCollapsed ? 'items-center' : 'items-stretch',
       )}
     >

@@ -4,37 +4,25 @@ import useSWR from 'swr';
 import { Class, ClassParams } from '@/types/class';
 import { fetchClasses } from '../utils/classes.utils';
 import { QueryResponse } from '@/types/api';
+import { ClassTabs } from '@/types';
 
 interface UseClassesParams extends ClassParams {
   initialData?: QueryResponse<Class[]>;
-  initialParams?: ClassParams;
 }
 
-export function useClasses({
-  tab,
-  search,
-  page,
-  limit,
-  initialData,
-  initialParams,
-}: UseClassesParams) {
-  const key = `classes-${tab}-${search}-${page}-${limit}`;
-
-  const isInitial =
-    initialParams &&
-    tab === initialParams.tab &&
-    search === initialParams.search &&
-    page === initialParams.page &&
-    limit === initialParams.limit;
+export function useClasses({ tab, search, page, limit, initialData }: UseClassesParams) {
+  const key = [String(tab), String(search || ''), String(page || ''), String(limit || '')];
 
   const { data, isLoading, mutate } = useSWR(
     key,
-    () => fetchClasses(tab, { search, page, limit }),
+    ([tab, search, page, limit]) => {
+      console.log('CSR fetch classes with keys: ', key);
+      return fetchClasses(tab as ClassTabs, { search, page, limit });
+    },
     {
-      fallbackData: isInitial ? initialData : undefined,
-      keepPreviousData: true,
-      revalidateOnMount: true,
-      revalidateOnFocus: true,
+      fallbackData: initialData,
+      revalidateOnMount: false,
+      revalidateIfStale: false,
     },
   );
 
