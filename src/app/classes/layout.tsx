@@ -1,13 +1,16 @@
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { ClassSidebar } from '@/features/classes/components/sidebar/class-sidebar';
+import { userService } from '@/features/user/services/user.service';
 
-export default function ClassLayout({ children }: { children: React.ReactNode }) {
+export default async function ClassLayout({ children }: { children: React.ReactNode }) {
+  const user = await userService.getMe();
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <div className="sticky top-0 z-50">
-        <Header />
+        <Header initialUser={user} />
         <div className="bg-galaxy-dark w-full py-2" />
       </div>
 

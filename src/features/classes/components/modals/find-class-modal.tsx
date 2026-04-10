@@ -1,42 +1,39 @@
 'use client';
 
-import { Class } from '@/types/class';
-import { Search, User } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '../../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
-  DialogTrigger,
+  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Dialog,
-} from '../../../../components/ui/dialog';
-import { Input } from '../../../../components/ui/input';
-import { Label } from '../../../../components/ui/label';
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Class } from '@/types/class';
+import { Search, User } from 'lucide-react';
+import { useState } from 'react';
 
 interface FindClassModalProps {
   onJoinClass: (classItem: Class) => void;
   classes: Class[];
 }
 
-export const FindClassModal: React.FC<FindClassModalProps> = ({
-  onJoinClass,
-  classes: mockClasses,
-}) => {
+export function FindClassModal({ onJoinClass, classes }: FindClassModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [courseCodeInput, setCourseCodeInput] = useState('');
+  const [codeInput, setCodeInput] = useState('');
   const [findResult, setFindResult] = useState<Class | null>(null);
   const [findError, setFindError] = useState('');
 
   const handleFindClass = () => {
-    const code = courseCodeInput.trim().toUpperCase();
+    const code = codeInput.trim().toUpperCase();
     if (code.length !== 6) {
       setFindError('Mã lớp phải gồm 6 ký tự.');
       setFindResult(null);
       return;
     }
 
-    const found = mockClasses.find((c) => c.courseCode === code);
+    const found = classes.find((c) => c.courseCode === code);
     if (found) {
       setFindResult(found);
       setFindError('');
@@ -73,8 +70,8 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({
               <Input
                 id="courseCode"
                 placeholder="VD: IT4440"
-                value={courseCodeInput}
-                onChange={(e) => setCourseCodeInput(e.target.value.toUpperCase())}
+                value={codeInput}
+                onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                 maxLength={6}
               />
               <Button onClick={handleFindClass} className="bg-galaxy text-white">
@@ -115,4 +112,4 @@ export const FindClassModal: React.FC<FindClassModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

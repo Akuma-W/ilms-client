@@ -2,27 +2,25 @@
 
 import useSWR from 'swr';
 import { Class, ClassParams } from '@/types/class';
-import { fetchClasses } from '../utils/classes.utils';
+import { buildClassKey, fetchClasses } from '../utils/classes.utils';
 import { QueryResponse } from '@/types/api';
 import { ClassTabs } from '@/types';
 
 interface UseClassesParams extends ClassParams {
-  initialData?: QueryResponse<Class[]>;
+  initialData?: QueryResponse<Class>;
 }
 
 export function useClasses({ tab, search, page, limit, initialData }: UseClassesParams) {
-  const key = [String(tab), String(search || ''), String(page || ''), String(limit || '')];
+  const key = buildClassKey(tab, search, page, limit);
 
-  const { data, isLoading, mutate } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     key,
     ([tab, search, page, limit]) => {
-      console.log('CSR fetch classes with keys: ', key);
-      return fetchClasses(tab as ClassTabs, { search, page, limit });
+      return fetchClasses(tab as ClassTabs, { search, page: Number(page), limit: Number(limit) });
     },
     {
       fallbackData: initialData,
       revalidateOnMount: false,
-      revalidateIfStale: false,
     },
   );
 
@@ -30,6 +28,7 @@ export function useClasses({ tab, search, page, limit, initialData }: UseClasses
     classes: data?.data || [],
     meta: data?.meta,
     isLoading,
+    error,
     mutate,
   };
 }

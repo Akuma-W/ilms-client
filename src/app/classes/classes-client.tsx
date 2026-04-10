@@ -2,57 +2,85 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { classTabItems } from '@/config/class';
-import { ClassCard } from '@/features/classes/components/ui/class-card';
-import { ClassEmpty } from '@/features/classes/components/class-empty';
 import { ClassSearch } from '@/features/classes/components/ui/class-search';
 import { CreateClassModal } from '@/features/classes/components/modals/create-class-modal';
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
-import { useClasses } from '@/features/classes/hooks/use-classes';
 import { cn } from '@/lib/utils';
 import { ClassTabs } from '@/types';
 import { QueryResponse } from '@/types/api';
 import { Class, ClassParams } from '@/types/class';
 import { User } from '@/types/user';
 import { School } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo } from 'react';
+import { ClassList } from '@/features/classes/components/ui/class-list';
 
 interface ClassesClientProps {
-  user: User;
-  initialData: QueryResponse<Class[]>;
+  user: User | null;
+  initialData: QueryResponse<Class>;
   initialParams: ClassParams;
 }
 
 export default function ClassesClient({ user, initialData, initialParams }: ClassesClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
 
   const tab = Object.values(ClassTabs).includes(searchParams.get('tab') as ClassTabs)
     ? (searchParams.get('tab') as ClassTabs)
     : initialParams.tab || ClassTabs.DISCOVERY;
-  const search = searchParams.get('search') ?? initialParams.search;
-  const page = searchParams.get('page') ?? initialParams.page;
-  const limit = searchParams.get('limit') ?? initialParams.limit;
+  const search = searchParams.get('search') ?? initialParams.search ?? '';
+  const page = Number(searchParams.get('page') ?? initialParams.page);
+  const limit = Number(searchParams.get('limit') ?? initialParams.limit);
 
-  const { classes } = useClasses({
-    tab,
-    search,
-    page,
-    limit,
-    initialData,
-  });
+  // const { classes } = useClasses({
+  //   tab,
+  //   search,
+  //   page,
+  //   limit,
+  //   initialData,
+  // });
 
-  const updateQuery = (params: Record<string, string>) => {
-    const newParams = new URLSearchParams(searchParams.toString());
+  const updateParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParamsString);
 
-    Object.entries(params).forEach(([k, v]) => {
-      if (!v) newParams.delete(k);
-      else newParams.set(k, v);
-    });
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value === '' || value === null) {
+          params.delete(key);
+        } else params.set(key, value);
+      });
 
-    if (newParams.toString() !== searchParams.toString()) {
-      router.replace(`/classes?${newParams.toString()}`);
-    }
-  };
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParamsString, pathname],
+  );
+
+  const handleTabChange = useCallback(
+    (nextTab: ClassTabs) => {
+      if (nextTab === tab) return;
+
+      updateParams({ tab: String(nextTab), page: '1', search: '' });
+    },
+    [updateParams, tab],
+  );
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      updateParams({ search: value, page: null });
+    },
+    [updateParams],
+  );
+
+  const handlePageChange = useCallback(
+    (p: number) => {
+      updateParams({ page: String(p) });
+    },
+    [updateParams],
+  );
+
+  const listParams = useMemo(() => ({ tab, search, page, limit }), [tab, search, page, limit]);
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
@@ -74,18 +102,15 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       {/* Page Tools: Search, Create Class, Find Class */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="relative w-full">
-          <ClassSearch />
+          <ClassSearch value={search} onSearch={handleSearch} />
         </div>
 
         {/* Modals */}
         <div className="flex items-center gap-3">
           {/* Find Class by Code */}
-          <FindClassModal
-            classes={classes}
-            onJoinClass={(cls) => console.log('Joining class:', cls)}
-          />
+          <FindClassModal classes={[]} onJoinClass={(cls) => console.log('Joining class:', cls)} />
           {/* Create Class (Teacher) */}
-          {user.role === 'teacher' && (
+          {user?.role === 'teacher' && (
             <CreateClassModal onCreateClass={(data) => console.log('Creating class: ', data)} />
           )}
         </div>
@@ -94,11 +119,7 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       {/* Tabs Section */}
       <Tabs
         value={tab}
-        onValueChange={(value) => {
-          if (value !== tab) {
-            updateQuery({ tab: value, page: '1' });
-          }
-        }}
+        onValueChange={(value) => handleTabChange(value as ClassTabs)}
         className="space-y-10"
       >
         <div className="flex items-center justify-between border-b border-gray-100 pb-px">
@@ -119,16 +140,13 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
           </TabsList>
         </div>
 
+        {/* Class List */}
         <TabsContent value={tab} className="mt-0">
-          {classes.length === 0 ? (
-            <ClassEmpty tab={tab} />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {classes.map((cls, index) => (
-                <ClassCard key={cls.id} classData={cls} index={index} tab={tab} />
-              ))}
-            </div>
-          )}
+          <ClassList
+            initialData={initialData}
+            params={listParams}
+            onPageChange={handlePageChange}
+          />
         </TabsContent>
       </Tabs>
     </div>

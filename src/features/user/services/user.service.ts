@@ -9,8 +9,13 @@ export const userService = {
 
     return result.data;
   },
+
   async getUser(id: string) {
     const result = await apiClient<User>(`/users/${id}`);
+
+    if (!result.data) {
+      throw new Error('User not found');
+    }
 
     return result.data;
   },

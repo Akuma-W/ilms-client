@@ -1,51 +1,36 @@
 'use client';
 
 import { SearchBar } from '@/components/shared/search-bar';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useEffect, useState } from 'react';
 
-export function ClassSearch() {
-  const router = useRouter();
-  const params = useSearchParams();
+interface ClassSearchProps {
+  value: string;
+  onSearch: (value: string) => void;
+}
 
-  const search = params.get('search') || '';
-  const paramsString = params.toString();
+export function ClassSearch({ value, onSearch }: ClassSearchProps) {
+  const [searchValue, setSearchValue] = useState(value);
+  const debouncedValue = useDebounce(searchValue, 500);
 
-  const [value, setValue] = useState(search);
-
+  // Sync when tab changes
   useEffect(() => {
-    const handleSearch = () => {
-      const timeout = setTimeout(() => {
-        const query = new URLSearchParams(paramsString);
+    setSearchValue(value);
+  }, [value]);
 
-        if (value) {
-          query.set('search', value);
-        } else {
-          query.delete('search');
-        }
-
-        query.set('page', '1'); // reset page
-        const newUrl = `?${query.toString()}`;
-        const currentUrl = `?${paramsString}`;
-
-        // ✅ tránh push loop
-        if (newUrl !== currentUrl) {
-          router.push(newUrl);
-        }
-      }, 500); // 500ms debounce
-
-      return () => clearTimeout(timeout);
-    };
-
-    handleSearch();
-  }, [value, paramsString, router]);
+  // Just call onSearch when debounced value changes
+  useEffect(() => {
+    if (debouncedValue !== value) {
+      onSearch(debouncedValue);
+    }
+  }, [debouncedValue, onSearch, value]);
 
   return (
     <SearchBar
-      value={value}
-      onChange={setValue}
-      onDelete={() => setValue('')}
-      placeholder="Tìm lớp học..."
+      value={searchValue}
+      onChange={setSearchValue}
+      onDelete={() => setSearchValue('')}
+      placeholder="Tìm lớp học bằng tên lớp, tên giảng viên, môn học ..."
     />
   );
 }

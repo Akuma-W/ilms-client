@@ -4,7 +4,6 @@ import ClassesClient from './classes-client';
 import { fetchClasses } from '@/features/classes/utils/classes.utils';
 import { userService } from '@/features/user/services/user.service';
 import { redirect } from 'next/navigation';
-import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
   title: 'Tổng quan lớp',
@@ -21,32 +20,28 @@ interface ClassesProps {
 
 export default async function Classes({ searchParams }: ClassesProps) {
   const params = await searchParams;
-  const tab = params.tab || 'discovery';
-  const search = params.search || '';
-  const page = params.page || '1';
-  const limit = params.limit || '10';
 
-  const initialData = await fetchClasses(tab, { search, page, limit });
-  console.log('SSR fetch classes with key:', JSON.stringify([tab, search, page, limit]));
+  if (!params.tab) {
+    const newParams = new URLSearchParams(params as Record<string, string>);
+    newParams.set('tab', 'discovery');
 
-  const user = await userService.getMe();
-  if (!user) {
-    redirect('/login');
+    redirect(`/classes?${newParams.toString()}`);
   }
 
+  const tab = params.tab;
+  const search = params.search || '';
+  const page = Number(params.page) || 1;
+  const limit = Number(params.limit) || 10;
+
+  const initialData = await fetchClasses(tab, { search, page, limit });
+
+  const user = await userService.getMe();
+
   return (
-    <SWRConfig
-      value={{
-        fallback: {
-          [JSON.stringify([tab, search, page, limit])]: initialData,
-        },
-      }}
-    >
-      <ClassesClient
-        user={user}
-        initialData={initialData}
-        initialParams={{ tab, page, limit, search }}
-      />
-    </SWRConfig>
+    <ClassesClient
+      user={user}
+      initialData={initialData}
+      initialParams={{ tab, page, limit, search }}
+    />
   );
 }

@@ -7,20 +7,20 @@ export const enrollmentService = {
   async getMyEnrollments(params: {
     status?: EnrollmentStatus;
     isStarred?: boolean;
-    // page?: string;
-    // limit?: string;
-    // search?: string;
-  }): Promise<QueryResponse<Class[]>> {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<QueryResponse<Class>> {
     const query = new URLSearchParams();
 
     if (params.status) query.set('status', params.status);
     if (params.isStarred !== undefined) query.set('isStarred', String(params.isStarred));
-    // if (params.page) query.set('page', params.page);
-    // if (params.limit) query.set('limit', params.limit);
-    // if (params.search) query.set('search', params.search);
+    if (params.page) query.set('page', String(params.page));
+    if (params.limit) query.set('limit', String(params.limit));
+    if (params.search) query.set('search', params.search);
 
     const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
-    const result = await apiClient<QueryResponse<Class[]>>(url);
+    const result = await apiClient<QueryResponse<Class>>(url);
 
     if (!result.data) {
       throw new Error('Data is invalid');

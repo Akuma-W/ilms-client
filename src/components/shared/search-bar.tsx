@@ -11,11 +11,12 @@ interface SearchBarProps {
   className?: string;
 }
 
-export function SearchBar({ value, onChange, onDelete, placeholder }: SearchBarProps) {
+export function SearchBar({ value, onChange, onDelete, placeholder, className }: SearchBarProps) {
   return (
-    <div className="relative flex-1 md:w-80">
+    <div className={`relative flex-1 md:min-w-80 w-full ${className}`}>
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
       <Input
+        name="search"
         placeholder={placeholder}
         className="pl-10 h-11 border-gray-200 focus:ring-galaxy-blue"
         value={value}

@@ -35,6 +35,6 @@ export interface ClassClient extends Class {
 export interface ClassParams {
   tab: ClassTabs;
   search?: string;
-  page?: string;
-  limit?: string;
+  page?: number;
+  limit?: number;
 }

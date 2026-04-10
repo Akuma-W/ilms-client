@@ -6,18 +6,26 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
   return (
     <SWRConfig
       value={{
-        fetcher: (url: string) =>
-          fetch(url, { credentials: 'include' }).then((res) => {
-            if (res.status === 401) return null;
-            if (!res.ok) throw new Error('Error');
-            return res.json();
-          }),
+        fetcher: async (url: string) => {
+          const res = await fetch(url, { credentials: 'include' });
+
+          if (res.status === 401) {
+            throw new Error('Unauthorized');
+          }
+
+          if (!res.ok) {
+            const error = new Error('API Error') as Error & { status: number };
+            error.status = res.status;
+            throw error;
+          }
+
+          return res.json();
+        },
         revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-        shouldRetryOnError: false,
-        refreshInterval: 10000, // 10 seconds
-        dedupingInterval: 10000, // 10 seconds
+        revalidateOnReconnect: true,
+        dedupingInterval: 5000, // 5 seconds
         keepPreviousData: true,
+        errorRetryCount: 3,
       }}
     >
       {children}

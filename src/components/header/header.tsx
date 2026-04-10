@@ -11,10 +11,17 @@ import { Sheet, SheetTrigger } from '../ui/sheet';
 import { MobileSidebar } from '../layout/mobile-sidebar';
 import { AvatarSkeleton } from './avatar-skeleton';
 import { logoutAction } from '@/features/auth/actions/logout.action';
+import { User } from '@/types/user';
 
-export function Header() {
+interface HeaderProps {
+  initialUser: User | null;
+}
+
+export function Header({ initialUser }: HeaderProps) {
   const router = useRouter();
-  const { user, isLoading, mutateUser } = useCurrentUser();
+  const { user, isLoading, mutateUser } = useCurrentUser({
+    initialUser,
+  });
 
   const handleLogout = async () => {
     await logoutAction();

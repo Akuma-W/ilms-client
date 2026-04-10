@@ -1,7 +1,7 @@
 'use client';
 
 import { Class } from '@/types/class';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ import useSidebarStore from '@/stores/sidebar-store';
 
 export function ClassSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const params = useParams();
 
   const { isCollapsed, toggle, setCollapsed } = useSidebarStore();
@@ -24,6 +25,21 @@ export function ClassSidebar() {
   const [starredClasses, setStarredClasses] = useState<Class[]>([]);
 
   const classId = params.id as string;
+
+  const isActive = (itemHref: string) => {
+    const url = new URL(itemHref, 'http://localhost');
+    const itemPath = url.pathname;
+    const itemTab = url.searchParams.get('tab');
+    const currentTab = searchParams.get('tab');
+
+    if (pathname !== itemPath) return false;
+
+    if (itemTab) {
+      return itemTab === currentTab;
+    }
+
+    return true;
+  };
 
   return (
     <motion.aside
@@ -45,7 +61,6 @@ export function ClassSidebar() {
             )}
 
             {classNavItems.map((item) => {
-              const isActive = pathname === item.href;
               return (
                 <Tooltip key={item.label}>
                   <TooltipTrigger asChild>
@@ -53,7 +68,7 @@ export function ClassSidebar() {
                       href={item.href}
                       className={cn(
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative group',
-                        isActive
+                        isActive(item.href)
                           ? 'bg-primary text-white shadow-lg shadow-primary/20'
                           : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50',
                       )}
@@ -61,7 +76,9 @@ export function ClassSidebar() {
                       <item.icon
                         className={cn(
                           'w-5 h-5',
-                          isActive ? 'text-white' : 'group-hover:scale-110 transition-transform',
+                          isActive(item.href)
+                            ? 'text-white'
+                            : 'group-hover:scale-110 transition-transform',
                         )}
                       />
                       {!isCollapsed && <span className="font-medium text-sm">{item.label}</span>}
