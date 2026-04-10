@@ -10,7 +10,7 @@ const classNavItems = [
 const classTabItems = [
   { value: 'discovery', label: 'Khám phá' },
   { value: 'joined', label: 'Đã tham gia' },
-  { value: 'pending', label: 'Đang duyệt' },
+  { value: 'pending', label: 'Chờ duyệt' },
   { value: 'created', label: 'Đã tạo' },
 ];
 

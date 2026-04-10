@@ -12,5 +12,5 @@ interface ClassDetailProps {
 export default async function ClassDetail({ params }: ClassDetailProps) {
   const { id } = await params;
 
-  redirect(`/classes/${id}/overview`);
+  redirect(`/classes/${id}/info`);
 }

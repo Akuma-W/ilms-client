@@ -11,7 +11,7 @@ export async function fetchClasses(
     page?: number;
     limit?: number;
   },
-): Promise<QueryResponse<Class>> {
+): Promise<QueryResponse<Class> | null> {
   switch (tab) {
     case 'joined':
       return enrollmentService.getMyEnrollments({

@@ -17,7 +17,7 @@ import { ClassList } from '@/features/classes/components/ui/class-list';
 
 interface ClassesClientProps {
   user: User | null;
-  initialData: QueryResponse<Class>;
+  initialData: QueryResponse<Class> | null;
   initialParams: ClassParams;
 }
 
@@ -33,14 +33,6 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
   const search = searchParams.get('search') ?? initialParams.search ?? '';
   const page = Number(searchParams.get('page') ?? initialParams.page);
   const limit = Number(searchParams.get('limit') ?? initialParams.limit);
-
-  // const { classes } = useClasses({
-  //   tab,
-  //   search,
-  //   page,
-  //   limit,
-  //   initialData,
-  // });
 
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -87,10 +79,14 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       {/* Page Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-black tracking-tight text-galaxy-blue">Danh sách lớp học</h1>
-        <h2 className="text-md font-semibold text-gray-500">
-          Xin chào, <span className="text-galaxy-blue font-bold">{user?.fullName}</span>
+        <h2 className="font-semibold text-gray-500">
+          Xin chào{' '}
+          <span className={user?.role === 'teacher' ? 'text-red-600' : 'text-green-600'}>
+            {user?.role === 'teacher' ? 'giảng viên ' : 'sinh viên '}
+          </span>
+          <span className="text-galaxy-blue font-bold text-[18px]">{user?.fullName}</span>
         </h2>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <p className="text-gray-500 text-md font-medium">Quản lý và khám phá các lớp học tại</p>
           <div className="flex items-center gap-2 text-primary font-black text-[12px] uppercase tracking-[0.2em] mb-2">
             <School className="w-3.5 h-3.5" />
@@ -108,11 +104,9 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
         {/* Modals */}
         <div className="flex items-center gap-3">
           {/* Find Class by Code */}
-          <FindClassModal classes={[]} onJoinClass={(cls) => console.log('Joining class:', cls)} />
+          <FindClassModal />
           {/* Create Class (Teacher) */}
-          {user?.role === 'teacher' && (
-            <CreateClassModal onCreateClass={(data) => console.log('Creating class: ', data)} />
-          )}
+          {user?.role === 'teacher' && <CreateClassModal />}
         </div>
       </div>
 

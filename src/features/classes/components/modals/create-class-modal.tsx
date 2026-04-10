@@ -1,102 +1,251 @@
 'use client';
 
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '../../../../components/ui/button';
+import { Globe, Lock, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useId, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useSWRConfig } from 'swr';
+import { CreateClassFormValues, createClassSchema } from '../../schemas/class.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { classService } from '../../services/class.service';
+import { toast } from 'sonner';
 import {
-  DialogTrigger,
+  Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  Dialog,
-} from '../../../../components/ui/dialog';
-import { Input } from '../../../../components/ui/input';
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
-  SelectTrigger,
-  SelectValue,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
   SelectContent,
   SelectItem,
-  Select,
-} from '../../../../components/ui/select';
-import { Textarea } from '../../../../components/ui/textarea';
-import { Class } from '@/types/class';
-import { Label } from '../../../../components/ui/label';
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
-interface CreateClassModalProps {
-  onCreateClass?: (data: Class) => void;
-}
+const DEFAULT_CREATE_CLASS_VALUES = {
+  title: '',
+  subject: '',
+  isPrivate: false,
+  description: '',
+  semester: '',
+};
 
-export const CreateClassModal: React.FC<CreateClassModalProps> = ({ onCreateClass }) => {
+export function CreateClassModal() {
+  const router = useRouter();
+  const { mutate } = useSWRConfig();
+  const formId = useId();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleCreate = () => {
-    // Logic for creating class would go here
-    // if (onCreateClass) onCreateClass({});
-    setIsOpen(false);
+  const form = useForm<CreateClassFormValues>({
+    resolver: zodResolver(createClassSchema),
+    defaultValues: DEFAULT_CREATE_CLASS_VALUES,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = form;
+
+  const onSubmit = async (values: CreateClassFormValues) => {
+    try {
+      const data = await classService.createClass({
+        title: values.title,
+        subject: values.subject,
+        isPrivate: values.isPrivate,
+        description: values.description || undefined,
+        semester: values.semester || undefined,
+      });
+
+      await mutate(
+        (key: unknown) => Array.isArray(key) && (key[0] === 'classes' || key[0] === 'my-classes'),
+        undefined,
+        { revalidate: true },
+      );
+
+      toast.success('Tạo lớp học thành công!', {
+        description: data?.title,
+      });
+
+      handleOpenChange(false);
+      router.push(`/classes/${data?.id}/info`);
+    } catch (error) {
+      const status = (error as { status?: number }).status;
+
+      const message =
+        status === 409
+          ? 'Tên lớp học đã tồn tại, vui lòng chọn tên khác.'
+          : status === 403
+            ? 'Bạn không có quyền tạo lớp học.'
+            : 'Đã có lỗi xảy ra, vui lòng thử lại.';
+
+      toast.error('Tạo lớp học thất bại', { description: message });
+    }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (isSubmitting) return;
+    setIsOpen(open);
+
+    if (!open) {
+      setTimeout(() => reset(DEFAULT_CREATE_CLASS_VALUES), 150);
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
           <Plus className="w-4 h-4 mr-2" />
           Tạo lớp mới
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-125">
+
+      <DialogContent
+        className="sm:max-w-125"
+        onInteractOutside={(e) => isSubmitting && e.preventDefault()}
+        onEscapeKeyDown={(e) => isSubmitting && e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-galaxy-blue">Tạo lớp học mới</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="title" className="font-bold">
-              Tiêu đề lớp học <span className="text-red-500">*</span>
-            </Label>
-            <Input id="title" placeholder="VD: Lập trình Web nâng cao" />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="subject" className="font-bold">
-              Môn học <span className="text-red-500">*</span>
-            </Label>
-            <Input id="subject" placeholder="VD: Công nghệ thông tin" />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="privacy" className="font-bold">
-              Chế độ hiển thị <span className="text-red-500">*</span>
-            </Label>
-            <Select defaultValue="public">
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn chế độ" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="public">Công khai</SelectItem>
-                <SelectItem value="private">Riêng tư</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="description" className="font-bold">
-              Mô tả (Tùy chọn)
-            </Label>
-            <Textarea id="description" placeholder="Mô tả ngắn gọn về lớp học..." />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="semester" className="font-bold">
-              Học kỳ (Tùy chọn)
-            </Label>
-            <Input id="semester" placeholder="VD: Học kỳ 2 - 2024" />
-          </div>
-        </div>
+        <Form {...form}>
+          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-2" noValidate>
+            <FormField
+              control={control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Tiêu đề lớp học <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="VD: Lập trình Web nâng cao"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Môn học <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="VD: Công nghệ thông tin"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="isPrivate"
+              render={({ field }) => (
+                <FormItem className="flex">
+                  <FormLabel>
+                    Chế độ hiển thị <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <Select
+                    value={field.value ? 'private' : 'public'}
+                    onValueChange={(v) => field.onChange(v === 'private')}
+                    disabled={isSubmitting}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <SelectValue placeholder="Chọn chế độ" />
+                        </div>
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      <SelectItem value="public" className="cursor-pointer">
+                        <div className="flex items-center gap-2 text-green-600">
+                          <Globe className="h-3.5 w-3.5 text-green-600" />
+                          Công khai
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="private" className="cursor-pointer">
+                        <div className="flex items-center gap-2 text-red-600">
+                          <Lock className="h-3.5 w-3.5 text-red-600" />
+                          Riêng tư
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mô tả (tùy chọn)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Mô tả ngắn gọn về lớp học..."
+                      rows={3}
+                      className="resize-none"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="semester"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Học kỳ (Tùy chọn)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="VD: Học kỳ 2 - 2024" disabled={isSubmitting} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button variant="outline" className="cursor-pointer" onClick={() => setIsOpen(false)}>
             Hủy
           </Button>
-          <Button className="bg-galaxy text-white" onClick={handleCreate}>
+          <Button className="cursor-pointer bg-galaxy text-white" onClick={handleSubmit(onSubmit)}>
             Tạo lớp
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
+}

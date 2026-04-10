@@ -7,7 +7,7 @@ import { QueryResponse } from '@/types/api';
 import { ClassTabs } from '@/types';
 
 interface UseClassesParams extends ClassParams {
-  initialData?: QueryResponse<Class>;
+  initialData?: QueryResponse<Class> | null;
 }
 
 export function useClasses({ tab, search, page, limit, initialData }: UseClassesParams) {

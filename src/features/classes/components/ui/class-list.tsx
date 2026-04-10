@@ -11,7 +11,7 @@ import { BookOpen } from 'lucide-react';
 import { ClassPagination } from './class-pagination';
 
 interface ClassListProps {
-  initialData: QueryResponse<Class>;
+  initialData: QueryResponse<Class> | null;
   params: {
     tab: ClassTabs;
     search?: string;

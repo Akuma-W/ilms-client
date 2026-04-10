@@ -10,7 +10,7 @@ export const enrollmentService = {
     page?: number;
     limit?: number;
     search?: string;
-  }): Promise<QueryResponse<Class>> {
+  }) {
     const query = new URLSearchParams();
 
     if (params.status) query.set('status', params.status);
@@ -22,8 +22,8 @@ export const enrollmentService = {
     const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
     const result = await apiClient<QueryResponse<Class>>(url);
 
-    if (!result.data) {
-      throw new Error('Data is invalid');
+    if (!result.success || !result.data) {
+      return null;
     }
 
     return result.data;

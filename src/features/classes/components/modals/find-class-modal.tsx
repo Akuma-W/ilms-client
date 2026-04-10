@@ -4,109 +4,181 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Loader2, Search } from 'lucide-react';
+import { useId, useState } from 'react';
+import { FindClassCard } from '../ui/find-class-card';
+import { useRouter } from 'next/navigation';
 import { Class } from '@/types/class';
-import { Search, User } from 'lucide-react';
-import { useState } from 'react';
+import { classService } from '../../services/class.service';
+
+type SearchStatus = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
+const COURSE_CODE_LENGTH = 6;
 
 interface FindClassModalProps {
-  onJoinClass: (classItem: Class) => void;
-  classes: Class[];
+  trigger?: React.ReactNode;
 }
 
-export function FindClassModal({ onJoinClass, classes }: FindClassModalProps) {
+export function FindClassModal({ trigger }: FindClassModalProps) {
+  const router = useRouter();
+  const inputId = useId();
+
   const [isOpen, setIsOpen] = useState(false);
   const [codeInput, setCodeInput] = useState('');
-  const [findResult, setFindResult] = useState<Class | null>(null);
-  const [findError, setFindError] = useState('');
+  const [status, setStatus] = useState<SearchStatus>('idle');
+  const [result, setResult] = useState<Class | null>(null);
 
-  const handleFindClass = () => {
-    const code = codeInput.trim().toUpperCase();
-    if (code.length !== 6) {
-      setFindError('Mã lớp phải gồm 6 ký tự.');
-      setFindResult(null);
+  const isValidLength = codeInput.length === COURSE_CODE_LENGTH;
+  const isLoading = status === 'loading';
+  const canSubmit = isValidLength && !isLoading;
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) setCodeInput('');
+  };
+
+  const handleSearch = async () => {
+    if (!canSubmit) return;
+
+    setStatus('loading');
+    setResult(null);
+
+    const { data, statusCode, success } = await classService.getClassByCourseCode(codeInput);
+
+    if (!success) {
+      setStatus(statusCode === 404 ? 'not_found' : 'error');
       return;
     }
 
-    const found = classes.find((c) => c.courseCode === code);
-    if (found) {
-      setFindResult(found);
-      setFindError('');
-    } else {
-      setFindError('Không tìm thấy lớp học với mã này.');
-      setFindResult(null);
+    setResult(data);
+    setStatus('found');
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCodeInput(e.target.value.toUpperCase().slice(0, COURSE_CODE_LENGTH));
+
+    if (status !== 'idle') {
+      setStatus('idle');
+      setResult(null);
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
+  const handleNavigate = (id: string) => {
+    handleOpenChange(false);
+    router.push(`/classes/${id}/info`);
+  };
+
+  const handleRetry = () => {
+    setStatus('idle');
+    document.getElementById(inputId)?.focus();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="h-11 px-6 border-galaxy-blue text-galaxy-blue hover:bg-galaxy-blue/5"
-        >
-          <Search className="w-4 h-4 mr-2" />
-          Tìm lớp học
-        </Button>
+        {trigger ?? (
+          <Button
+            variant="outline"
+            className="h-11 px-6 border-galaxy-blue text-galaxy-blue font-bold hover:bg-galaxy-blue/5"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Tìm lớp học
+          </Button>
+        )}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-125">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-galaxy-blue">
             Tìm lớp học theo mã
           </DialogTitle>
+          <DialogDescription>
+            Nhập mã lớp do giảng viên cung cấp để tham gia vào lớp
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="courseCode" className="font-bold">
-              Nhập mã lớp (6 ký tự, viết hoa)
+
+        <div className="space-y-5 py-1">
+          <div className="space-y-2">
+            <Label htmlFor="courseCode" className="text-galaxy-blue/90 font-bold">
+              Nhập mã lớp{' '}
+              <span className="text-muted-foreground font-normal">
+                ({COURSE_CODE_LENGTH} ký tự, ví dụ: IT4440)
+              </span>
             </Label>
             <div className="flex gap-2">
               <Input
                 id="courseCode"
                 placeholder="VD: IT4440"
                 value={codeInput}
-                onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
-                maxLength={6}
+                onKeyDown={handleKeyDown}
+                onChange={handleInputChange}
+                maxLength={COURSE_CODE_LENGTH}
+                className="font-mono tracking-widest uppercase"
+                autoComplete="off"
+                autoFocus
+                readOnly={isLoading}
+                aria-invalid={status === 'not_found' || status === 'error'}
               />
-              <Button onClick={handleFindClass} className="bg-galaxy text-white">
-                Tìm kiếm
+              <Button
+                onClick={handleSearch}
+                disabled={!canSubmit}
+                className="cursor-pointer bg-galaxy text-white hover:bg-galaxy/90 hover:scale-105"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                    Đang tìm
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-4 w-4 mr-2" />
+                    Tìm kiếm
+                  </>
+                )}
               </Button>
             </div>
-            {findError && <p className="text-sm text-red-500 mt-1">{findError}</p>}
           </div>
 
-          {findResult && (
-            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-bold text-gray-900">{findResult.title}</h4>
-                  <p className="text-xs text-gray-500">
-                    {findResult.subject} • {findResult.courseCode}
-                  </p>
-                </div>
-                {/* <Star className={cn("w-4 h-4", findResult.isStarred ? "fill-yellow-400 text-yellow-400" : "text-gray-300")} /> */}
-              </div>
-              <p className="text-sm text-gray-600 line-clamp-2">{findResult.description}</p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <User className="w-3.5 h-3.5" />
-                <span>{findResult.teacher.fullName}</span>
-              </div>
-              <Button
-                className="w-full bg-galaxy text-white mt-2"
-                onClick={() => {
-                  onJoinClass(findResult);
-                  setIsOpen(false);
-                }}
-              >
-                Tham gia lớp học
+          {codeInput.length > 0 && !isValidLength && (
+            <p className="text-xs text-muted-foreground">
+              Mã lớp cần có {COURSE_CODE_LENGTH} ký tự.
+            </p>
+          )}
+
+          {/* Không tìm thấy */}
+          {status === 'not_found' && (
+            <div className="rounded-lg border border-dashed px-4 py-6 text-center space-y-1">
+              <p className="text-sm font-medium">Không tìm thấy lớp học</p>
+              <p className="text-xs text-muted-foreground">
+                Kiểm tra lại mã <span className="font-mono font-medium">{codeInput}</span> hoặc liên
+                hệ giáo viên.
+              </p>
+            </div>
+          )}
+
+          {/* Lỗi */}
+          {status === 'error' && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/5 px-4 py-4 space-y-3">
+              <p className="text-sm text-destructive">Có lỗi xảy ra, vui lòng thử lại.</p>
+              <Button variant="outline" size="sm" onClick={handleRetry}>
+                Thử lại
               </Button>
             </div>
+          )}
+
+          {/* Kết quả */}
+          {status === 'found' && result && (
+            <FindClassCard classItem={result} onNavigate={handleNavigate} />
           )}
         </div>
       </DialogContent>

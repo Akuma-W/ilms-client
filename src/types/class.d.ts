@@ -38,3 +38,11 @@ export interface ClassParams {
   page?: number;
   limit?: number;
 }
+
+export interface CreateClassPayload {
+  title: string;
+  subject: string;
+  description?: string;
+  semester?: string;
+  isPrivate: boolean;
+}

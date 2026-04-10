@@ -1,7 +1,7 @@
 export interface APIResponse<T> {
   success: boolean;
   message: string;
-  statusCode?: string;
+  statusCode?: number;
   error?: string;
   data: T | null;
 }

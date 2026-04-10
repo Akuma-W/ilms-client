@@ -19,27 +19,39 @@ export async function apiClient<T>(
     };
   }
 
-  const res = await fetch(`${CLIENT_API_URL}${url}`, {
-    ...options,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-      ...options?.headers,
-    },
-  });
+  try {
+    const res = await fetch(`${CLIENT_API_URL}${url}`, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+        ...options?.headers,
+      },
+    });
 
-  if (res.status === 401) {
-    throw new Error('Unauthorized');
+    if (res.status === 401) {
+      return {
+        success: false,
+        message: 'Unauthorized',
+        data: null,
+      };
+    }
+
+    const result = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      return {
+        success: result.success,
+        message: result?.message || 'Request failed',
+        statusCode: result.statusCode,
+        data: null,
+      };
+    }
+
+    return result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    throw new Error(message);
   }
-
-  if (!res.ok) {
-    const errorData = await res.json();
-
-    throw new Error(errorData?.message || 'Request failed');
-  }
-
-  const result = await res.json();
-
-  return result;
 }
