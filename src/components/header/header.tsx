@@ -14,7 +14,7 @@ import { logoutAction } from '@/features/auth/actions/logout.action';
 import { User } from '@/types/user';
 
 interface HeaderProps {
-  initialUser: User | null;
+  initialUser?: User | null;
 }
 
 export function Header({ initialUser }: HeaderProps) {
