@@ -82,8 +82,8 @@ export function CreateClassModal() {
         description: data?.title,
       });
 
-      handleOpenChange(false);
       router.push(`/classes/${data?.id}/info`);
+      handleOpenChange(false);
     } catch (error) {
       const status = (error as { status?: number }).status;
 

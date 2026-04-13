@@ -22,10 +22,10 @@ export async function apiClient<T>(
   try {
     const res = await fetch(`${CLIENT_API_URL}${url}`, {
       ...options,
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
+        Cookie: cookiesStore.toString(),
         ...options?.headers,
       },
     });

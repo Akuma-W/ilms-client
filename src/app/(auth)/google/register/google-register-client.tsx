@@ -48,7 +48,7 @@ export default function GoogleRegisterClient() {
             <Button
               variant="outline"
               className="w-full cursor-pointer"
-              onClick={() => router.back()}
+              onClick={() => router.replace('/')}
             >
               Quay lại
             </Button>
