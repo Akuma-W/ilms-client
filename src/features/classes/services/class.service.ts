@@ -57,6 +57,10 @@ export const classService = {
   async getClassData(id: string) {
     const result = await apiClient<Class>(`/classes/${id}`);
 
+    if (!result.data) {
+      throw new Error('Invalid Data');
+    }
+
     return result.data;
   },
 };

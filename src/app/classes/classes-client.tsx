@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { classTabItems } from '@/config/class';
+import { classesTabItems } from '@/config/class';
 import { ClassSearch } from '@/features/classes/components/ui/class-search';
 import { CreateClassModal } from '@/features/classes/components/modals/create-class-modal';
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
@@ -118,19 +118,22 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       >
         <div className="flex items-center justify-between border-b border-gray-100 pb-px">
           <TabsList className="bg-transparent h-auto p-0 gap-10">
-            {classTabItems.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className={cn(
-                  'px-1 py-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
-                  'text-gray-400 hover:text-gray-600 active:text-primary',
-                  'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary',
-                )}
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+            {classesTabItems.map((tab) => {
+              if (user?.role !== 'teacher' && tab.value === 'created') return;
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={cn(
+                    'px-1 py-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
+                    'text-gray-400 hover:text-gray-600 active:text-primary',
+                    'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary',
+                  )}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </div>
 

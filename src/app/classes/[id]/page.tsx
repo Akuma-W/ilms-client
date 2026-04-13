@@ -10,7 +10,12 @@ interface ClassDetailProps {
 }
 
 export default async function ClassDetail({ params }: ClassDetailProps) {
-  const { id } = await params;
+  const { id: classId } = await params;
+  const isJoined = classId === '1';
 
-  redirect(`/classes/${id}/info`);
+  if (isJoined) {
+    redirect(`/classes/${classId}/overview`);
+  } else {
+    redirect(`/classes/${classId}/info`);
+  }
 }

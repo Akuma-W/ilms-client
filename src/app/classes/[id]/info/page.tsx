@@ -1,4 +1,4 @@
-import { ClassInfo } from '@/features/classes/components/pages/class-info';
+import { ClassInfo } from '@/features/classes/components/items/class-info';
 import { classService } from '@/features/classes/services/class.service';
 import { userService } from '@/features/user/services/user.service';
 

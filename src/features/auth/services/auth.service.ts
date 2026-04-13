@@ -12,6 +12,10 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
+    if (result.success === false) {
+      throw new Error(result.message);
+    }
+
     return result;
   },
 

@@ -1,4 +1,16 @@
-import { BookOpen, LayoutDashboard, MessageSquare, Wrench } from 'lucide-react';
+import {
+  BarChart,
+  BookOpen,
+  Edit,
+  FileText,
+  HelpCircle,
+  Info,
+  LayoutDashboard,
+  MessageSquare,
+  Send,
+  Users,
+  Wrench,
+} from 'lucide-react';
 
 const classNavItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/classes?tab=discovery' },
@@ -7,11 +19,23 @@ const classNavItems = [
   { icon: MessageSquare, label: 'Tin nhắn', href: '/chats' },
 ];
 
-const classTabItems = [
+const classesTabItems = [
   { value: 'discovery', label: 'Khám phá' },
   { value: 'joined', label: 'Đã tham gia' },
   { value: 'pending', label: 'Chờ duyệt' },
   { value: 'created', label: 'Đã tạo' },
 ];
 
-export { classNavItems, classTabItems };
+const classTabItems = [
+  { value: 'overview', icon: BookOpen, label: 'Tổng quan', joinedOnly: true },
+  { value: 'materials', icon: FileText, label: 'Tài liệu', joinedOnly: true },
+  { value: 'assignments', icon: Edit, label: 'Bài tập', joinedOnly: true },
+  { value: 'submissions', icon: Send, label: 'Nộp bài', joinedOnly: true },
+  { value: 'quizzes', icon: HelpCircle, label: 'Quiz', joinedOnly: true },
+  { value: 'forum', icon: MessageSquare, label: 'Forum', joinedOnly: true },
+  { value: 'members', icon: Users, label: 'Thành viên', joinedOnly: true },
+  { value: 'grades', icon: BarChart, label: 'Bảng điểm', joinedOnly: true },
+  { value: 'info', icon: Info, label: 'Giới thiệu', joinedOnly: false },
+];
+
+export { classNavItems, classesTabItems, classTabItems };
