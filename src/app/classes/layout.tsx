@@ -2,9 +2,11 @@ import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { ClassSidebar } from '@/features/classes/components/sidebar/class-sidebar';
 import { userService } from '@/features/user/services/user.service';
+import { enrollmentService } from '@/features/classes/services/enrollment.service';
 
 export default async function ClassLayout({ children }: { children: React.ReactNode }) {
   const user = await userService.getMe();
+  const { classes, total } = await enrollmentService.getStarredClasses();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -18,7 +20,7 @@ export default async function ClassLayout({ children }: { children: React.ReactN
       <div className="flex flex-1">
         {/* Sidebar */}
         <div className="hidden md:block">
-          <ClassSidebar />
+          <ClassSidebar starredClasses={classes} total={total} />
         </div>
 
         {/* Content */}

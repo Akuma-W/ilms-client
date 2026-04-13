@@ -27,6 +27,8 @@ export function ClassList({ initialData, params, onPageChange }: ClassListProps)
     initialData,
   });
 
+  const toggleStar = () => {};
+
   if (isLoading && !classes) return <ClassListSkeleton />;
 
   if (error) {
@@ -60,7 +62,7 @@ export function ClassList({ initialData, params, onPageChange }: ClassListProps)
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {classes.map((cls, index) => (
-          <ClassCard key={cls.id} classData={cls} index={index} tab={params.tab} />
+          <ClassCard key={cls.id} classData={cls} index={index} toggleStar={toggleStar} />
         ))}
       </div>
       <ClassPagination

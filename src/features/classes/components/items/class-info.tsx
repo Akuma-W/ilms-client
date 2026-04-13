@@ -47,6 +47,7 @@ export const ClassInfo = ({ classData, userData }: ClassInfoProps) => {
   if (!classData) {
     return null;
   }
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 mt-0">
       {/* Class Details */}
@@ -68,9 +69,9 @@ export const ClassInfo = ({ classData, userData }: ClassInfoProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-primary transition-all group">
               <div className="relative w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary overflow-hidden">
-                {classData?.teacher.avatarUrl ? (
+                {classData?.teacher.avatar ? (
                   <Image
-                    src={classData.teacher.avatarUrl}
+                    src={classData.teacher.avatar}
                     alt={classData.teacher.fullName}
                     fill
                     className="object-cover"

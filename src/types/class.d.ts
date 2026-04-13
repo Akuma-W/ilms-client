@@ -1,3 +1,4 @@
+import { EnrollmentStatus } from './enum';
 import { School } from './school';
 import { User } from './user';
 
@@ -21,6 +22,7 @@ export interface Class {
   createdAt: Date;
 
   isStarred?: boolean;
+  status: EnrollmentStatus;
   school: School;
   teacher: User;
 }

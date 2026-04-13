@@ -14,7 +14,7 @@ export function useCurrentUser({ initialUser }: UseCurrentUserProps = {}) {
     () => userService.getMe(),
     {
       fallbackData: initialUser || null,
-      refreshInterval: 10 * 60 * 1000,
+      refreshInterval: 10 * 1000, // 10s
     },
   );
 

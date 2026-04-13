@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { BookOpen, ChevronRight, Star } from 'lucide-react';
 import Image from 'next/image';
-import { ClassTabs } from '@/types';
 import { Class } from '@/types/class';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,12 +13,11 @@ import { getGradientFromTitle } from '@/lib/ui/utils';
 interface ClassCardProps {
   classData: Class;
   index: number;
-  tab?: ClassTabs;
+  toggleStar: () => void;
 }
 
-export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) {
-  const isDiscovery = tab === 'discovery';
-  const ctaText = isDiscovery ? 'Tham gia' : 'Vào học';
+export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
+  const ctaText = classData.status === 'approved' ? 'Vào học' : 'Tham gia';
   const gradient = getGradientFromTitle(classData.title);
 
   return (
@@ -38,11 +36,12 @@ export function ClassCard({ classData, index, tab = 'joined' }: ClassCardProps) 
 
         {/* Starred */}
         <div className="absolute top-4 right-4 z-10">
-          {tab === 'joined' && (
+          {classData.status === 'approved' && (
             <Button
               variant="ghost"
               size="icon"
-              className="w-8 h-8 rounded-lg bg-white/50 hover:bg-white/80 text-gray-900 shadow-sm"
+              className="cursor-pointer w-8 h-8 rounded-lg bg-white/50 hover:bg-white/80 text-gray-900 shadow-sm"
+              onClick={toggleStar}
             >
               <Star
                 className={cn('w-4 h-4', classData.isStarred && 'fill-yellow-400 text-yellow-400')}

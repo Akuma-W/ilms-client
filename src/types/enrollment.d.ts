@@ -14,3 +14,16 @@ export interface Enrollment {
   class: Class;
   user: User;
 }
+
+export interface JoinClassDto {
+  userId: string;
+  classId: string;
+  roleIn: Role;
+  isStarred?: boolean;
+}
+
+export interface JoinClassResponse {
+  id: string;
+  roleIn: Role;
+  status: EnrollmentStatus;
+}

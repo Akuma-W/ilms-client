@@ -1,9 +1,41 @@
 import { apiClient } from '@/lib/api/api-client';
 import { QueryResponse } from '@/types/api';
 import { Class } from '@/types/class';
+import { Enrollment, JoinClassResponse } from '@/types/enrollment';
 import { EnrollmentStatus } from '@/types/enum';
 
 export const enrollmentService = {
+  async joinClass(payload: EnrollmentStatus) {
+    const result = await apiClient<JoinClassResponse>('/enrollments/join', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    return result.data;
+  },
+
+  async getMyRelationInClass(classId: string) {
+    const result = await apiClient<Enrollment>(`/enrollments/me/${classId}`);
+
+    return result.data;
+  },
+
+  async getStarredClasses() {
+    const result = await apiClient<{
+      classes: Class[];
+      total: number;
+    }>('/enrollments/me/star');
+
+    if (!result.data) {
+      return {
+        classes: [],
+        total: 0,
+      };
+    }
+
+    return result.data;
+  },
+
   async getMyEnrollments(params: {
     status?: EnrollmentStatus;
     isStarred?: boolean;

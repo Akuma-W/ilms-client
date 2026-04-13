@@ -2,7 +2,7 @@
 
 import { Class } from '@/types/class';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -15,14 +15,17 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { DeadlineWidget } from './deadline-widget';
 import useSidebarStore from '@/stores/sidebar-store';
 
-export function ClassSidebar() {
+interface ClassSidebarProps {
+  starredClasses: Class[];
+  total: number;
+}
+
+export function ClassSidebar({ starredClasses, total }: ClassSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = useParams();
 
   const { isCollapsed, toggle, setCollapsed } = useSidebarStore();
-
-  const [starredClasses, setStarredClasses] = useState<Class[]>([]);
 
   const classId = params.id as string;
 
@@ -118,15 +121,19 @@ export function ClassSidebar() {
               </TooltipTrigger>
               {isCollapsed && (
                 <TooltipContent side="right" className="glass border-white/10 text-white">
-                  Lớp đã lưu
+                  Lớp đã lưu{' '}
+                  <span className="text-xs bg-primary text-white rounded-full px-2 py-0.5 ml-1 font-semibold">
+                    {total}
+                  </span>
                 </TooltipContent>
               )}
             </Tooltip>
 
             <div className="space-y-1">
-              {starredClasses.length > 0 ? (
+              {total > 0 ? (
                 starredClasses.map((cls) => {
                   const isActive = classId === cls.id;
+
                   return (
                     <Tooltip key={cls.id}>
                       <TooltipTrigger asChild>
