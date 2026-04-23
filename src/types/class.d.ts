@@ -1,4 +1,3 @@
-import { EnrollmentStatus } from './enum';
 import { School } from './school';
 import { User } from './user';
 
@@ -21,10 +20,9 @@ export interface Class {
   teacherId: string;
   createdAt: Date;
 
-  isStarred?: boolean;
-  status: EnrollmentStatus;
   school: School;
   teacher: User;
+  enrollment: Enrollment | null;
 }
 
 export interface ClassClient extends Class {

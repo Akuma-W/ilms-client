@@ -60,4 +60,12 @@ export const enrollmentService = {
 
     return result.data;
   },
+
+  async toggleStar(enrollmentId: string) {
+    const result = await apiClient(`/enrollments/${enrollmentId}/star`, {
+      method: 'PATCH',
+    });
+
+    return result.success;
+  },
 };

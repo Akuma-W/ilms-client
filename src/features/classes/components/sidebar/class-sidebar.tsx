@@ -14,16 +14,22 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { DeadlineWidget } from './deadline-widget';
 import useSidebarStore from '@/stores/sidebar-store';
+import { useStarredClasses } from '../../hooks/use-starred-classes';
+import { getColorFromTitle } from '@/lib/ui/utils';
 
 interface ClassSidebarProps {
-  starredClasses: Class[];
-  total: number;
+  initialStarredClasses?: {
+    classes: Class[];
+    total: number;
+  };
 }
 
-export function ClassSidebar({ starredClasses, total }: ClassSidebarProps) {
+export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = useParams();
+
+  const { starredClasses, total } = useStarredClasses({ initialData: initialStarredClasses });
 
   const { isCollapsed, toggle, setCollapsed } = useSidebarStore();
 
@@ -107,7 +113,10 @@ export function ClassSidebar({ starredClasses, total }: ClassSidebarProps) {
                 <div className="px-3 flex items-center justify-between">
                   {!isCollapsed && (
                     <h3 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                      Lớp đã lưu
+                      Lớp đã lưu{' '}
+                      <span className="text-xs bg-primary text-white rounded-full px-2 py-0.5 ml-1 font-semibold">
+                        {total}
+                      </span>
                     </h3>
                   )}
                   <Button
@@ -133,6 +142,7 @@ export function ClassSidebar({ starredClasses, total }: ClassSidebarProps) {
               {total > 0 ? (
                 starredClasses.map((cls) => {
                   const isActive = classId === cls.id;
+                  const color = getColorFromTitle(cls.title);
 
                   return (
                     <Tooltip key={cls.id}>
@@ -140,26 +150,32 @@ export function ClassSidebar({ starredClasses, total }: ClassSidebarProps) {
                         <Link
                           href={`/classes/${cls.id}`}
                           className={cn(
-                            'flex items-center gap-3 px-3 py-2 rounded-xl transition-all group relative',
+                            'flex items-center px-1 gap-3 py-2 rounded-xl transition-all group relative',
                             isActive
-                              ? 'bg-white/5 text-white ring-1 ring-white/10 shadow-[0_0_15px_rgba(255,255,255,0.05)]'
-                              : 'text-slate-400 hover:text-white hover:bg-white/5',
+                              ? 'bg-white/5 text-galaxy-blue ring-1 ring-white/10'
+                              : 'text-slate-400 hover:border hover:border-galaxy-blue hover:text-galaxy-blue',
                           )}
                         >
-                          <div className="w-2 h-2 rounded-full shrink-0" />
-                          {!isCollapsed && (
-                            <span className="font-medium text-sm truncate">{cls.title}</span>
-                          )}
+                          <div className="flex text-sm items-center">
+                            <span
+                              className={cn(
+                                `text-${color} border-${color}`,
+                                'font-bold px-2 py-1 justify-between rounded-2xl border mr-2',                              )}
+                            >
+                              {cls.courseCode}
+                            </span>
+                            {!isCollapsed && (
+                              <span className="font-medium line-clamp-1">{cls.title}</span>
+                            )}
+                          </div>
                           {isActive && (
                             <div className="absolute inset-0 rounded-xl ring-1 ring-primary/50 ring-offset-2 ring-offset-background pointer-events-none" />
                           )}
                         </Link>
                       </TooltipTrigger>
-                      {isCollapsed && (
-                        <TooltipContent side="right" className="glass border-white/10 text-white">
-                          {cls.title}
-                        </TooltipContent>
-                      )}
+                      <TooltipContent side="right" className="glass border-white/10 text-white">
+                        {cls.title}
+                      </TooltipContent>
                     </Tooltip>
                   );
                 })

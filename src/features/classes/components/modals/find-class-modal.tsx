@@ -89,10 +89,10 @@ export function FindClassModal({ trigger }: FindClassModalProps) {
         {trigger ?? (
           <Button
             variant="outline"
-            className="h-11 px-6 border-galaxy-blue text-galaxy-blue font-bold hover:bg-galaxy-blue/5"
+            className="cursor-pointer h-11 px-6 border-galaxy-blue text-galaxy-blue font-bold hover:bg-galaxy-blue/5"
           >
             <Search className="w-4 h-4 mr-2" />
-            Tìm lớp học
+            Nhập mã
           </Button>
         )}
       </DialogTrigger>

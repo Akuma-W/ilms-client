@@ -29,6 +29,6 @@ export function useClasses({ tab, search, page, limit, initialData }: UseClasses
     meta: data?.meta,
     isLoading,
     error,
-    mutate,
+    mutateClasses: mutate,
   };
 }

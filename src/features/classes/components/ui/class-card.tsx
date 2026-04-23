@@ -13,11 +13,11 @@ import { getGradientFromTitle } from '@/lib/ui/utils';
 interface ClassCardProps {
   classData: Class;
   index: number;
-  toggleStar: () => void;
+  toggleStar: (enrollmentId: string) => void;
 }
 
 export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
-  const ctaText = classData.status === 'approved' ? 'Vào học' : 'Tham gia';
+  const ctaText = classData.enrollment?.status === 'approved' ? 'Vào học' : 'Tham gia';
   const gradient = getGradientFromTitle(classData.title);
 
   return (
@@ -36,15 +36,18 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
 
         {/* Starred */}
         <div className="absolute top-4 right-4 z-10">
-          {classData.status === 'approved' && (
+          {classData.enrollment?.status === 'approved' && (
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer w-8 h-8 rounded-lg bg-white/50 hover:bg-white/80 text-gray-900 shadow-sm"
-              onClick={toggleStar}
+              className="cursor-pointer w-8 h-8 rounded-lg bg-white/80 hover:bg-white/80 text-gray-900 shadow-sm"
+              onClick={() => toggleStar(classData.enrollment!.id)}
             >
               <Star
-                className={cn('w-4 h-4', classData.isStarred && 'fill-yellow-400 text-yellow-400')}
+                className={cn(
+                  'w-4 h-4',
+                  classData.enrollment?.isStarred && 'fill-yellow-400 text-yellow-400',
+                )}
               />
             </Button>
           )}

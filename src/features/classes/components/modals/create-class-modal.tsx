@@ -27,14 +27,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const DEFAULT_CREATE_CLASS_VALUES = {
   title: '',
@@ -110,9 +104,9 @@ export function CreateClassModal() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
+        <Button className="cursor-pointer bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
           <Plus className="w-4 h-4 mr-2" />
-          Tạo lớp mới
+          Tạo lớp
         </Button>
       </DialogTrigger>
 
@@ -172,34 +166,32 @@ export function CreateClassModal() {
                   <FormLabel>
                     Chế độ hiển thị <span className="text-red-500">*</span>
                   </FormLabel>
-                  <Select
-                    value={field.value ? 'private' : 'public'}
-                    onValueChange={(v) => field.onChange(v === 'private')}
-                    disabled={isSubmitting}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <SelectValue placeholder="Chọn chế độ" />
-                        </div>
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      <SelectItem value="public" className="cursor-pointer">
-                        <div className="flex items-center gap-2 text-green-600">
-                          <Globe className="h-3.5 w-3.5 text-green-600" />
+                  <FormControl>
+                    <RadioGroup
+                      value={field.value ? 'private' : 'public'}
+                      onValueChange={(v) => field.onChange(v === 'private')}
+                      className="flex gap-6 cursor-pointer"
+                    >
+                      <FormItem className="flex items-center gap-2">
+                        <FormControl>
+                          <RadioGroupItem value="public" className="cursor-pointer" />
+                        </FormControl>
+                        <FormLabel className="cursor-pointer flex items-center gap-2 font-normal text-green-600">
+                          <Globe className="h-3.5 w-3.5" />
                           Công khai
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="private" className="cursor-pointer">
-                        <div className="flex items-center gap-2 text-red-600">
-                          <Lock className="h-3.5 w-3.5 text-red-600" />
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center gap-2">
+                        <FormControl>
+                          <RadioGroupItem value="private" className="cursor-pointer" />
+                        </FormControl>
+                        <FormLabel className="cursor-pointer flex items-center gap-2 font-normal text-red-600">
+                          <Lock className="h-3.5 w-3.5" />
                           Riêng tư
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
                 </FormItem>
               )}
             />

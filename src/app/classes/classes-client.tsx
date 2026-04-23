@@ -75,7 +75,7 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
   const listParams = useMemo(() => ({ tab, search, page, limit }), [tab, search, page, limit]);
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto">
+    <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
       {/* Page Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-black tracking-tight text-galaxy-blue">Danh sách lớp học</h1>
@@ -96,7 +96,7 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       </div>
 
       {/* Page Tools: Search, Create Class, Find Class */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-end gap-4">
         <div className="relative w-full">
           <ClassSearch value={search} onSearch={handleSearch} />
         </div>

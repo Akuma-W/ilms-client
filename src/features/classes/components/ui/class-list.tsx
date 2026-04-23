@@ -9,6 +9,8 @@ import { ClassCard } from './class-card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BookOpen } from 'lucide-react';
 import { ClassPagination } from './class-pagination';
+import { useStarredClasses } from '../../hooks/use-starred-classes';
+import { enrollmentService } from '../../services/enrollment.service';
 
 interface ClassListProps {
   initialData: QueryResponse<Class> | null;
@@ -22,12 +24,22 @@ interface ClassListProps {
 }
 
 export function ClassList({ initialData, params, onPageChange }: ClassListProps) {
-  const { classes, meta, isLoading, error } = useClasses({
+  const { classes, meta, isLoading, error, mutateClasses } = useClasses({
     ...params,
     initialData,
   });
 
-  const toggleStar = () => {};
+  const { mutateStar } = useStarredClasses();
+
+  const toggleStar = async (enrollmentId: string) => {
+    try {
+      await enrollmentService.toggleStar(enrollmentId);
+      mutateStar();
+      mutateClasses();
+    } catch (error) {
+      console.error('Error toggling star:', error);
+    }
+  };
 
   if (isLoading && !classes) return <ClassListSkeleton />;
 

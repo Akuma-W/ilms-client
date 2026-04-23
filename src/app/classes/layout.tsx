@@ -6,7 +6,7 @@ import { enrollmentService } from '@/features/classes/services/enrollment.servic
 
 export default async function ClassLayout({ children }: { children: React.ReactNode }) {
   const user = await userService.getMe();
-  const { classes, total } = await enrollmentService.getStarredClasses();
+  const data = await enrollmentService.getStarredClasses();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -20,7 +20,7 @@ export default async function ClassLayout({ children }: { children: React.ReactN
       <div className="flex flex-1">
         {/* Sidebar */}
         <div className="hidden md:block">
-          <ClassSidebar starredClasses={classes} total={total} />
+          <ClassSidebar initialStarredClasses={data} />
         </div>
 
         {/* Content */}

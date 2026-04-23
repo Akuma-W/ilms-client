@@ -10,3 +10,10 @@ export function getGradientFromTitle(title: string) {
   const index = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
   return colors[index];
 }
+
+export function getColorFromTitle(title: string) {
+  const colors = ['blue-500', 'purple-500', 'emerald-500', 'orange-500', 'cyan-500'];
+
+  const index = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
+  return colors[index];
+}

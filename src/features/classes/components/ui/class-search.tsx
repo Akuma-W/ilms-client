@@ -31,6 +31,7 @@ export function ClassSearch({ value, onSearch }: ClassSearchProps) {
       onChange={setSearchValue}
       onDelete={() => setSearchValue('')}
       placeholder="Tìm lớp học bằng tên lớp, tên giảng viên, môn học ..."
+      className="md:min-w-100 min-w-50"
     />
   );
 }
