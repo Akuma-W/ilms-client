@@ -24,8 +24,8 @@ export default async function ClassLayout({ children }: { children: React.ReactN
         </div>
 
         {/* Content */}
-        <div className="flex flex-col min-w-0 transition-all duration-300">
-          <main className="flex-1 custom-scrollbar">{children}</main>
+        <div className="flex flex-col w-full transition-all duration-300">
+          <main className="flex-1">{children}</main>
         </div>
       </div>
       <Footer />

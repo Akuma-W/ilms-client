@@ -17,58 +17,73 @@ export function ClassHero({ classData }: ClassHeroProps) {
   const gradient = getGradientFromTitle(classData.title);
 
   return (
-    <div className="relative h-64 flex items-end overflow-hidden bg-white border-b border-gray-100">
+    <div className="relative overflow-hidden bg-background border-b">
       {/* Background Pattern */}
-      <div className="absolute inset-0 z-0 opacity-5">
-        <div className={`absolute inset-0 ${gradient} bg-linear-to-br`} />
+      <div className="absolute inset-0 z-0">
+        <div className={`absolute inset-0 ${gradient} bg-linear-to-br opacity-50`} />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="container mx-auto px-8 pb-8 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-3xl">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.back()}
-                className="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200"
+      <div className="container relative z-10 mx-auto px-8 py-10 md:py-14">
+        {/* Top bar */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => router.replace('/classes')}
+            className="cursor-pointer gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="hidden md:inline">Quay lại</span>
+          </Button>
+        </div>
+
+        {/* Main content */}
+        <div className="flex flex-col justify-between gap-6">
+          {/* Meta */}
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <Badge
+              variant="secondary"
+              className={`font-semibold py-1 ${gradient} text-white bg-linear-to-b`}
+            >
+              {classData.subject}
+            </Badge>
+
+            <span className="text-foreground text-xs font-medium tracking-widest uppercase">
+              {classData.courseCode}
+            </span>
+          </div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl md:text-4xl font-black tracking-tight text-gray-900 text-wrap"
+          >
+            {classData.title}
+          </motion.h1>
+
+          {/* Info row */}
+          <div className="flex flex-wrap items-center gap-6 text-sm">
+            {/* Teacher */}
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20 text-[10px]">
+                {classData.teacher.fullName.charAt(0)}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{classData.teacher.fullName}</span>
+              </div>
+              <Badge
+                variant="outline"
+                className="bg-red-500 text-slate-50 border-gray-200 text-[9px] px-1.5 uppercase tracking-widest"
               >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-widest">
-                {classData.subject}
+                Giảng viên
               </Badge>
-              <span className="text-gray-400 text-xs font-bold tracking-widest uppercase">
-                {classData.courseCode}
-              </span>
             </div>
 
-            <div className="space-y-1">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl md:text-4xl font-black tracking-tight text-gray-900 text-wrap"
-              >
-                {classData.title}
-              </motion.h1>
-              <div className="flex flex-wrap gap-6 text-gray-500">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20 text-[10px]">
-                    {classData.teacher.fullName.charAt(0)}
-                  </div>
-                  <span className="text-sm font-bold text-gray-700">
-                    {classData.teacher.fullName}
-                  </span>
-                  <Badge className="bg-gray-100 text-gray-500 border-gray-200 text-[9px] h-4 px-1.5 uppercase tracking-widest">
-                    Giảng viên
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-bold text-gray-600">{classData.semester}</span>
-                </div>
-              </div>
+            {/* Semester */}
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-bold text-gray-600">{classData.semester}</span>
             </div>
           </div>
         </div>

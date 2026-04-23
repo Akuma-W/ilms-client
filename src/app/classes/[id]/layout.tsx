@@ -17,7 +17,7 @@ export default async function ClassDetailLayout({
   const isJoined = !!relation;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 px-8 w-full">
       {/* Hero Section */}
       <ClassHero classData={classData} />
 
@@ -25,7 +25,7 @@ export default async function ClassDetailLayout({
       <StickyNav classId={classData.id} isJoined={isJoined} />
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-8 py-12">{children}</div>
+      <div className="flex-1">{children}</div>
     </div>
   );
 }
