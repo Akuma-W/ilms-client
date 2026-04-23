@@ -35,7 +35,7 @@ export function StickyNav({ classId, isJoined }: { classId: string; isJoined?: b
           : 'bg-white border-b border-gray-100',
       )}
     >
-      <div className="container mx-auto px-8">
+      <div className="container mx-auto px-4">
         <div className="h-16 flex gap-2 overflow-x-auto no-scrollbar justify-start">
           <Tabs value={activeTab?.value} className="w-full">
             <TabsList className="bg-transparent border-b border-gray-200 rounded-none h-16 w-full justify-start p-0">
@@ -44,7 +44,7 @@ export function StickyNav({ classId, isJoined }: { classId: string; isJoined?: b
                   key={tab.value}
                   value={tab.value}
                   asChild
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500"
+                  className="shrink-0 h-full px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500"
                 >
                   <Link
                     href={`/classes/${classId}/${tab.value}`}

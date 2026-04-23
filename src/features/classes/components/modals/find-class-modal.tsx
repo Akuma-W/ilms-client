@@ -91,7 +91,7 @@ export function FindClassModal({ trigger }: FindClassModalProps) {
             variant="outline"
             className="cursor-pointer h-11 px-6 border-galaxy-blue text-galaxy-blue font-bold hover:bg-galaxy-blue/5"
           >
-            <Search className="w-4 h-4 mr-2" />
+            <Search className="w-4 h-4" />
             Nhập mã
           </Button>
         )}

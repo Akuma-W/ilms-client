@@ -149,27 +149,41 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
                       <TooltipTrigger asChild>
                         <Link
                           href={`/classes/${cls.id}`}
+                          style={{ '--class-theme': color } as React.CSSProperties}
                           className={cn(
-                            'flex items-center px-1 gap-3 py-2 rounded-xl transition-all group relative',
+                            'flex items-center px-1 gap-3 py-2 rounded-xl transition-all group relative border border-transparent',
                             isActive
-                              ? 'bg-white/5 text-galaxy-blue ring-1 ring-white/10'
-                              : 'text-slate-400 hover:border hover:border-galaxy-blue hover:text-galaxy-blue',
+                              ? 'text-galaxy-blue'
+                              : 'text-slate-400 hover:border-galaxy-blue',
                           )}
                         >
-                          <div className="flex text-sm items-center">
-                            <span
+                          <div className="flex text-sm items-center w-full">
+                            <div
                               className={cn(
-                                `text-${color} border-${color}`,
-                                'font-bold px-2 py-1 justify-between rounded-2xl border mr-2',                              )}
+                                'font-bold px-2 py-1 justify-between rounded-2xl border mr-2 transition-all duration-200',
+                                'border-(--class-theme) text-(--class-theme)',
+                                isActive
+                                  ? `bg-(--class-theme) text-white group-hover:scale-105`
+                                  : `text-(--class-theme) border-(--class-theme) group-hover:bg-(--class-theme) group-hover:text-white`,
+                              )}
                             >
                               {cls.courseCode}
-                            </span>
+                            </div>
                             {!isCollapsed && (
-                              <span className="font-medium line-clamp-1">{cls.title}</span>
+                              <span
+                                className={cn(
+                                  'font-medium transition-all duration-200 line-clamp-1',
+                                  isActive
+                                    ? 'group-hover:font-bold'
+                                    : 'text-slate-400 font-medium group-hover:font-bold group-hover:text-galaxy-blue',
+                                )}
+                              >
+                                {cls.title}
+                              </span>
                             )}
                           </div>
                           {isActive && (
-                            <div className="absolute inset-0 rounded-xl ring-1 ring-primary/50 ring-offset-2 ring-offset-background pointer-events-none" />
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-galaxy-blue transition-all group-hover:w-full" />
                           )}
                         </Link>
                       </TooltipTrigger>

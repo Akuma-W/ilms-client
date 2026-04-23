@@ -14,18 +14,13 @@ interface ClassHeroProps {
 
 export function ClassHero({ classData }: ClassHeroProps) {
   const router = useRouter();
-  const color = getGradientFromTitle(classData.title);
+  const gradient = getGradientFromTitle(classData.title);
 
   return (
     <div className="relative h-64 flex items-end overflow-hidden bg-white border-b border-gray-100">
       {/* Background Pattern */}
       <div className="absolute inset-0 z-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 10% 20%, ${color || '#1e3a8a'} 0%, transparent 60%), radial-gradient(circle at 90% 80%, #581c87 0%, transparent 60%)`,
-          }}
-        />
+        <div className={`absolute inset-0 ${gradient} bg-linear-to-br`} />
       </div>
 
       {/* Content */}
@@ -53,7 +48,7 @@ export function ClassHero({ classData }: ClassHeroProps) {
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-3xl md:text-4xl font-black tracking-tight text-gray-900"
+                className="text-3xl md:text-4xl font-black tracking-tight text-gray-900 text-wrap"
               >
                 {classData.title}
               </motion.h1>

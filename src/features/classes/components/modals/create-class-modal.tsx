@@ -105,7 +105,7 @@ export function CreateClassModal() {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Tạo lớp
         </Button>
       </DialogTrigger>

@@ -116,8 +116,8 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
         onValueChange={(value) => handleTabChange(value as ClassTabs)}
         className="space-y-10"
       >
-        <div className="flex items-center justify-between border-b border-gray-100 pb-px">
-          <TabsList className="bg-transparent h-auto p-0 gap-10">
+        <div className="overflow-x-auto no-scrollbar">
+          <TabsList className="bg-transparent h-auto">
             {classesTabItems.map((tab) => {
               if (user?.role !== 'teacher' && tab.value === 'created') return;
               return (
@@ -125,7 +125,7 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
                   key={tab.value}
                   value={tab.value}
                   className={cn(
-                    'px-1 py-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
+                    'p-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
                     'text-gray-400 hover:text-gray-600 active:text-primary',
                     'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary',
                   )}
