@@ -18,7 +18,7 @@ import Link from 'next/link';
 
 export default function RegisterClient() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden">
+    <div className="flex items-center justify-center p-6 bg-slate-50 relative overflow-hidden">
       {/* Subtle Galaxy Background Accents */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-100/50 rounded-full blur-[120px]" />
@@ -29,7 +29,7 @@ export default function RegisterClient() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-2/3 lg:w-1/2 relative z-10"
+        className="w-2/3 lg:w-2/5 relative z-10"
       >
         <Card className="border-none shadow-2xl shadow-gray-200/50 rounded-3xl overflow-hidden bg-white/80 backdrop-blur-sm">
           <div className="h-2 bg-galaxy" />

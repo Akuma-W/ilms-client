@@ -18,7 +18,7 @@ import { motion } from 'motion/react';
 
 export default function LoginClient() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-muted/40">
+    <div className="flex items-center justify-center px-4 py-12 bg-muted/40">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

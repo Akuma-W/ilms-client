@@ -27,7 +27,7 @@ const contacts = [
         href: 'tel:+84961243758',
       },
     ],
-    color: 'blue',
+    color: 'bg-blue-100 text-blue-600',
   },
   {
     key: 'email',
@@ -40,7 +40,7 @@ const contacts = [
         href: 'mailto:keiverse41@gmail.com',
       },
     ],
-    color: 'purple',
+    color: 'bg-purple-100 text-purple-600',
   },
   {
     key: 'address',
@@ -51,7 +51,7 @@ const contacts = [
         value: 'Thành phố Hồ Chí Minh, Việt Nam',
       },
     ],
-    color: 'orange',
+    color: 'bg-orange-100 text-orange-600',
   },
   {
     key: 'working-time',
@@ -61,7 +61,7 @@ const contacts = [
       { value: 'Thứ 2 - Thứ 6: 08:00 - 18:00' },
       // { value: 'Thứ 7: 08:00 - 12:00' },
     ],
-    color: 'green',
+    color: 'bg-green-100 text-green-600',
   },
 ];
 

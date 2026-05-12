@@ -3,6 +3,7 @@
 import { ContactSection } from '@/components/common/contact-section';
 import { Card, CardContent } from '@/components/ui/card';
 import { contacts } from '@/config/layout';
+import { cn } from '@/lib/utils';
 import { MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
@@ -44,11 +45,9 @@ export function ContactClient() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 + idx * 0.1 }}
               >
-                <Card className=" border-gray-100 shadow-sm">
-                  <CardContent className="px-6 py-2 flex gap-4">
-                    <div
-                      className={`p-3 bg-${contact.color}-50 rounded-xl text-${contact.color}-600`}
-                    >
+                <Card className="border-gray-100 shadow-sm">
+                  <CardContent className="px-6 flex gap-4">
+                    <div className={cn('p-3 rounded-xl', contact.color)}>
                       <Icon className="w-6 h-6" />
                     </div>
 
@@ -82,6 +81,7 @@ export function ContactClient() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
+          className="lg:col-span-2"
         >
           <ContactSection defaultType="contact" />
         </motion.div>
