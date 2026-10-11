@@ -57,7 +57,7 @@ export function ClassHero({ classData }: ClassHeroProps) {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl font-black tracking-tight text-gray-900 text-wrap"
+            className="text-2xl md:text-3xl font-black tracking-tight text-gray-900 text-wrap"
           >
             {classData.title}
           </motion.h1>

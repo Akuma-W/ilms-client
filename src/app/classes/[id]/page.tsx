@@ -1,10 +1,5 @@
 import { enrollmentService } from '@/features/classes/services/enrollment.service';
-import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-
-export const metadata: Metadata = {
-  title: 'Danh sách lớp',
-};
 
 interface ClassDetailProps {
   params: Promise<{ id: string }>;

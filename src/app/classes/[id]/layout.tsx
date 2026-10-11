@@ -25,7 +25,7 @@ export default async function ClassDetailLayout({
       <StickyNav classId={classData.id} isJoined={isJoined} />
 
       {/* Main Content Area */}
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 mt-2">{children}</div>
     </div>
   );
 }
