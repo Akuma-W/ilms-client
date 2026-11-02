@@ -20,7 +20,7 @@ export const createMaterialSchema = z.object({
     .min(3, 'Tiêu đề tài liệu ít nhất 3 ký tự')
     .max(100, 'Tiêu đề không được vượt quá 100 ký tự'),
   materialType: z.enum(['video', 'pdf', 'link', 'slide', 'document'] as const, {
-    errorMap: () => ({ message: 'Vui lòng chọn loại tài liệu hợp lệ' }),
+    message: 'Vui lòng chọn loại tài liệu hợp lệ',
   }),
   fileUrl: z.string().optional(),
   externalUrl: z
