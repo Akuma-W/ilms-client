@@ -1,6 +1,6 @@
 # AGENTS.md — INTERACTIVE LMS CLIENT (FRONTEND)
 
-> Engineering rules, architecture constraints, code style, and development workflows for AI Agents working within `interactive-lms-client/`.
+> Engineering rules, architecture constraints, code style, and development workflows for AI Agents working within `ilms-client/`.
 >
 > **Core Principle:** Maintain modular feature architecture, enforce clean hydration and page-rendering boundaries, preserve the Galaxy design system, and write maintainable, type-safe code with concise English documentation.
 
@@ -199,7 +199,7 @@ export function ClassesClient({ initialData }: ClassesClientProps) {
 
 ## 8. QUALITY ASSURANCE & VERIFICATION
 
-- Automated test runners (Jest/Vitest) are currently not installed in `interactive-lms-client`.
+- Automated test runners (Jest/Vitest) are currently not installed in `ilms-client`.
 - Before marking any frontend task complete, perform **Manual Verification**:
   1. Inspect UI responsiveness across Mobile, Tablet, and Desktop breakpoints.
   2. Test Dark Mode and Light Mode rendering.

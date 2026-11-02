@@ -31,7 +31,7 @@ The frontend of Interactive LMS is a modern web application built with Next.js 1
 ```bash
 # Clone the repository (if not already)
 git clone https://github.com/your-username/interactive-lms.git
-cd interactive-lms/interactive-lms-client
+cd ilms-client
 
 # Install dependencies
 npm install
@@ -45,7 +45,7 @@ npm run dev
 ## Folder Structure
 
 ```text
-interactive-lms-client/
+ilms-client/
 ├─ src/
 │  ├─ app/            # Next.js App Router pages
 │  ├─ components/     # Reusable UI components
