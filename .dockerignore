@@ -7,7 +7,7 @@
 **/.next
 **/.classpath
 **/.dockerignore
-**/.env
+**/.env*
 **/.git
 **/.gitignore
 **/.project
@@ -15,7 +15,6 @@
 **/.toolstarget
 **/.vs
 **/.vscode
-**/.next
 **/.cache
 **/*.*proj.user
 **/*.dbmdl

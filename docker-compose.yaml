@@ -1,6 +1,6 @@
 services:
   ilms-client:
-    image: ilms-client
+    image: ilms-client:latest
     container_name: ilms-client
     build:
       context: .
@@ -8,6 +8,7 @@ services:
       args:
         - NEXT_PUBLIC_CLIENT_API_URL=${NEXT_PUBLIC_CLIENT_API_URL}
         - NEXT_PUBLIC_SERVER_API_URL=${NEXT_PUBLIC_SERVER_API_URL}
+        - NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=${NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY}
     environment:
       NODE_ENV: production
     env_file:
@@ -15,16 +16,16 @@ services:
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.ilms-fe.loadbalancer.server.port=3000'
-      - 'traefik.http.routers.ilms-fe.rule=Host(`ilms.gzrcloud.com`)'
+      - 'traefik.http.routers.ilms-fe.rule=Host(`${APP_DOMAIN:-localhost}`)'
       - 'traefik.http.routers.ilms-fe.entryPoints=web,websecure'
       - 'traefik.http.routers.ilms-fe.tls=true'
       - 'traefik.http.routers.ilms-fe.tls.certresolver=letsencrypt'
     ports:
-      - 3000:3000
+      - '${CLIENT_PORT:-3000}:3000'
     networks:
       - ilms-network
 
 networks:
   ilms-network:
-    driver: bridge
+    name: ilms-network
     external: true

@@ -1,14 +1,14 @@
 # ========== Install deps ==========
 ARG NODE_VERSION=24
 
-FROM node:${NODE_VERSION}-alpine as deps
+FROM node:${NODE_VERSION}-alpine AS deps
 
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Build app
+# ========== Build app ==========
 FROM node:${NODE_VERSION}-alpine AS builder
 WORKDIR /app
 
@@ -26,6 +26,7 @@ COPY . .
 
 RUN npm run build
 
+# ========== Production runner ==========
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
 

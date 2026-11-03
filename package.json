@@ -10,6 +10,7 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "fix": "npm run format && npm run lint:fix",
     "shadcn": "shadcn@latest add"
   },
   "dependencies": {
