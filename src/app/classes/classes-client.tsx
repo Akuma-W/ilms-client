@@ -6,7 +6,7 @@ import { ClassSearch } from '@/features/classes/components/ui/class-search';
 import { CreateClassModal } from '@/features/classes/components/modals/create-class-modal';
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
 import { cn } from '@/lib/utils';
-import { ClassTabs } from '@/types';
+import { ClassTabs } from '@/types/enum';
 import { QueryResponse } from '@/types/api';
 import { Class, ClassParams } from '@/types/class';
 import { User } from '@/types/user';

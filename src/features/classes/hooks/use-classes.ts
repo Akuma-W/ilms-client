@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { Class, ClassParams } from '@/types/class';
 import { buildClassKey, fetchClasses } from '../utils/classes.utils';
 import { QueryResponse } from '@/types/api';
-import { ClassTabs } from '@/types';
+import { ClassTabs } from '@/types/enum';
 
 interface UseClassesParams extends ClassParams {
   initialData?: QueryResponse<Class> | null;

@@ -11,8 +11,8 @@ export interface Enrollment {
   joinedAt: Date | null;
   status: EnrollmentStatus;
 
-  class: Class;
-  user: User;
+  class?: Class;
+  user?: User;
 }
 
 export interface JoinClassDto {

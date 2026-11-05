@@ -1,0 +1,98 @@
+import type { GradeCategory, StudentGradeSummary } from '@/types/grade';
+import { MOCK_STUDENTS } from './mock-users';
+
+export const MOCK_GRADE_CATEGORIES: GradeCategory[] = [
+  {
+    id: 'gc100001-0000-4000-8000-000000000001',
+    name: 'Chuyên cần & Tham gia Meet',
+    weight: 0.1,
+    classId: 'a2b6d7c4-7bdd-41b7-9793-c89bd99d3d2a',
+  },
+  {
+    id: 'gc100002-0000-4000-8000-000000000002',
+    name: 'Bài tập về nhà (BTVN)',
+    weight: 0.3,
+    classId: 'a2b6d7c4-7bdd-41b7-9793-c89bd99d3d2a',
+  },
+  {
+    id: 'gc100003-0000-4000-8000-000000000003',
+    name: 'Kiểm tra trắc nghiệm (Quizizz)',
+    weight: 0.2,
+    classId: 'a2b6d7c4-7bdd-41b7-9793-c89bd99d3d2a',
+  },
+  {
+    id: 'gc100004-0000-4000-8000-000000000004',
+    name: 'Đồ án giữa kỳ (Trie & AVL)',
+    weight: 0.4,
+    classId: 'a2b6d7c4-7bdd-41b7-9793-c89bd99d3d2a',
+  },
+];
+
+export const MOCK_STUDENT_GRADES: StudentGradeSummary[] = [
+  {
+    studentId: MOCK_STUDENTS[0].id,
+    studentName: MOCK_STUDENTS[0].fullName,
+    studentEmail: MOCK_STUDENTS[0].email,
+    avatarUrl: MOCK_STUDENTS[0].avatarUrl,
+    attendanceScore: 10.0,
+    assignmentScore: 9.5,
+    quizScore: 10.0,
+    finalScore: 9.6,
+    rank: 2,
+  },
+  {
+    studentId: MOCK_STUDENTS[1].id,
+    studentName: MOCK_STUDENTS[1].fullName,
+    studentEmail: MOCK_STUDENTS[1].email,
+    avatarUrl: MOCK_STUDENTS[1].avatarUrl,
+    attendanceScore: 10.0,
+    assignmentScore: 10.0,
+    quizScore: 9.5,
+    finalScore: 9.8,
+    rank: 1,
+  },
+  {
+    studentId: MOCK_STUDENTS[2].id,
+    studentName: MOCK_STUDENTS[2].fullName,
+    studentEmail: MOCK_STUDENTS[2].email,
+    avatarUrl: MOCK_STUDENTS[2].avatarUrl,
+    attendanceScore: 9.0,
+    assignmentScore: 8.5,
+    quizScore: 9.0,
+    finalScore: 8.8,
+    rank: 4,
+  },
+  {
+    studentId: MOCK_STUDENTS[3].id,
+    studentName: MOCK_STUDENTS[3].fullName,
+    studentEmail: MOCK_STUDENTS[3].email,
+    avatarUrl: MOCK_STUDENTS[3].avatarUrl,
+    attendanceScore: 10.0,
+    assignmentScore: 9.0,
+    quizScore: 9.0,
+    finalScore: 9.2,
+    rank: 3,
+  },
+  {
+    studentId: MOCK_STUDENTS[4].id,
+    studentName: MOCK_STUDENTS[4].fullName,
+    studentEmail: MOCK_STUDENTS[4].email,
+    avatarUrl: MOCK_STUDENTS[4].avatarUrl,
+    attendanceScore: 8.5,
+    assignmentScore: 7.5,
+    quizScore: 8.0,
+    finalScore: 7.9,
+    rank: 6,
+  },
+  {
+    studentId: MOCK_STUDENTS[5].id,
+    studentName: MOCK_STUDENTS[5].fullName,
+    studentEmail: MOCK_STUDENTS[5].email,
+    avatarUrl: MOCK_STUDENTS[5].avatarUrl,
+    attendanceScore: 9.5,
+    assignmentScore: 8.0,
+    quizScore: 8.5,
+    finalScore: 8.4,
+    rank: 5,
+  },
+];

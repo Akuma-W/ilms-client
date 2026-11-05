@@ -1,7 +1,7 @@
 import { Enrollment } from './enrollment';
 import { School } from './school';
 import { User } from './user';
-import { ClassTabs } from './index';
+import { ClassTabs } from './enum';
 
 export interface Class {
   id: string;

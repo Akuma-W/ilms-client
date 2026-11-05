@@ -107,3 +107,12 @@ export const AIRequestType = {
 } as const;
 
 export type AIRequestType = (typeof AIRequestType)[keyof typeof AIRequestType];
+
+export const ClassTabs = {
+  DISCOVERY: 'discovery',
+  JOINED: 'joined',
+  PENDING: 'pending',
+  CREATED: 'created',
+} as const;
+
+export type ClassTabs = (typeof ClassTabs)[keyof typeof ClassTabs];

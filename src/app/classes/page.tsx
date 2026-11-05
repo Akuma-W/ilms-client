@@ -1,4 +1,4 @@
-import { ClassTabs } from '@/types';
+import { ClassTabs } from '@/types/enum';
 import { Metadata } from 'next';
 import ClassesClient from './classes-client';
 import { fetchClasses } from '@/features/classes/utils/classes.utils';

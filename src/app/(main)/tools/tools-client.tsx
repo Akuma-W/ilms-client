@@ -1,12 +1,13 @@
 'use client';
 
-import { iconToolMap, ToolInfomation } from '@/types';
+import { iconToolMap } from '@/config/tool';
+import type { ToolInformation } from '@/types/tool';
 import { Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 
 interface ToolsClientProps {
-  tools: ToolInfomation[];
+  tools: ToolInformation[];
 }
 
 export function ToolsClient({ tools }: ToolsClientProps) {

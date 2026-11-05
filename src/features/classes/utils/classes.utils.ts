@@ -1,4 +1,4 @@
-import { ClassTabs } from '@/types';
+import { ClassTabs } from '@/types/enum';
 import { QueryResponse } from '@/types/api';
 import { Class } from '@/types/class';
 import { enrollmentService } from '../services/enrollment.service';

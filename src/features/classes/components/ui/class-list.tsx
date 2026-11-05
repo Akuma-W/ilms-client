@@ -1,6 +1,6 @@
 'use client';
 
-import { ClassTabs } from '@/types';
+import { ClassTabs } from '@/types/enum';
 import { Class } from '@/types/class';
 import { useClasses } from '../../hooks/use-classes';
 import { QueryResponse } from '@/types/api';

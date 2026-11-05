@@ -1,14 +1,14 @@
 import { FileType } from './enum';
+import type { Assignment } from './assignment';
+import type { Quiz } from './quiz';
 
-export interface Topic {
+export interface Reference {
   id: string;
   title: string;
-  description: string | null;
-  orderIndex: number | null;
-  classId: string;
-  createdBy: string;
-  createdAt: string;
-  materials?: Material[];
+  url: string;
+  description?: string | null;
+  topicId: string;
+  createdAt?: string;
 }
 
 export interface Material {
@@ -19,6 +19,20 @@ export interface Material {
   externalUrl: string | null;
   topicId: string;
   createdAt: string;
+}
+
+export interface Topic {
+  id: string;
+  title: string;
+  description: string | null;
+  orderIndex: number | null;
+  classId: string;
+  createdBy: string;
+  createdAt: string;
+  materials?: Material[];
+  references?: Reference[];
+  assignments?: Assignment[];
+  quizzes?: Quiz[];
 }
 
 export interface CreateTopicPayload {
