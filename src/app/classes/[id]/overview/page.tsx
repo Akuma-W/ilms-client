@@ -41,7 +41,5 @@ export default async function ClassOverview({ params }: ClassOverviewProps) {
   //     isTeacher={isTeacher}
   //   />
   // );
-  return (
-    <div>Overview</div>
-  )
+  return <div>Overview</div>;
 }

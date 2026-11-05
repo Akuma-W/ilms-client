@@ -158,7 +158,7 @@
 //               <FolderOpen className="h-16 w-16 text-gray-300 mb-4" />
 //               <h3 className="text-lg font-bold text-gray-700">Chưa có bài giảng nào</h3>
 //               <p className="text-gray-400 text-sm max-w-sm mt-2">
-//                 {isTeacher 
+//                 {isTeacher
 //                   ? 'Hãy bắt đầu thiết lập bài học đầu tiên bằng cách nhấn nút "Thêm bài giảng mới" ở trên.'
 //                   : 'Giảng viên chưa tải lên nội dung bài học cho lớp này.'}
 //               </p>

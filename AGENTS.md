@@ -8,17 +8,17 @@
 
 ## 1. TECHNOLOGY STACK OVERVIEW
 
-| Technology | Version / Configuration | Purpose |
-| --- | --- | --- |
-| **Framework** | Next.js `^16.2.1` (App Router) | Core web application framework |
-| **Runtime Library** | React `19.2.3`, React DOM `19.2.3` | UI component library |
-| **Language** | TypeScript `^5.9.3` | Strict type safety |
-| **Styling** | Tailwind CSS `^4.2.2` (`@tailwindcss/postcss`) | CSS engine configured via `@theme inline` |
-| **UI Components** | shadcn/ui `^3.8.5` (style: new-york, Radix UI, Base UI) | Pre-built accessible components |
-| **Icons & Animations** | Lucide React (`^0.576.0`), Motion (`^12.38.0`) | Icons and motion transitions |
-| **Client State** | Zustand `^5.0.12` | Lightweight global client state management |
-| **Data Fetching** | SWR `^2.4.1` | Client-side caching, revalidation, and mutation |
-| **Form & Validation** | React Hook Form `^7.72.0`, Zod `^4.3.6` | Form state and client input validation |
+| Technology             | Version / Configuration                                 | Purpose                                         |
+| ---------------------- | ------------------------------------------------------- | ----------------------------------------------- |
+| **Framework**          | Next.js `^16.2.1` (App Router)                          | Core web application framework                  |
+| **Runtime Library**    | React `19.2.3`, React DOM `19.2.3`                      | UI component library                            |
+| **Language**           | TypeScript `^5.9.3`                                     | Strict type safety                              |
+| **Styling**            | Tailwind CSS `^4.2.2` (`@tailwindcss/postcss`)          | CSS engine configured via `@theme inline`       |
+| **UI Components**      | shadcn/ui `^3.8.5` (style: new-york, Radix UI, Base UI) | Pre-built accessible components                 |
+| **Icons & Animations** | Lucide React (`^0.576.0`), Motion (`^12.38.0`)          | Icons and motion transitions                    |
+| **Client State**       | Zustand `^5.0.12`                                       | Lightweight global client state management      |
+| **Data Fetching**      | SWR `^2.4.1`                                            | Client-side caching, revalidation, and mutation |
+| **Form & Validation**  | React Hook Form `^7.72.0`, Zod `^4.3.6`                 | Form state and client input validation          |
 
 ---
 
@@ -206,7 +206,6 @@ export function ClassesClient({ initialData }: ClassesClientProps) {
   3. Verify form validation with valid, boundary, and invalid inputs.
   4. Verify state handling: Loading skeleton, Empty state, Error alert, and Success feedback.
   5. Inspect browser Network tab to ensure no unnecessary duplicate API requests.
-
 
 ---
 

@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, Facebook, Linkedin, Github, Youtube, Clock } from 
 const navItems = [
   { label: 'Trang chủ', href: '/' },
   { label: 'Lớp học', href: '/classes' },
-  { label: 'Quiz', href: '/quizzes' },
+  { label: 'Bài trắc nghiệm', href: '/quizzes' },
   { label: 'Công cụ', href: '/tools' },
   { label: 'Liên hệ', href: '/contact' },
 ];
@@ -11,7 +11,7 @@ const navItems = [
 const quickLinks = [
   { label: 'Tham gia ngay', href: '/login' },
   { label: 'Lớp học', href: '/classes' },
-  { label: 'Ôn tập Quiz', href: '/quizzes' },
+  { label: 'Trắc nghiệm ôn tập', href: '/quizzes' },
   { label: 'Liên hệ', href: '/contact' },
 ];
 

@@ -30,7 +30,5 @@ export default async function ClassMaterials({ params }: ClassMaterialsProps) {
   // const flattenedMaterials = materialsWithTopicInfo.flat();
 
   // return <MaterialsClient initialMaterials={flattenedMaterials} />;
-  return (
-    <div>Materials</div>
-  );
+  return <div>Materials</div>;
 }

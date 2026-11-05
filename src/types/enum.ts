@@ -18,9 +18,18 @@ export const EnrollmentStatus = {
   pending: 'pending',
   approved: 'approved',
   rejected: 'rejected',
+  suspended: 'suspended',
 } as const;
 
 export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus];
+
+export const SchoolStatus = {
+  active: 'active',
+  deactivated: 'deactivated',
+  archived: 'archived',
+} as const;
+
+export type SchoolStatus = (typeof SchoolStatus)[keyof typeof SchoolStatus];
 
 export const FileType = {
   video: 'video',

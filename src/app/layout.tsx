@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
 import { SWRProvider } from '@/features/providers/swr-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { BackendConnectionModal } from '@/components/common/backend-connection-modal';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -34,7 +35,10 @@ export default function RootLayout({
     <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <SWRProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            {children}
+            <BackendConnectionModal />
+          </TooltipProvider>
         </SWRProvider>
         <Toaster position="top-right" richColors theme="light" duration={2000} />
       </body>

@@ -9,7 +9,7 @@
 //   // 1. Get all materials for a topic
 //   async getMaterials(topicId: string) {
 //     const result = await apiClient<Material[]>(`/materials/topics/${topicId}`);
-    
+
 //     if (!result.success || !result.data) {
 //       return [];
 //     }

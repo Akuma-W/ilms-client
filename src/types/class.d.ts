@@ -1,12 +1,7 @@
+import { Enrollment } from './enrollment';
 import { School } from './school';
 import { User } from './user';
-
-// type ClassStatus = {
-//   find: "find",
-//   joined: "joined",
-//   pending: "pending",
-//   created: "created",
-// }
+import { ClassTabs } from './index';
 
 export interface Class {
   id: string;
@@ -16,6 +11,9 @@ export interface Class {
   courseCode: string;
   semester: string | null;
   isPrivate: boolean;
+  meetingUri?: string | null;
+  meetingSpaceId?: string | null;
+  isArchived?: boolean;
   schoolId: string;
   teacherId: string;
   createdAt: Date;

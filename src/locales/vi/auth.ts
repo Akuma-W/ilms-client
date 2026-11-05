@@ -45,4 +45,3 @@ export const authLocales = {
     submitButton: 'Kích hoạt tài khoản',
   },
 } as const;
-

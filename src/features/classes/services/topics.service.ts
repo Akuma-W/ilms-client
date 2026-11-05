@@ -7,7 +7,7 @@
 //   // 1. Get all topics for a class
 //   async getTopics(classId: string) {
 //     const result = await apiClient<Topic[]>(`/topics/classes/${classId}`);
-    
+
 //     if (!result.success || !result.data) {
 //       return [];
 //     }

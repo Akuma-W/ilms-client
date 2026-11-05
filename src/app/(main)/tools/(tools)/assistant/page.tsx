@@ -1,200 +1,83 @@
 'use client';
 
-import { Bot, Trash2, User, Sparkles, Loader2, Send, Brain } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { Bot, Sparkles, Clock, ArrowLeft } from 'lucide-react';
+import { motion } from 'motion/react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
+/**
+ * AI Assistant preview placeholder page.
+ * Notifies users that the integrated AI learning assistant is currently under development.
+ */
 export default function AIAssistant() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: 'Chào bạn! Mình là trợ lý AI của KEIVerse. Mình có thể giúp gì cho bạn hôm nay?',
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
-    setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
-    setIsLoading(true);
-
-    try {
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        body: JSON.stringify({ message: userMessage }),
-      });
-
-      const data = await res.json();
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: data.text || 'Không có phản hồi',
-        },
-      ]);
-    } catch (error) {
-      console.error('AI Error:', error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: 'Có lỗi xảy ra khi kết nối với AI. Vui lòng thử lại sau.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([
-      {
-        role: 'assistant',
-        content: 'Chào bạn! Mình là trợ lý AI của KEIVerse. Mình có thể giúp gì cho bạn hôm nay?',
-      },
-    ]);
-  };
-
   return (
-    <>
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-galaxy-purple/10 rounded-2xl">
-            <Brain className="w-8 h-8 text-galaxy-purple" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              Trợ lý AI Thông minh
-            </h1>
-            <p className="text-gray-600">
-              Sử dụng trí tuệ nhân tạo để giải đáp thắc mắc và hỗ trợ học tập.
-            </p>
-          </div>
-        </div>
+    <div className="container mx-auto max-w-4xl px-4 py-12">
+      <div className="mb-6">
+        <Link href="/tools">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="cursor-pointer gap-2 text-gray-600 hover:text-galaxy-blue"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Quay lại Công cụ
+          </Button>
+        </Link>
       </div>
 
-      {/* Main Component */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="max-w-4xl mx-auto"
+        transition={{ duration: 0.4 }}
       >
-        <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 flex flex-col h-150">
-          <div className="flex items-center justify-between mb-6 pb-4 border-bottom border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-galaxy-blue/10 rounded-2xl">
-                <Bot className="w-6 h-6 text-galaxy-blue" />
+        <Card className="overflow-hidden border-border/80 shadow-lg">
+          <div className="h-2 bg-galaxy" />
+          <CardHeader className="text-center py-10 space-y-3">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-galaxy-purple/10 text-galaxy-purple">
+              <Bot className="h-9 w-9" />
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900">
+              Trợ lý Học tập AI KEIVerse
+            </CardTitle>
+            <CardDescription className="text-base max-w-md mx-auto text-gray-500">
+              Tính năng hỏi đáp và trợ giúp học tập thông minh đang được nâng cấp để kết nối trực
+              tiếp với tài liệu lớp học của bạn.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="pb-12 text-center space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold text-galaxy-blue">
+              <Clock className="h-3.5 w-3.5" />
+              Đang phát triển (Coming Soon)
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto pt-4 text-left">
+              <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                <Sparkles className="h-5 w-5 text-amber-500 mb-2" />
+                <h4 className="font-semibold text-sm text-gray-900 mb-1">Giải đáp học tập</h4>
+                <p className="text-xs text-gray-500">
+                  Hỗ trợ trả lời câu hỏi và làm rõ khái niệm chuyên môn.
+                </p>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Trợ lý AI</h2>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs text-gray-500 font-medium">Đang hoạt động</span>
-                </div>
+              <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                <Bot className="h-5 w-5 text-galaxy-blue mb-2" />
+                <h4 className="font-semibold text-sm text-gray-900 mb-1">Gắn liền học liệu</h4>
+                <p className="text-xs text-gray-500">
+                  Phân tích trực tiếp nội dung bài giảng và tài liệu của môn học.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                <Sparkles className="h-5 w-5 text-galaxy-purple mb-2" />
+                <h4 className="font-semibold text-sm text-gray-900 mb-1">Lộ trình ôn tập</h4>
+                <p className="text-xs text-gray-500">
+                  Gợi ý câu hỏi và bài tập phù hợp với tiến độ cá nhân.
+                </p>
               </div>
             </div>
-            <button
-              onClick={clearChat}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-              title="Xóa cuộc trò chuyện"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div
-            ref={scrollRef}
-            className="flex-1 overflow-y-auto space-y-4 mb-6 pr-2 custom-scrollbar"
-          >
-            <AnimatePresence mode="popLayout">
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-                  >
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                        msg.role === 'user'
-                          ? 'bg-galaxy-purple text-white'
-                          : 'bg-galaxy-blue text-white'
-                      }`}
-                    >
-                      {msg.role === 'user' ? (
-                        <User className="w-4 h-4" />
-                      ) : (
-                        <Sparkles className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div
-                      className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                        msg.role === 'user'
-                          ? 'bg-galaxy-purple text-white rounded-tr-none'
-                          : 'bg-gray-100 text-gray-800 rounded-tl-none shadow-sm'
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="flex gap-3 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-galaxy-blue text-white flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div className="p-4 bg-gray-100 rounded-2xl rounded-tl-none">
-                    <Loader2 className="w-5 h-5 animate-spin text-galaxy-blue" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={handleSend} className="relative">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Hỏi mình bất cứ điều gì..."
-              className="w-full pl-6 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-galaxy-blue focus:bg-white transition-all"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-galaxy-blue text-white rounded-xl hover:bg-blue-600 disabled:opacity-50 disabled:hover:bg-galaxy-blue transition-all"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
-        </div>
+          </CardContent>
+        </Card>
       </motion.div>
-    </>
+    </div>
   );
 }

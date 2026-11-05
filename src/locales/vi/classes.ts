@@ -17,7 +17,7 @@ export const classesLocales = {
       info: 'Thông tin',
       materials: 'Tài liệu bài giảng',
       assignments: 'Bài tập',
-      quizzes: 'Đề kiểm tra',
+      quizzes: 'Bài trắc nghiệm',
       forums: 'Diễn đàn',
       grades: 'Bảng điểm',
       members: 'Thành viên',
@@ -44,4 +44,3 @@ export const classesLocales = {
     emptyMaterials: 'Chủ đề này chưa có tài liệu nào.',
   },
 } as const;
-

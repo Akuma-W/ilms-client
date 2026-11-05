@@ -8,13 +8,18 @@ interface UseCurrentUserProps {
   initialUser?: User | null;
 }
 
+/**
+ * Hook providing current authenticated user state via SWR.
+ * Optimizes network overhead by relying on focus revalidation instead of periodic polling.
+ */
 export function useCurrentUser({ initialUser }: UseCurrentUserProps = {}) {
   const { data, error, isLoading, mutate } = useSWR<User | null>(
     '/users/me',
     () => userService.getMe(),
     {
       fallbackData: initialUser || null,
-      refreshInterval: 10 * 1000, // 10s
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
     },
   );
 

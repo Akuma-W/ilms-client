@@ -29,10 +29,10 @@ const banners = [
   },
   {
     id: '3',
-    title: 'Thử thách Quiz',
+    title: 'Bài trắc nghiệm ôn tập',
     subtitle: 'Ôn tập kiến thức với hàng ngàn câu hỏi trắc nghiệm.',
     image: 'https://picsum.photos/seed/banner3/1920/600',
-    cta: 'Làm Quiz ngay',
+    cta: 'Làm bài ngay',
     href: '/quizzes',
   },
 ];
@@ -46,7 +46,7 @@ const features = [
     color: 'bg-blue-500',
   },
   {
-    title: 'Quiz ôn tập',
+    title: 'Bài trắc nghiệm ôn tập',
     description: 'Hệ thống bài tập trắc nghiệm đa dạng, giúp củng cố kiến thức sau mỗi bài học.',
     icon: BookOpen,
     color: 'bg-purple-500',
@@ -88,8 +88,8 @@ const steps = [
     icon: FileText,
   },
   {
-    title: 'Tham gia bài tập / Quiz',
-    description: 'Kiểm tra kiến thức định kỳ qua các bài tập và quiz tương tác.',
+    title: 'Tham gia bài tập / Trắc nghiệm',
+    description: 'Kiểm tra kiến thức định kỳ qua các bài tập và bài trắc nghiệm tương tác.',
     icon: GraduationCap,
   },
   {

@@ -37,6 +37,7 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
         return <Home className="w-4 h-4" />;
       case 'Lớp học':
         return <GraduationCap className="w-4 h-4" />;
+      case 'Bài trắc nghiệm':
       case 'Quiz':
         return <BookOpen className="w-4 h-4" />;
       case 'Công cụ':

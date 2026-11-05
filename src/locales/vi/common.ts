@@ -34,7 +34,7 @@ export const commonLocales = {
   nav: {
     home: 'Trang chủ',
     classes: 'Lớp học',
-    quizzes: 'Đề kiểm tra',
+    quizzes: 'Bài trắc nghiệm',
     tools: 'Công cụ AI',
     profile: 'Hồ sơ cá nhân',
     admin: 'Quản trị hệ thống',
@@ -47,4 +47,3 @@ export const commonLocales = {
     pageOf: 'Trang {page} trên {total}',
   },
 } as const;
-
