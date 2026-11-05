@@ -1,46 +1,37 @@
-// 'use server';
+import { clientApiClient } from '@/lib/api/client-api-client';
+import { CreateTopicPayload, Topic } from '@/types/topic';
 
-// import { apiClient } from '@/lib/api/api-client';
-// import { CreateTopicPayload, Topic } from '@/types';
+/**
+ * Client-side topics service for Browser Components (CSR, SWR, Mutations).
+ */
+export const topicsService = {
+  async getTopics(classId: string): Promise<Topic[]> {
+    const res = await clientApiClient<Topic[] | Record<string, Topic>>(
+      `/topics/classes/${classId}`,
+    );
+    const raw = res.data;
+    if (Array.isArray(raw)) return raw;
+    if (raw && typeof raw === 'object') return Object.values(raw);
+    return [];
+  },
 
-// export const topicsService = {
-//   // 1. Get all topics for a class
-//   async getTopics(classId: string) {
-//     const result = await apiClient<Topic[]>(`/topics/classes/${classId}`);
+  async createTopic(classId: string, payload: CreateTopicPayload) {
+    return clientApiClient<Topic>(`/topics/classes/${classId}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 
-//     if (!result.success || !result.data) {
-//       return [];
-//     }
+  async updateTopic(id: string, payload: Partial<CreateTopicPayload>) {
+    return clientApiClient<Topic>(`/topics/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
 
-//     return result.data;
-//   },
-
-//   // 2. Create a new topic under a class
-//   async createTopic(classId: string, payload: CreateTopicPayload) {
-//     const result = await apiClient<Topic>(`/topics/classes/${classId}`, {
-//       method: 'POST',
-//       body: JSON.stringify(payload),
-//     });
-
-//     return result;
-//   },
-
-//   // 3. Update topic title/description
-//   async updateTopic(id: string, payload: CreateTopicPayload) {
-//     const result = await apiClient<Topic>(`/topics/${id}`, {
-//       method: 'PATCH',
-//       body: JSON.stringify(payload),
-//     });
-
-//     return result;
-//   },
-
-//   // 4. Delete topic
-//   async deleteTopic(id: string) {
-//     const result = await apiClient<{ message: string }>(`/topics/${id}`, {
-//       method: 'DELETE',
-//     });
-
-//     return result;
-//   },
-// };
+  async deleteTopic(id: string) {
+    return clientApiClient<{ message: string }>(`/topics/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};

@@ -47,6 +47,20 @@ export async function getEnrolledClasses(params: ClassQueryParams): Promise<Clas
 - **Types & Interfaces:** `PascalCase` (e.g., `Class`, `CreateClassPayload`, `SidebarState`).
 - **Constants:** `UPPER_SNAKE_CASE` (e.g., `CLIENT_API_URL`, `DEFAULT_PAGE_SIZE`).
 
+### 2.3. Clean Architecture & Single Responsibility Principle (SRP)
+
+- **File Length Ceiling:** Every file MUST NOT exceed **350 lines** (target: 100–250 lines). If a component exceeds 300 lines, immediately extract sub-components or utility helpers.
+- **Strict Separation of Concerns:**
+  - **No In-Component Types:** Never declare extensive domain interfaces inside `.tsx` components. Put them in `src/types/{feature}.d.ts`.
+  - **No In-Component Helpers:** Move all parsers, URL formatters, file-size calculations, and icon resolvers into `src/features/{feature}/utils/`.
+  - **Page Orchestration:** The main page component (`[name]-client.tsx`) acts purely as a coordinator assembling sub-components from `src/features/{feature}/components/`.
+
+### 2.4. Global `cursor-pointer` Standard
+
+- The `cursor-pointer` styling is already baked into `src/components/ui/button.tsx` (via `buttonVariants`) and `src/app/globals.css` (`button:not(:disabled) { cursor: pointer; }`).
+- **FORBIDDEN:** Do not manually add `className="cursor-pointer ..."` to `<Button>` components.
+- **ALLOWED:** Apply `cursor-pointer` only to non-button interactive elements (e.g. clickable cards, accordion headers, custom filter tabs).
+
 ---
 
 ## 3. ARCHITECTURE & FOLDER STRUCTURE
@@ -191,13 +205,39 @@ export function ClassesClient({ initialData }: ClassesClientProps) {
   - Field names: English.
   - Validation messages: Clear Vietnamese for student/teacher display.
   - Always export the inferred type: `export type CreateClassFormValues = z.infer<typeof createClassSchema>;`
-- **TypeScript Types:**
-  - Common domain entities are in `src/types/*.d.ts` (e.g., `class.d.ts`, `user.d.ts`, `api.d.ts`).
-  - Do not use `any`. Use generics or `unknown` with type narrowing.
+- **TypeScript Declaration Files (`src/types/*.d.ts`):**
+  - All shared entity and data contract types MUST be written as `.d.ts` files (e.g., `class.d.ts`, `topic.d.ts`, `user.d.ts`, `api.d.ts`).
+  - **Zero Runtime Code in `.d.ts`:** Never place `const`, functions, classes, or valued enums inside `.d.ts`. Use `.ts` exclusively for files exporting runtime objects (such as `enum.ts` or `ClassTabs` in `index.ts`).
+  - **Direct Import:** Always import types directly from their respective module: `import type { Topic, Material } from '@/types/topic';`.
+  - **FORBIDDEN:** Never re-export `.d.ts` files from `src/types/index.ts` using `export * from './user'`, as Next.js bundler will fail looking for runtime `.js` files.
 
 ---
 
-## 8. QUALITY ASSURANCE & VERIFICATION
+## 8. CLASSROOM WORKSPACE & PAGE DESIGN CONVENTIONS
+
+- **Full-Width Workspace:** All classroom pages (`src/app/classes/[id]/`) must render across the full width (`w-full` with `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`), eliminating 2/3 left-biased containers.
+- **Hub-and-Spoke Topic Model:**
+  - `Topic` serves as the structural spine of the course.
+  - Each Topic contains 4 groups of learning resources:
+    1. **Bài giảng (Lectures / Materials):** Video YouTube/MP4, Slide PDF.
+    2. **Tài liệu tham khảo (References):** Textbooks, external links, exercises.
+    3. **Bài tập (Assignments):** Homework, projects with deadlines and grading.
+    4. **Trắc nghiệm (Quizzes):** Interactive online/offline quiz assessments.
+- **Page Roles:**
+  - **Tổng quan (`/overview`):** The Master Syllabus. Shows all topics. When expanded, reveals all 4 resource categories. Topic action: "Thêm tài nguyên".
+  - **Tài liệu (`/materials`):** Learning Materials Filter. Shows topics filtering only Lectures + References. Topic action: "Thêm tài liệu".
+- **Action Buttons & RBAC:**
+  - Every resource item supports: Edit (`Sửa`), Delete (`Xóa`), and View/Download (`Xem/Tải`).
+  - Every Topic supports: Edit Topic (`Sửa`), Delete Topic (`Xóa`), and Add Resource (`Thêm tài nguyên` / `Thêm tài liệu`).
+  - Mutating actions (Add, Edit, Delete) are strictly gated to Teachers (`isTeacher === true`).
+- **Plural URL Standard for Details:**
+  - `/classes/[id]/materials/[itemId]`
+  - `/classes/[id]/assignments/[itemId]`
+  - `/classes/[id]/forums/[postId]`
+
+---
+
+## 9. QUALITY ASSURANCE & VERIFICATION
 
 - Automated test runners (Jest/Vitest) are currently not installed in `ilms-client`.
 - Before marking any frontend task complete, perform **Manual Verification**:

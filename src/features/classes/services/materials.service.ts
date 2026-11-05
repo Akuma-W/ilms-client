@@ -1,77 +1,77 @@
-// 'use server';
+import { clientApiClient } from '@/lib/api/client-api-client';
+import { CreateMaterialPayload, Material } from '@/types/topic';
+import { CLIENT_API_URL } from '@/config';
 
-// import { cookies } from 'next/headers';
-// import { CLIENT_API_URL } from '@/config';
-// import { apiClient } from '@/lib/api/api-client';
-// import { CreateMaterialPayload, Material } from '@/types';
+/**
+ * Client-side materials service for Browser Components (CSR, SWR, Upload, Mutations).
+ */
+export const materialsService = {
+  async getMaterials(topicId: string): Promise<Material[]> {
+    const res = await clientApiClient<Material[] | Record<string, Material>>(
+      `/materials/topics/${topicId}`,
+    );
+    const raw = res.data;
+    if (Array.isArray(raw)) return raw;
+    if (raw && typeof raw === 'object') return Object.values(raw);
+    return [];
+  },
 
-// export const materialsService = {
-//   // 1. Get all materials for a topic
-//   async getMaterials(topicId: string) {
-//     const result = await apiClient<Material[]>(`/materials/topics/${topicId}`);
+  async createMaterial(topicId: string, payload: CreateMaterialPayload) {
+    return clientApiClient<Material>(`/materials/topics/${topicId}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 
-//     if (!result.success || !result.data) {
-//       return [];
-//     }
+  async updateMaterial(id: string, payload: Partial<CreateMaterialPayload>) {
+    return clientApiClient<Material>(`/materials/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
 
-//     return result.data;
-//   },
+  async deleteMaterial(id: string) {
+    return clientApiClient<{ message: string }>(`/materials/${id}`, {
+      method: 'DELETE',
+    });
+  },
 
-//   // 2. Create a new material under a topic
-//   async createMaterial(topicId: string, payload: CreateMaterialPayload) {
-//     const result = await apiClient<Material>(`/materials/topics/${topicId}`, {
-//       method: 'POST',
-//       body: JSON.stringify(payload),
-//     });
+  /**
+   * Upload file to MinIO object storage via NestJS storage controller.
+   */
+  async uploadFile(formData: FormData): Promise<{
+    success: boolean;
+    message?: string;
+    data: { url: string; key: string } | null;
+  }> {
+    try {
+      const targetUrl = `${CLIENT_API_URL}/storage/upload?folder=materials`;
+      const res = await fetch(targetUrl, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
 
-//     return result;
-//   },
+      const data = await res.json().catch(() => null);
 
-//   // 3. Delete material by ID
-//   async deleteMaterial(id: string) {
-//     const result = await apiClient<{ message: string }>(`/materials/${id}`, {
-//       method: 'DELETE',
-//     });
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data?.message || 'Tải tệp tin lên thất bại',
+          data: null,
+        };
+      }
 
-//     return result;
-//   },
-
-//   // 4. Upload file to MinIO/Local storage via NestJS Storage endpoint
-//   async uploadFile(formData: FormData) {
-//     const cookiesStore = await cookies();
-//     const accessToken = cookiesStore.get('access_token')?.value;
-
-//     try {
-//       const res = await fetch(`${CLIENT_API_URL}/storage/upload?folder=materials`, {
-//         method: 'POST',
-//         body: formData,
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           // Note: DO NOT set Content-Type header, fetch will automatically set it with boundary
-//         },
-//       });
-
-//       if (!res.ok) {
-//         const errorRes = await res.json().catch(() => null);
-//         return {
-//           success: false,
-//           message: errorRes?.message || 'File upload failed',
-//           data: null,
-//         };
-//       }
-
-//       const result = await res.json();
-//       return {
-//         success: true,
-//         message: 'Upload successful',
-//         data: result, // result will contain { path, url }
-//       };
-//     } catch (error) {
-//       return {
-//         success: false,
-//         message: error instanceof Error ? error.message : 'An error occurred during upload',
-//         data: null,
-//       };
-//     }
-//   },
-// };
+      return {
+        success: true,
+        data: data?.data || data,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Lỗi kết nối khi tải tệp',
+        data: null,
+      };
+    }
+  },
+};

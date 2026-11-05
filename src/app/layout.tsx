@@ -9,6 +9,7 @@ import { BackendConnectionModal } from '@/components/common/backend-connection-m
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {

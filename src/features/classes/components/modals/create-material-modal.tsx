@@ -1,389 +1,466 @@
-// 'use client';
+'use client';
 
-// import { FileText, Link as LinkIcon, Paperclip, Play, Presentation, UploadCloud, X } from 'lucide-react';
-// import { useId, useState } from 'react';
-// import { useForm } from 'react-hook-form';
-// import { zodResolver } from '@hookform/resolvers/zod';
-// import { toast } from 'sonner';
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-// } from '@/components/ui/dialog';
-// import { Button } from '@/components/ui/button';
-// import {
-//   Form,
-//   FormControl,
-//   FormField,
-//   FormItem,
-//   FormLabel,
-//   FormMessage,
-// } from '@/components/ui/form';
-// import { Input } from '@/components/ui/input';
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select';
-// import { CreateMaterialFormValues, createMaterialSchema } from '../../schemas/topic.schema';
-// import { materialsService } from '../../services/materials.service';
-// import { FileType } from '@/types/enum';
+import {
+  FileText,
+  Link as LinkIcon,
+  Play,
+  Presentation,
+  UploadCloud,
+  X,
+  FolderOpen,
+  Layers,
+} from 'lucide-react';
+import { useId, useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CreateMaterialFormValues, createMaterialSchema } from '../../schemas/topic.schema';
+import { materialsService } from '../../services/materials.service';
+import { FileType } from '@/types/enum';
+import { Topic } from '@/types/topic';
 
-// interface CreateMaterialModalProps {
-//   topicId: string;
-//   isOpen: boolean;
-//   onOpenChange: (open: boolean) => void;
-//   onSuccess: () => void;
-// }
+interface CreateMaterialModalProps {
+  topicId?: string;
+  topics?: Topic[];
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}
 
-// const DEFAULT_VALUES = {
-//   title: '',
-//   materialType: 'pdf' as FileType,
-//   fileUrl: '',
-//   externalUrl: '',
-// };
+const DEFAULT_VALUES: CreateMaterialFormValues = {
+  title: '',
+  materialType: 'pdf' as FileType,
+  fileUrl: '',
+  externalUrl: '',
+};
 
-// export function CreateMaterialModal({
-//   topicId,
-//   isOpen,
-//   onOpenChange,
-//   onSuccess,
-// }: CreateMaterialModalProps) {
-//   const formId = useId();
-//   const [isUploading, setIsUploading] = useState(false);
-//   const [uploadProgress, setUploadProgress] = useState(0);
-//   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+/**
+ * Modal dialog for teachers to add learning materials (PDF, Slide, Video, Doc, Link) to a topic.
+ */
+export function CreateMaterialModal({
+  topicId,
+  topics,
+  isOpen,
+  onOpenChange,
+  onSuccess,
+}: CreateMaterialModalProps) {
+  const formId = useId();
+  const [selectedTopicId, setSelectedTopicId] = useState<string>(
+    topicId || (topics && topics.length > 0 ? topics[0].id : ''),
+  );
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-//   const form = useForm<CreateMaterialFormValues>({
-//     resolver: zodResolver(createMaterialSchema),
-//     defaultValues: DEFAULT_VALUES,
-//   });
+  useEffect(() => {
+    if (topicId) {
+      setSelectedTopicId(topicId);
+    } else if (topics && topics.length > 0 && !selectedTopicId) {
+      setSelectedTopicId(topics[0].id);
+    }
+  }, [topicId, topics, selectedTopicId]);
 
-//   const {
-//     control,
-//     handleSubmit,
-//     setValue,
-//     watch,
-//     reset,
-//     formState: { isSubmitting },
-//   } = form;
+  const form = useForm<CreateMaterialFormValues>({
+    resolver: zodResolver(createMaterialSchema),
+    defaultValues: DEFAULT_VALUES,
+  });
 
-//   const currentType = watch('materialType');
-//   const fileUrl = watch('fileUrl');
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
-//   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const files = e.target.files;
-//     if (files && files.length > 0) {
-//       await uploadSelectedFile(files[0]);
-//     }
-//   };
+  const currentType = watch('materialType');
+  const fileUrl = watch('fileUrl');
 
-//   const handleDragOver = (e: React.DragEvent) => {
-//     e.preventDefault();
-//   };
+  const uploadSelectedFile = async (file: File) => {
+    setSelectedFile(file);
+    setIsUploading(true);
+    setUploadProgress(25);
 
-//   const handleDrop = async (e: React.DragEvent) => {
-//     e.preventDefault();
-//     const files = e.dataTransfer.files;
-//     if (files && files.length > 0) {
-//       await uploadSelectedFile(files[0]);
-//     }
-//   };
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-//   const uploadSelectedFile = async (file: File) => {
-//     setSelectedFile(file);
-//     setIsUploading(true);
-//     setUploadProgress(20);
+      setUploadProgress(60);
+      const res = await materialsService.uploadFile(formData);
+      setUploadProgress(90);
 
-//     try {
-//       const formData = new FormData();
-//       formData.append('file', file);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || 'Tải lên tệp thất bại');
+      }
 
-//       setUploadProgress(50);
-//       const res = await materialsService.uploadFile(formData);
-//       setUploadProgress(85);
+      const fileUrlResult = res.data.url;
+      setValue('fileUrl', fileUrlResult, { shouldValidate: true });
 
-//       if (!res.success || !res.data) {
-//         throw new Error(res.message || 'Tải lên tệp thất bại');
-//       }
+      // Auto-populate title from file name if current title is empty
+      const currentTitle = form.getValues('title');
+      if (!currentTitle) {
+        const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+        setValue('title', nameWithoutExt, { shouldValidate: true });
+      }
 
-//       const fileUrlResult = res.data.url;
-//       setValue('fileUrl', fileUrlResult, { shouldValidate: true });
+      setUploadProgress(100);
+      toast.success('Tải lên tệp thành công!');
+    } catch (error) {
+      setSelectedFile(null);
+      setValue('fileUrl', '');
+      toast.error('Lỗi khi tải tệp lên', {
+        description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
+      });
+    } finally {
+      setIsUploading(false);
+      setTimeout(() => setUploadProgress(0), 1000);
+    }
+  };
 
-//       // Auto-populate title if empty
-//       const currentTitle = form.getValues('title');
-//       if (!currentTitle) {
-//         const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-//         setValue('title', nameWithoutExt, { shouldValidate: true });
-//       }
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      await uploadSelectedFile(files[0]);
+    }
+  };
 
-//       setUploadProgress(100);
-//       toast.success('Tải lên tệp thành công!');
-//     } catch (error) {
-//       setSelectedFile(null);
-//       setValue('fileUrl', '');
-//       toast.error('Lỗi khi tải lên tệp tin', {
-//         description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
-//       });
-//     } finally {
-//       setIsUploading(false);
-//       setTimeout(() => setUploadProgress(0), 1000);
-//     }
-//   };
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
 
-//   const onSubmit = async (values: CreateMaterialFormValues) => {
-//     try {
-//       const payload = {
-//         title: values.title,
-//         materialType: values.materialType,
-//         fileUrl: values.materialType !== 'link' ? values.fileUrl : undefined,
-//         externalUrl: values.materialType === 'link' ? values.externalUrl : undefined,
-//       };
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await uploadSelectedFile(files[0]);
+    }
+  };
 
-//       const res = await materialsService.createMaterial(topicId, payload);
+  const removeFile = () => {
+    setSelectedFile(null);
+    setValue('fileUrl', '', { shouldValidate: true });
+  };
 
-//       if (!res.success) {
-//         throw new Error(res.message || 'Tạo tài liệu thất bại');
-//       }
+  const handleClose = () => {
+    if (isSubmitting || isUploading) return;
+    onOpenChange(false);
+    reset(DEFAULT_VALUES);
+    setSelectedFile(null);
+  };
 
-//       toast.success('Thêm tài liệu thành công!');
-//       onSuccess();
-//       handleClose();
-//     } catch (error) {
-//       toast.error('Thêm tài liệu thất bại', {
-//         description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
-//       });
-//     }
-//   };
+  const onSubmit = async (values: CreateMaterialFormValues) => {
+    const targetTopicId = topicId || selectedTopicId;
+    if (!targetTopicId) {
+      toast.error('Vui lòng chọn chủ đề bài học trước khi thêm tài liệu');
+      return;
+    }
 
-//   const handleClose = () => {
-//     if (isSubmitting || isUploading) return;
-//     onOpenChange(false);
-//     reset(DEFAULT_VALUES);
-//     setSelectedFile(null);
-//   };
+    try {
+      const payload = {
+        title: values.title,
+        materialType: values.materialType,
+        fileUrl: values.materialType !== 'link' ? values.fileUrl : undefined,
+        externalUrl: values.materialType === 'link' ? values.externalUrl : undefined,
+      };
 
-//   const removeFile = () => {
-//     setSelectedFile(null);
-//     setValue('fileUrl', '', { shouldValidate: true });
-//   };
+      const res = await materialsService.createMaterial(targetTopicId, payload);
 
-//   return (
-//     <Dialog open={isOpen} onOpenChange={handleClose}>
-//       <DialogContent
-//         className="sm:max-w-130"
-//         onInteractOutside={(e) => (isSubmitting || isUploading) && e.preventDefault()}
-//         onEscapeKeyDown={(e) => (isSubmitting || isUploading) && e.preventDefault()}
-//       >
-//         <DialogHeader>
-//           <DialogTitle className="text-xl font-bold text-galaxy-blue flex items-center gap-2">
-//             <Paperclip className="h-5 w-5 text-purple-600" />
-//             Thêm tài liệu học tập mới
-//           </DialogTitle>
-//         </DialogHeader>
+      if (!res.success) {
+        throw new Error(res.message || 'Tạo tài liệu thất bại');
+      }
 
-//         <Form {...form}>
-//           <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2" noValidate>
-//             <FormField
-//               control={control}
-//               name="materialType"
-//               render={({ field }) => (
-//                 <FormItem>
-//                   <FormLabel>Loại tài liệu</FormLabel>
-//                   <Select
-//                     onValueChange={(v) => {
-//                       field.onChange(v);
-//                       removeFile();
-//                       setValue('externalUrl', '');
-//                     }}
-//                     value={field.value}
-//                     disabled={isSubmitting || isUploading}
-//                   >
-//                     <FormControl>
-//                       <SelectTrigger className="cursor-pointer">
-//                         <SelectValue placeholder="Chọn loại tài liệu" />
-//                       </SelectTrigger>
-//                     </FormControl>
-//                     <SelectContent>
-//                       <SelectItem value="pdf" className="cursor-pointer">
-//                         <div className="flex items-center gap-2">
-//                           <FileText className="h-4 w-4 text-red-500" />
-//                           Tài liệu PDF
-//                         </div>
-//                       </SelectItem>
-//                       <SelectItem value="slide" className="cursor-pointer">
-//                         <div className="flex items-center gap-2">
-//                           <Presentation className="h-4 w-4 text-orange-500" />
-//                           Bài thuyết trình / Slide
-//                         </div>
-//                       </SelectItem>
-//                       <SelectItem value="video" className="cursor-pointer">
-//                         <div className="flex items-center gap-2">
-//                           <Play className="h-4 w-4 text-blue-500" />
-//                           Bài giảng Video
-//                         </div>
-//                       </SelectItem>
-//                       <SelectItem value="document" className="cursor-pointer">
-//                         <div className="flex items-center gap-2">
-//                           <FileText className="h-4 w-4 text-emerald-500" />
-//                           Tài liệu văn bản (Word/Doc)
-//                         </div>
-//                       </SelectItem>
-//                       <SelectItem value="link" className="cursor-pointer">
-//                         <div className="flex items-center gap-2">
-//                           <LinkIcon className="h-4 w-4 text-purple-500" />
-//                           Liên kết ngoài (YouTube/Website)
-//                         </div>
-//                       </SelectItem>
-//                     </SelectContent>
-//                   </Select>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
+      toast.success('Thêm tài liệu thành công!');
+      onSuccess();
+      handleClose();
+    } catch (error) {
+      toast.error('Thêm tài liệu thất bại', {
+        description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
+      });
+    }
+  };
 
-//             <FormField
-//               control={control}
-//               name="title"
-//               render={({ field }) => (
-//                 <FormItem>
-//                   <FormLabel>
-//                     Tiêu đề tài liệu <span className="text-red-500">*</span>
-//                   </FormLabel>
-//                   <FormControl>
-//                     <Input
-//                       placeholder={
-//                         selectedFile
-//                           ? 'Sử dụng tên tệp hoặc nhập tiêu đề mới'
-//                           : 'VD: Giáo trình Lập trình mạng nâng cao'
-//                       }
-//                       disabled={isSubmitting || isUploading}
-//                       {...field}
-//                     />
-//                   </FormControl>
-//                   <FormMessage />
-//                 </FormItem>
-//               )}
-//             />
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent
+        className="sm:max-w-lg rounded-xl border border-border bg-card text-card-foreground shadow-xl p-6"
+        onInteractOutside={(e) => (isSubmitting || isUploading) && e.preventDefault()}
+        onEscapeKeyDown={(e) => (isSubmitting || isUploading) && e.preventDefault()}
+      >
+        <DialogHeader className="flex flex-row items-center gap-3 space-y-0 pb-2 border-b border-border/50">
+          <div className="flex items-center justify-center size-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
+            <FolderOpen className="size-4.5" />
+          </div>
+          <div>
+            <DialogTitle className="text-base font-semibold text-foreground">
+              Thêm tài liệu học tập mới
+            </DialogTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Hỗ trợ tệp đính kèm (PDF, Slide, Video, Word) hoặc liên kết ngoài.
+            </p>
+          </div>
+        </DialogHeader>
 
-//             {currentType === 'link' ? (
-//               <FormField
-//                 control={control}
-//                 name="externalUrl"
-//                 render={({ field }) => (
-//                   <FormItem>
-//                     <FormLabel>
-//                       Liên kết ngoài <span className="text-red-500">*</span>
-//                     </FormLabel>
-//                     <FormControl>
-//                       <Input
-//                         placeholder="https://example.com/tai-lieu-tham-khao"
-//                         disabled={isSubmitting}
-//                         {...field}
-//                       />
-//                     </FormControl>
-//                     <FormMessage />
-//                   </FormItem>
-//                 )}
-//               />
-//             ) : (
-//               <div className="space-y-2">
-//                 <FormLabel>
-//                   Tệp đính kèm <span className="text-red-500">*</span>
-//                 </FormLabel>
+        <Form {...form}>
+          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-3" noValidate>
+            {!topicId && topics && topics.length > 0 && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                  <Layers className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                  Chủ đề bài học
+                </label>
+                <Select
+                  value={selectedTopicId}
+                  onValueChange={setSelectedTopicId}
+                  disabled={isSubmitting || isUploading}
+                >
+                  <SelectTrigger className="cursor-pointer rounded-lg h-9 text-sm">
+                    <SelectValue placeholder="Chọn chủ đề bài học..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {topics.map((t) => (
+                      <SelectItem key={t.id} value={t.id} className="cursor-pointer">
+                        {t.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-//                 {fileUrl ? (
-//                   <div className="flex items-center justify-between border border-emerald-200 bg-emerald-50/50 p-3 rounded-lg">
-//                     <div className="flex items-center gap-2 truncate">
-//                       <FileText className="h-5 w-5 text-emerald-600 shrink-0" />
-//                       <span className="text-sm font-medium text-emerald-800 truncate">
-//                         {selectedFile ? selectedFile.name : 'Đã tải lên tệp tin'}
-//                       </span>
-//                     </div>
-//                     <Button
-//                       type="button"
-//                       variant="ghost"
-//                       size="icon"
-//                       className="h-8 w-8 text-emerald-800 hover:bg-emerald-100"
-//                       onClick={removeFile}
-//                       disabled={isSubmitting || isUploading}
-//                     >
-//                       <X className="h-4 w-4" />
-//                     </Button>
-//                   </div>
-//                 ) : (
-//                   <div
-//                     onDragOver={handleDragOver}
-//                     onDrop={handleDrop}
-//                     className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors relative"
-//                   >
-//                     <input
-//                       type="file"
-//                       id="material-file"
-//                       className="hidden"
-//                       onChange={handleFileChange}
-//                       disabled={isSubmitting || isUploading}
-//                     />
-//                     <label
-//                       htmlFor="material-file"
-//                       className="flex flex-col items-center justify-center cursor-pointer w-full"
-//                     >
-//                       <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
-//                       <p className="text-sm font-semibold text-gray-700">Kéo thả tệp hoặc nhấp để chọn</p>
-//                       <p className="text-xs text-gray-500 mt-1">
-//                         Chấp nhận các tệp văn bản, video, pdf lên tới 50MB
-//                       </p>
-//                     </label>
+            <FormField
+              control={control}
+              name="materialType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-medium text-foreground">
+                    Định dạng tài liệu
+                  </FormLabel>
+                  <Select
+                    onValueChange={(v) => {
+                      field.onChange(v);
+                      removeFile();
+                      setValue('externalUrl', '');
+                    }}
+                    value={field.value}
+                    disabled={isSubmitting || isUploading}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="cursor-pointer rounded-lg h-9 text-sm">
+                        <SelectValue placeholder="Chọn loại tài liệu" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="rounded-lg">
+                      <SelectItem value="pdf" className="cursor-pointer text-xs">
+                        <div className="flex items-center gap-2">
+                          <FileText className="size-3.5 text-red-500" />
+                          <span>Tài liệu PDF</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="slide" className="cursor-pointer text-xs">
+                        <div className="flex items-center gap-2">
+                          <Presentation className="size-3.5 text-orange-500" />
+                          <span>Bài thuyết trình / Slide</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="video" className="cursor-pointer text-xs">
+                        <div className="flex items-center gap-2">
+                          <Play className="size-3.5 text-blue-500" />
+                          <span>Bài giảng Video</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="document" className="cursor-pointer text-xs">
+                        <div className="flex items-center gap-2">
+                          <FileText className="size-3.5 text-emerald-500" />
+                          <span>Văn bản Word / DOCX</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="link" className="cursor-pointer text-xs">
+                        <div className="flex items-center gap-2">
+                          <LinkIcon className="size-3.5 text-purple-500" />
+                          <span>Liên kết ngoài (YouTube / Website)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
 
-//                     {isUploading && (
-//                       <div className="absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center rounded-xl p-4">
-//                         <UploadCloud className="h-8 w-8 text-blue-500 animate-bounce mb-2" />
-//                         <span className="text-sm font-medium text-gray-700">
-//                           Đang tải lên hệ thống MinIO... ({uploadProgress}%)
-//                         </span>
-//                         <div className="w-48 bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
-//                           <div
-//                             className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-//                             style={{ width: `${uploadProgress}%` }}
-//                           />
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
-//                 )}
-//                 {/* Hidden input to hold fileUrl for form validation */}
-//                 <input type="hidden" {...control.register('fileUrl')} />
-//                 <FormField
-//                   control={control}
-//                   name="fileUrl"
-//                   render={() => (
-//                     <FormItem>
-//                       <FormMessage />
-//                     </FormItem>
-//                   )}
-//                 />
-//               </div>
-//             )}
-//           </form>
-//         </Form>
+            <FormField
+              control={control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-medium text-foreground">
+                    Tiêu đề tài liệu <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={
+                        selectedFile
+                          ? selectedFile.name
+                          : 'VD: Giáo trình Chương 1: Kiến trúc Client-Server'
+                      }
+                      disabled={isSubmitting || isUploading}
+                      className="rounded-lg h-9 text-sm"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
 
-//         <DialogFooter className="mt-4">
-//           <Button variant="outline" className="cursor-pointer" onClick={handleClose} disabled={isSubmitting || isUploading}>
-//             Hủy
-//           </Button>
-//           <Button
-//             className="cursor-pointer bg-galaxy text-white"
-//             onClick={handleSubmit(onSubmit)}
-//             disabled={isSubmitting || isUploading}
-//           >
-//             {isSubmitting ? 'Đang lưu...' : 'Thêm tài liệu'}
-//           </Button>
-//         </DialogFooter>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// }
+            {currentType === 'link' ? (
+              <FormField
+                control={control}
+                name="externalUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-medium text-foreground">
+                      Đường dẫn liên kết (URL) <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://example.com/tai-lieu-tham-khao"
+                        disabled={isSubmitting}
+                        className="rounded-lg h-9 text-sm font-mono text-xs"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <div className="space-y-1.5">
+                <FormLabel className="text-xs font-medium text-foreground">
+                  Tệp đính kèm <span className="text-destructive">*</span>
+                </FormLabel>
+
+                {fileUrl ? (
+                  <div className="flex items-center justify-between border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/30 px-3.5 py-2.5 rounded-lg">
+                    <div className="flex items-center gap-2.5 truncate">
+                      <FileText className="size-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span className="text-xs font-medium text-emerald-900 dark:text-emerald-200 truncate">
+                        {selectedFile ? selectedFile.name : 'Đã tải lên tệp tin'}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-7 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/20 rounded-md cursor-pointer"
+                      onClick={removeFile}
+                      disabled={isSubmitting || isUploading}
+                    >
+                      <X className="size-3.5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    className="border-2 border-dashed border-border/80 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer bg-muted/20 hover:bg-muted/40 transition-colors relative"
+                  >
+                    <input
+                      type="file"
+                      id="material-file-input"
+                      className="hidden"
+                      onChange={handleFileChange}
+                      disabled={isSubmitting || isUploading}
+                    />
+                    <label
+                      htmlFor="material-file-input"
+                      className="flex flex-col items-center justify-center cursor-pointer w-full text-center"
+                    >
+                      <UploadCloud className="size-8 text-muted-foreground mb-1.5" />
+                      <p className="text-xs font-medium text-foreground">
+                        Kéo thả tệp hoặc nhấp để chọn
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Chấp nhận tài liệu PDF, DOCX, Slide, Video (tối đa 50MB)
+                      </p>
+                    </label>
+
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-background/90 backdrop-blur-xs flex flex-col items-center justify-center rounded-xl p-4">
+                        <UploadCloud className="size-6 text-emerald-500 animate-bounce mb-1.5" />
+                        <span className="text-xs font-medium text-foreground">
+                          Đang tải lên MinIO... ({uploadProgress}%)
+                        </span>
+                        <div className="w-40 bg-muted h-1 rounded-full mt-2 overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-1 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Hidden input to hold fileUrl for form validation */}
+                <input type="hidden" {...control.register('fileUrl')} />
+                <FormField
+                  control={control}
+                  name="fileUrl"
+                  render={() => (
+                    <FormItem>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+          </form>
+        </Form>
+
+        <DialogFooter className="gap-2 pt-2 border-t border-border/50">
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer rounded-lg text-xs h-8.5"
+            onClick={handleClose}
+            disabled={isSubmitting || isUploading}
+          >
+            Hủy
+          </Button>
+          <Button
+            size="sm"
+            className="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium"
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting || isUploading}
+          >
+            {isSubmitting ? 'Đang lưu...' : 'Thêm tài liệu'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
