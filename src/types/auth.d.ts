@@ -26,3 +26,5 @@ export interface GoogleUser {
   avatar?: string;
   fullName: string;
 }
+
+export type AuthCallbackStatus = 'loading' | 'success' | 'error';

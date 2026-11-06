@@ -1,4 +1,4 @@
-import { siteConfig } from '@/config';
+import { SITE_CONFIG } from '@/config';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ export function Logo({
   withSlogan = false,
   className,
 }: LogoProps) {
-  const { name, slogan, logo } = siteConfig;
+  const { name, slogan, logo } = SITE_CONFIG;
 
   const sizeClasses = {
     sm: 'h-8 w-8',

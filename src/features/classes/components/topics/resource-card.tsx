@@ -18,15 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMaterialBadgeConfig, formatDateVi } from '../../utils/resource.utils';
-import type { Material, Reference } from '@/types/topic';
-import type { Assignment } from '@/types/assignment';
-import type { Quiz } from '@/types/quiz';
-
-export type UnifiedResource =
-  | { kind: 'material'; data: Material }
-  | { kind: 'reference'; data: Reference }
-  | { kind: 'assignment'; data: Assignment }
-  | { kind: 'quiz'; data: Quiz };
+import type { UnifiedResource } from '@/types/topic';
 
 interface ResourceCardProps {
   item: UnifiedResource;
@@ -66,7 +58,7 @@ function ResourceBadges({ item }: { item: UnifiedResource }) {
     const badge = getMaterialBadgeConfig(item.data.materialType);
     return (
       <span
-        className={`px-2 py-0.5 text-[11px] font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
+        className={`px-2.5 py-0.5 text-xs font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
       >
         {badge.label}
       </span>
@@ -74,20 +66,20 @@ function ResourceBadges({ item }: { item: UnifiedResource }) {
   }
   if (item.kind === 'reference') {
     return (
-      <span className="px-2 py-0.5 text-[11px] font-medium rounded border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
+      <span className="px-2.5 py-0.5 text-xs font-medium rounded border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
         Tham khảo
       </span>
     );
   }
   if (item.kind === 'assignment') {
     return (
-      <span className="px-2 py-0.5 text-[11px] font-medium rounded border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20">
+      <span className="px-2.5 py-0.5 text-xs font-medium rounded border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20">
         Bài tập
       </span>
     );
   }
   return (
-    <span className="px-2 py-0.5 text-[11px] font-medium rounded border bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20">
+    <span className="px-2.5 py-0.5 text-xs font-medium rounded border bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20">
       Trắc nghiệm
     </span>
   );
@@ -112,16 +104,19 @@ export function ResourceCard({
       <div className="flex items-center gap-2.5 min-w-0 pr-2">
         <ResourceIcon item={item} />
         <div className="min-w-0">
-          <p className="text-xs font-medium text-foreground truncate">{title}</p>
-          <div className="flex items-center gap-2 mt-0.5">
+          <p className="text-sm font-medium text-foreground truncate">{title}</p>
+          {item.kind === 'reference' && item.data.description && (
+            <p className="text-xs text-muted-foreground truncate mt-0.5">{item.data.description}</p>
+          )}
+          <div className="flex items-center gap-2 mt-1">
             <ResourceBadges item={item} />
             {item.kind === 'assignment' && item.data.dueAt && (
-              <span className="text-[11px] text-muted-foreground truncate">
+              <span className="text-xs text-muted-foreground truncate">
                 Hạn: {formatDateVi(item.data.dueAt)}
               </span>
             )}
             {item.kind === 'quiz' && item.data.timeLimit > 0 && (
-              <span className="text-[11px] text-muted-foreground truncate">
+              <span className="text-xs text-muted-foreground truncate">
                 {item.data.timeLimit} phút
               </span>
             )}

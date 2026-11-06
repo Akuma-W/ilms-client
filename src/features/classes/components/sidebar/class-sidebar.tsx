@@ -1,13 +1,13 @@
 'use client';
 
-import { Class } from '@/types/class';
+import type { Class } from '@/types/class';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { classNavItems } from '@/config/class';
+import { CLASS_SIDEBAR_NAV } from '@/config';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { DeadlineWidget } from './deadline-widget';
 import useSidebarStore from '@/stores/sidebar-store';
 import { useStarredClasses } from '../../hooks/use-starred-classes';
-import { getColorFromTitle } from '@/lib/ui/utils';
+import { getClassTheme } from '@/lib/ui/utils';
 
 interface ClassSidebarProps {
   initialStarredClasses?: {
@@ -69,7 +69,7 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
               </h3>
             )}
 
-            {classNavItems.map((item) => {
+            {CLASS_SIDEBAR_NAV.map((item) => {
               return (
                 <Tooltip key={item.label}>
                   <TooltipTrigger asChild>
@@ -142,14 +142,14 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
               {total > 0 ? (
                 starredClasses.map((cls) => {
                   const isActive = classId === cls.id;
-                  const color = getColorFromTitle(cls.title);
+                  const clsTheme = getClassTheme(cls);
 
                   return (
                     <Tooltip key={cls.id}>
                       <TooltipTrigger asChild>
                         <Link
                           href={`/classes/${cls.id}`}
-                          style={{ '--class-theme': color } as React.CSSProperties}
+                          style={{ '--class-theme': clsTheme.hex } as React.CSSProperties}
                           className={cn(
                             'flex items-center px-1 gap-3 py-2 rounded-xl transition-all group relative border border-transparent',
                             isActive

@@ -1,10 +1,10 @@
 import { BannerCarousel } from '@/components/home/banner-carousel';
-import { banners, features, steps } from '@/config/home';
+import { HOME_BANNERS, HOME_FEATURES, HOME_STEPS } from '@/config';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ContactSection } from '@/components/common/contact-section';
-import { siteConfig } from '@/config';
+import { SITE_CONFIG } from '@/config';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,12 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  const { slogan } = siteConfig;
+  const { slogan } = SITE_CONFIG;
 
   return (
     <section className="flex flex-col w-full overflow-x-hidden">
       {/* Banner */}
-      <BannerCarousel banners={banners} />
+      <BannerCarousel banners={HOME_BANNERS} />
 
       {/* Slogan Bar */}
       <div className="w-full bg-galaxy py-8 text-center relative overflow-hidden">
@@ -44,7 +44,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
+            {HOME_FEATURES.map((feature, index) => (
               <div
                 key={index}
                 className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1 group"
@@ -135,7 +135,7 @@ export default function Home() {
             <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-linear-to-r from-blue-500 via-purple-500 to-blue-500 -translate-y-1/2 opacity-20"></div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12">
-              {steps.map((step, index) => (
+              {HOME_STEPS.map((step, index) => (
                 <div key={index} className="relative flex flex-col items-center text-center group">
                   <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-6 border border-white/20 transition-all group-hover:bg-galaxy group-hover:scale-110 relative z-10">
                     <step.icon className="w-10 h-10 text-blue-400 group-hover:text-white" />

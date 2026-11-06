@@ -46,3 +46,20 @@ export interface CreateMaterialPayload {
   fileUrl?: string;
   externalUrl?: string;
 }
+
+export type UnifiedResource =
+  | { kind: 'material'; data: Material }
+  | { kind: 'reference'; data: Reference }
+  | { kind: 'assignment'; data: Assignment }
+  | { kind: 'quiz'; data: Quiz };
+
+export type MaterialWithTopic = Material & {
+  topicTitle?: string;
+};
+
+export interface MaterialBadgeConfig {
+  label: string;
+  bg: string;
+  text: string;
+  border: string;
+}

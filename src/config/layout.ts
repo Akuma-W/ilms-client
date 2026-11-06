@@ -1,21 +1,35 @@
-import { Phone, Mail, MapPin, Facebook, Linkedin, Github, Youtube, Clock } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Facebook,
+  Linkedin,
+  Github,
+  Youtube,
+  Clock,
+  Home,
+  GraduationCap,
+  BookOpen,
+  Dices,
+  HelpCircle,
+} from 'lucide-react';
 
-const navItems = [
-  { label: 'Trang chủ', href: '/' },
-  { label: 'Lớp học', href: '/classes' },
-  { label: 'Bài trắc nghiệm', href: '/quizzes' },
-  { label: 'Công cụ', href: '/tools' },
-  { label: 'Liên hệ', href: '/contact' },
-];
+export const MAIN_NAV_ITEMS = [
+  { label: 'Trang chủ', href: '/', icon: Home },
+  { label: 'Lớp học', href: '/classes', icon: GraduationCap },
+  { label: 'Bài trắc nghiệm', href: '/quizzes', icon: BookOpen },
+  { label: 'Công cụ', href: '/tools', icon: Dices },
+  { label: 'Liên hệ', href: '/contact', icon: HelpCircle },
+] as const;
 
-const quickLinks = [
+export const QUICK_LINKS = [
   { label: 'Tham gia ngay', href: '/login' },
   { label: 'Lớp học', href: '/classes' },
   { label: 'Trắc nghiệm ôn tập', href: '/quizzes' },
   { label: 'Liên hệ', href: '/contact' },
-];
+] as const;
 
-const contacts = [
+export const FOOTER_CONTACTS = [
   {
     key: 'phone',
     icon: Phone,
@@ -57,19 +71,14 @@ const contacts = [
     key: 'working-time',
     icon: Clock,
     title: 'Giờ làm việc',
-    items: [
-      { value: 'Thứ 2 - Thứ 6: 08:00 - 18:00' },
-      // { value: 'Thứ 7: 08:00 - 12:00' },
-    ],
+    items: [{ value: 'Thứ 2 - Thứ 6: 08:00 - 18:00' }],
     color: 'bg-green-100 text-green-600',
   },
-];
+] as const;
 
-const socials = [
+export const SOCIAL_LINKS = [
   { icon: Facebook, href: 'https://www.facebook.com', hover: 'hover:bg-blue-500' },
   { icon: Linkedin, href: 'https://www.linkedin.com', hover: 'hover:bg-blue-700' },
   { icon: Github, href: 'https://www.github.com', hover: 'hover:bg-gray-600' },
   { icon: Youtube, href: 'https://www.youtube.com', hover: 'hover:bg-red-600' },
-];
-
-export { navItems, quickLinks, contacts, socials };
+] as const;

@@ -5,13 +5,12 @@ import { Button } from '../ui/button';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CONTACT_FORM_CONFIG } from '@/config/contact';
+import { CONTACT_FORM_CONFIG, WEB3FORMS_ACCESS_KEY } from '@/config';
 import { toast } from 'sonner';
-import { Feedback } from '@/types/contact';
+import type { Feedback } from '@/types/contact';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { WEB3FORMS_ACCESS_KEY } from '@/config';
 
 const ContactSchema = z.object({
   name: z.string().min(1, 'Vui lòng nhập tên'),

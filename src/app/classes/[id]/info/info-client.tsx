@@ -11,12 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ROLE_CONFIG } from '@/config/role';
+import { ROLE_CONFIG } from '@/config';
 import { InfoItem } from '@/features/classes/components/items/info-item';
-import { getColorFromTitle } from '@/lib/ui/utils';
-import { Class } from '@/types/class';
-import { Enrollment } from '@/types/enrollment';
-import { User } from '@/types/user';
+import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
+import type { Class } from '@/types/class';
+import type { Enrollment } from '@/types/enrollment';
+import type { User } from '@/types/user';
 import {
   AlertTriangle,
   BookOpen,
@@ -45,7 +45,8 @@ export function InfoClient({ classData, userData, relation }: InfoClientProps) {
 
   const isTeacher = relation?.roleIn === 'teacher';
   const isJoined = !!relation;
-  const color = getColorFromTitle(classData?.title || '');
+  const classTheme = getClassTheme(classData);
+  const subjectTheme = getSubjectTheme(classData?.subject);
 
   if (!classData || !userData) return null;
 
@@ -54,21 +55,29 @@ export function InfoClient({ classData, userData, relation }: InfoClientProps) {
       icon: Calendar,
       label: 'Học kỳ & Năm học',
       value: classData.semester,
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
     },
     {
       icon: BookOpen,
       label: 'Mã lớp học',
       value: classData.courseCode,
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
     },
     {
       icon: GraduationCap,
       label: 'Môn học',
       value: classData.subject,
+      subtleBg: subjectTheme.subtleBg,
+      iconClass: subjectTheme.icon,
     },
     {
       icon: Globe,
       label: 'Chế độ lớp học',
       value: classData.isPrivate ? 'Riêng tư' : 'Công khai',
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
     },
   ];
 
@@ -164,7 +173,8 @@ export function InfoClient({ classData, userData, relation }: InfoClientProps) {
                 icon={item.icon}
                 label={item.label}
                 value={item.value}
-                color={color}
+                subtleBg={item.subtleBg}
+                iconClass={item.iconClass}
               />
             ))}
           </div>

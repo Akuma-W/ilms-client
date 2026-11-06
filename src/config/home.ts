@@ -9,8 +9,9 @@ import {
   UserPlus,
   Users,
 } from 'lucide-react';
+import type { HomeBanner, HomeFeature, HomeStep } from '@/types/home';
 
-const banners = [
+export const HOME_BANNERS: HomeBanner[] = [
   {
     id: '1',
     title: 'Chào mừng đến với KEIVerse',
@@ -37,7 +38,7 @@ const banners = [
   },
 ];
 
-const features = [
+export const HOME_FEATURES: HomeFeature[] = [
   {
     title: 'Tương tác lớp học',
     description:
@@ -71,7 +72,7 @@ const features = [
   },
 ];
 
-const steps = [
+export const HOME_STEPS: HomeStep[] = [
   {
     title: 'Đăng ký / Đăng nhập',
     description: 'Tạo tài khoản cá nhân để bắt đầu hành trình học tập của bạn.',
@@ -98,5 +99,3 @@ const steps = [
     icon: MessageSquare,
   },
 ];
-
-export { banners, features, steps };

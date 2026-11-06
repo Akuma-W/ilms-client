@@ -22,7 +22,7 @@ import {
   getMaterialBadgeConfig,
   formatDateVi,
 } from '../../utils/resource.utils';
-import type { UnifiedResource } from './resource-card';
+import type { UnifiedResource } from '@/types/topic';
 
 interface ResourcePreviewModalProps {
   resource: UnifiedResource | null;

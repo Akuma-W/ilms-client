@@ -15,12 +15,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResourceGroup } from './resource-group';
-import type { UnifiedResource } from './resource-card';
-import type { Topic } from '@/types/topic';
+import type { Topic, UnifiedResource } from '@/types/topic';
 
 interface TopicItemProps {
   topic: Topic;
-  index: number;
   classId: string;
   isExpanded: boolean;
   isTeacher?: boolean;
@@ -39,7 +37,6 @@ interface TopicItemProps {
  */
 export function TopicItem({
   topic,
-  index,
   classId,
   isExpanded,
   isTeacher = false,
@@ -91,25 +88,25 @@ export function TopicItem({
       >
         <div className="flex items-start gap-3 min-w-0 pr-4">
           <div
-            className={`flex items-center justify-center size-8 rounded-lg shrink-0 mt-0.5 ${
+            className={`flex items-center justify-center size-9 rounded-lg shrink-0 mt-0.5 ${
               isExpanded
                 ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20'
                 : 'bg-muted text-muted-foreground'
             }`}
           >
-            <span className="text-xs font-semibold">{index + 1}</span>
+            <span className="text-sm font-bold">{topic.orderIndex}</span>
           </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-semibold text-foreground truncate">{topic.title}</h4>
-              <span className="text-[11px] text-muted-foreground px-2 py-0.5 rounded-full bg-muted font-normal">
+              <h4 className="font-semibold text-foreground truncate">{topic.title}</h4>
+              <span className="text-xs text-muted-foreground px-2.5 py-0.5 rounded-full bg-muted font-medium">
                 {totalCount} {mode === 'materials' ? 'tài liệu' : 'tài nguyên'}
               </span>
             </div>
 
             {topic.description && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{topic.description}</p>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{topic.description}</p>
             )}
           </div>
         </div>
@@ -181,7 +178,12 @@ export function TopicItem({
           )}
 
           <div className="text-muted-foreground p-1">
-            {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+              </TooltipTrigger>
+              <TooltipContent side="top">{isExpanded ? 'Thu gọn' : 'Mở rộng'}</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -190,9 +192,9 @@ export function TopicItem({
       {isExpanded && (
         <div className="px-4 pb-4 pt-1 border-t border-border/50 space-y-3">
           {totalCount === 0 && !isTeacher ? (
-            <div className="py-6 text-center text-xs text-muted-foreground flex flex-col items-center justify-center">
+            <div className="py-6 text-center text-sm text-muted-foreground flex flex-col items-center justify-center">
               <Paperclip className="size-5 mb-1.5 opacity-40" />
-              <span>Chủ đề này chưa có nội dung nào được đính kèm.</span>
+              <span>Chủ đề này chưa có tài nguyên nào.</span>
             </div>
           ) : (
             <>

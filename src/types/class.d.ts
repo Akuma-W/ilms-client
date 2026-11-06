@@ -2,6 +2,7 @@ import { Enrollment } from './enrollment';
 import { School } from './school';
 import { User } from './user';
 import { ClassTabs } from './enum';
+import type { LucideIcon } from 'lucide-react';
 
 export interface Class {
   id: string;
@@ -44,3 +45,32 @@ export interface CreateClassPayload {
   semester?: string;
   isPrivate: boolean;
 }
+
+export interface ClassroomTabColors {
+  border: string;
+  icon: string;
+  activeText: string;
+}
+
+export interface ClassroomTabConfig {
+  value: string;
+  icon: LucideIcon;
+  label: string;
+  joinedOnly: boolean;
+  colors: ClassroomTabColors;
+}
+
+export interface ClassTheme {
+  name: string;
+  hex: string;
+  gradient: string;
+  gradientClass: string;
+  border: string;
+  subtleBg: string;
+  badgeBg: string;
+  text: string;
+  icon: string;
+  hoverText: string;
+}
+
+export type SearchStatus = 'idle' | 'loading' | 'found' | 'not_found' | 'error';

@@ -10,30 +10,198 @@ import {
   Users,
   Wrench,
 } from 'lucide-react';
+import type { ClassroomTabConfig, ClassTheme } from '@/types/class';
 
-const classNavItems = [
+export const COURSE_CODE_LENGTH = 6;
+
+export const CLASS_SIDEBAR_NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/classes?tab=discovery' },
   { icon: BookOpen, label: 'Lớp của tôi', href: '/classes?tab=joined' },
   { icon: Wrench, label: 'Công cụ', href: '/tools' },
   { icon: MessageSquare, label: 'Tin nhắn', href: '/chats' },
-];
+] as const;
 
-const classesTabItems = [
+export const CLASSES_FILTER_TABS = [
   { value: 'discovery', label: 'Khám phá' },
   { value: 'joined', label: 'Đã tham gia' },
   { value: 'pending', label: 'Chờ duyệt' },
   { value: 'created', label: 'Đã tạo' },
+] as const;
+
+export const CLASSROOM_NAV_TABS: ClassroomTabConfig[] = [
+  {
+    value: 'overview',
+    icon: BookOpen,
+    label: 'Tổng quan',
+    joinedOnly: true,
+    colors: {
+      border: 'border-cyan-500',
+      icon: 'text-cyan-600 dark:text-cyan-400',
+      activeText: 'text-cyan-900 dark:text-cyan-100',
+    },
+  },
+  {
+    value: 'materials',
+    icon: FileText,
+    label: 'Tài liệu',
+    joinedOnly: true,
+    colors: {
+      border: 'border-emerald-500',
+      icon: 'text-emerald-600 dark:text-emerald-400',
+      activeText: 'text-emerald-900 dark:text-emerald-100',
+    },
+  },
+  {
+    value: 'assignments',
+    icon: Edit,
+    label: 'Bài tập',
+    joinedOnly: true,
+    colors: {
+      border: 'border-amber-500',
+      icon: 'text-amber-600 dark:text-amber-400',
+      activeText: 'text-amber-900 dark:text-amber-100',
+    },
+  },
+  {
+    value: 'quizzes',
+    icon: HelpCircle,
+    label: 'Trắc nghiệm',
+    joinedOnly: true,
+    colors: {
+      border: 'border-rose-500',
+      icon: 'text-rose-600 dark:text-rose-400',
+      activeText: 'text-rose-900 dark:text-rose-100',
+    },
+  },
+  {
+    value: 'forums',
+    icon: MessageSquare,
+    label: 'Diễn đàn',
+    joinedOnly: true,
+    colors: {
+      border: 'border-violet-500',
+      icon: 'text-violet-600 dark:text-violet-400',
+      activeText: 'text-violet-900 dark:text-violet-100',
+    },
+  },
+  {
+    value: 'members',
+    icon: Users,
+    label: 'Thành viên',
+    joinedOnly: true,
+    colors: {
+      border: 'border-blue-500',
+      icon: 'text-blue-600 dark:text-blue-400',
+      activeText: 'text-blue-900 dark:text-blue-100',
+    },
+  },
+  {
+    value: 'grades',
+    icon: BarChart,
+    label: 'Bảng điểm',
+    joinedOnly: true,
+    colors: {
+      border: 'border-yellow-500',
+      icon: 'text-yellow-600 dark:text-yellow-400',
+      activeText: 'text-yellow-900 dark:text-yellow-100',
+    },
+  },
+  {
+    value: 'info',
+    icon: Info,
+    label: 'Giới thiệu',
+    joinedOnly: false,
+    colors: {
+      border: 'border-slate-500',
+      icon: 'text-slate-600 dark:text-slate-400',
+      activeText: 'text-slate-900 dark:text-slate-100',
+    },
+  },
 ];
 
-const classTabItems = [
-  { value: 'overview', icon: BookOpen, label: 'Tổng quan', joinedOnly: true },
-  { value: 'materials', icon: FileText, label: 'Tài liệu', joinedOnly: true },
-  { value: 'assignments', icon: Edit, label: 'Bài tập', joinedOnly: true },
-  { value: 'quizzes', icon: HelpCircle, label: 'Trắc nghiệm', joinedOnly: true },
-  { value: 'forums', icon: MessageSquare, label: 'Diễn đàn', joinedOnly: true },
-  { value: 'members', icon: Users, label: 'Thành viên', joinedOnly: true },
-  { value: 'grades', icon: BarChart, label: 'Bảng điểm', joinedOnly: true },
-  { value: 'info', icon: Info, label: 'Giới thiệu', joinedOnly: false },
+export const CLASS_THEMES: ClassTheme[] = [
+  {
+    name: 'blue',
+    hex: '#3B82F6',
+    gradient: 'from-blue-400 to-indigo-600',
+    gradientClass: 'bg-linear-to-r from-blue-400 to-indigo-600',
+    border: 'border-blue-500/40 hover:border-blue-500/80',
+    subtleBg: 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-300',
+    badgeBg: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30',
+    text: 'text-blue-700 dark:text-blue-300',
+    icon: 'text-blue-600 dark:text-blue-400',
+    hoverText: 'group-hover:text-blue-600 dark:group-hover:text-blue-400',
+  },
+  {
+    name: 'purple',
+    hex: '#A855F7',
+    gradient: 'from-purple-400 to-pink-600',
+    gradientClass: 'bg-linear-to-r from-purple-400 to-pink-600',
+    border: 'border-purple-500/40 hover:border-purple-500/80',
+    subtleBg: 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300',
+    badgeBg: 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30',
+    text: 'text-purple-700 dark:text-purple-300',
+    icon: 'text-purple-600 dark:text-purple-400',
+    hoverText: 'group-hover:text-purple-600 dark:group-hover:text-purple-400',
+  },
+  {
+    name: 'emerald',
+    hex: '#10B981',
+    gradient: 'from-emerald-400 to-teal-600',
+    gradientClass: 'bg-linear-to-r from-emerald-400 to-teal-600',
+    border: 'border-emerald-500/40 hover:border-emerald-500/80',
+    subtleBg: 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    badgeBg: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    icon: 'text-emerald-600 dark:text-emerald-400',
+    hoverText: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400',
+  },
+  {
+    name: 'amber',
+    hex: '#F59E0B',
+    gradient: 'from-amber-400 to-orange-600',
+    gradientClass: 'bg-linear-to-r from-amber-400 to-orange-600',
+    border: 'border-amber-500/40 hover:border-amber-500/80',
+    subtleBg: 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300',
+    badgeBg: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+    text: 'text-amber-700 dark:text-amber-300',
+    icon: 'text-amber-600 dark:text-amber-400',
+    hoverText: 'group-hover:text-amber-600 dark:group-hover:text-amber-400',
+  },
+  {
+    name: 'cyan',
+    hex: '#06B6D4',
+    gradient: 'from-cyan-400 to-blue-600',
+    gradientClass: 'bg-linear-to-r from-cyan-400 to-blue-600',
+    border: 'border-cyan-500/40 hover:border-cyan-500/80',
+    subtleBg: 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300',
+    badgeBg: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30',
+    text: 'text-cyan-700 dark:text-cyan-300',
+    icon: 'text-cyan-600 dark:text-cyan-400',
+    hoverText: 'group-hover:text-cyan-600 dark:group-hover:text-cyan-400',
+  },
+  {
+    name: 'rose',
+    hex: '#F43F5E',
+    gradient: 'from-rose-400 to-red-600',
+    gradientClass: 'bg-linear-to-r from-rose-400 to-red-600',
+    border: 'border-rose-500/40 hover:border-rose-500/80',
+    subtleBg: 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300',
+    badgeBg: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
+    text: 'text-rose-700 dark:text-rose-300',
+    icon: 'text-rose-600 dark:text-rose-400',
+    hoverText: 'group-hover:text-rose-600 dark:group-hover:text-rose-400',
+  },
+  {
+    name: 'violet',
+    hex: '#8B5CF6',
+    gradient: 'from-violet-400 to-purple-600',
+    gradientClass: 'bg-linear-to-r from-violet-400 to-purple-600',
+    border: 'border-violet-500/40 hover:border-violet-500/80',
+    subtleBg: 'bg-violet-500/10 hover:bg-violet-500/20 text-violet-700 dark:text-violet-300',
+    badgeBg: 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30',
+    text: 'text-violet-700 dark:text-violet-300',
+    icon: 'text-violet-600 dark:text-violet-400',
+    hoverText: 'group-hover:text-violet-600 dark:group-hover:text-violet-400',
+  },
 ];
-
-export { classNavItems, classesTabItems, classTabItems };

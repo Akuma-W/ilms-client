@@ -9,14 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TopicItem } from '@/features/classes/components/topics/topic-item';
 import { ResourcePreviewModal } from '@/features/classes/components/topics/resource-preview-modal';
-import { UnifiedResource } from '@/features/classes/components/topics/resource-card';
 import { CreateMaterialModal } from '@/features/classes/components/modals/create-material-modal';
 import { topicsService } from '@/features/classes/services/topics.service';
 import { materialsService } from '@/features/classes/services/materials.service';
 import { getMockTopics } from '@/mocks/classes/class-data.mock';
-import type { Topic, Material } from '@/types/topic';
-
-export type MaterialWithTopic = Material & { topicTitle?: string };
+import type { Topic, MaterialWithTopic, UnifiedResource } from '@/types/topic';
 
 interface MaterialsClientProps {
   classId: string;
@@ -149,7 +146,7 @@ export function MaterialsClient({
   }, [topics, searchQuery]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
+    <div className="w-full space-y-6">
       {/* 1. Header & Actions Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
         <div>
@@ -193,9 +190,8 @@ export function MaterialsClient({
 
           {isTeacher && (
             <Button
-              size="sm"
               onClick={() => setIsTopAddOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8.5 rounded-lg px-3 shrink-0"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 rounded-lg px-3 shrink-0"
             >
               <Plus className="size-3.5 mr-1.5" />
               Thêm tài liệu
@@ -223,11 +219,10 @@ export function MaterialsClient({
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredTopics.map((topic, index) => (
+          {filteredTopics.map((topic) => (
             <TopicItem
               key={topic.id}
               topic={topic}
-              index={index}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
               isTeacher={isTeacher}

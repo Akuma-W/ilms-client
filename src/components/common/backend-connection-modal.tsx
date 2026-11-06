@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Server, RefreshCw, CheckCircle2, Clock, Home } from 'lucide-react';
-import { BACKEND_REQUIRED_ROUTES } from '@/config/route';
+import { BACKEND_REQUIRED_ROUTES } from '@/config';
 
 const MAX_AUTO_ATTEMPTS = 5;
 const COUNTDOWN_SECONDS = 5;

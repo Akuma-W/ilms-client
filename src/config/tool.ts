@@ -1,7 +1,7 @@
 import { Brain, RotateCcw } from 'lucide-react';
 import type { ToolInformation, ToolIconKey } from '@/types/tool';
 
-export const iconToolMap = {
+export const TOOL_ICON_MAP = {
   random: RotateCcw,
   assistant: Brain,
 } as const;

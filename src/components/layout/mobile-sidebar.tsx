@@ -1,26 +1,14 @@
 'use client';
 
-import { User } from '@/types/user';
-import {
-  Home,
-  GraduationCap,
-  BookOpen,
-  Dices,
-  HelpCircle,
-  Bell,
-  LogOut,
-  MessageCircle,
-  Settings,
-  User2,
-} from 'lucide-react';
+import type { User } from '@/types/user';
+import { Bell, BookOpen, LogOut, MessageCircle, Settings, User2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { SheetContent, SheetHeader, SheetTitle } from '../ui/sheet';
 import { Logo } from '../common/logo';
 import { cn } from '@/lib/utils';
 import { AvatarImage, AvatarFallback, Avatar } from '../ui/avatar';
 import { Button } from '../ui/button';
-import { navItems } from '@/config/layout';
-import { ROLE_CONFIG } from '@/config/role';
+import { MAIN_NAV_ITEMS, ROLE_CONFIG } from '@/config';
 import Link from 'next/link';
 
 interface MobileSidebarProps {
@@ -30,24 +18,6 @@ interface MobileSidebarProps {
 
 export function MobileSidebar({ user, logout }: MobileSidebarProps) {
   const pathname = usePathname();
-
-  const getIcon = (label: string) => {
-    switch (label) {
-      case 'Trang chủ':
-        return <Home className="w-4 h-4" />;
-      case 'Lớp học':
-        return <GraduationCap className="w-4 h-4" />;
-      case 'Bài trắc nghiệm':
-      case 'Quiz':
-        return <BookOpen className="w-4 h-4" />;
-      case 'Công cụ':
-        return <Dices className="w-4 h-4" />;
-      case 'Liên hệ':
-        return <HelpCircle className="w-4 h-4" />;
-      default:
-        return null;
-    }
-  };
 
   return (
     <SheetContent side="left" className="w-75 sm:w-100 p-0">
@@ -99,7 +69,7 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
               Menu
             </p>
             <div className="space-y-1">
-              {navItems.map((item) => (
+              {MAIN_NAV_ITEMS.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant="ghost"
@@ -110,7 +80,7 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
                         : 'text-gray-600 hover:bg-gray-50',
                     )}
                   >
-                    {getIcon(item.label)}
+                    <item.icon className="w-4 h-4" />
                     {item.label}
                   </Button>
                 </Link>

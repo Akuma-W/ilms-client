@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { ToolsClient } from './tools-client';
-import { DEFAULT_TOOLS } from '@/config/tool';
+import { DEFAULT_TOOLS } from '@/config';
 
 export const metadata: Metadata = {
   title: 'Công cụ hỗ trợ',

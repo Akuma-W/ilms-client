@@ -4,11 +4,10 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { BookOpen, ChevronRight, Star } from 'lucide-react';
 import Image from 'next/image';
-import { Class } from '@/types/class';
+import type { Class } from '@/types/class';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { getGradientFromTitle } from '@/lib/ui/utils';
+import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
 
 interface ClassCardProps {
   classData: Class;
@@ -18,7 +17,8 @@ interface ClassCardProps {
 
 export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
   const ctaText = classData.enrollment?.status === 'approved' ? 'Vào học' : 'Tham gia';
-  const gradient = getGradientFromTitle(classData.title);
+  const classTheme = getClassTheme(classData);
+  const subjectTheme = getSubjectTheme(classData.subject);
 
   return (
     <motion.div
@@ -31,7 +31,7 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
       }
     >
       {/* Card Header / Banner */}
-      <div className={cn('h-28 relative overflow-hidden bg-linear-to-br', gradient)}>
+      <div className={cn('h-28 relative overflow-hidden bg-linear-to-br', classTheme.gradient)}>
         <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/20 blur-2xl" />
 
         {/* Starred */}
@@ -40,7 +40,7 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="cursor-pointer w-8 h-8 rounded-lg bg-white/80 hover:bg-white/80 text-gray-900 shadow-sm"
+              className="cursor-pointer size-7 rounded-lg bg-white/80 hover:bg-white/80 text-gray-900 shadow-sm"
               onClick={() => toggleStar(classData.enrollment!.id)}
             >
               <Star
@@ -55,10 +55,17 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
 
         {/* Title */}
         <div className="absolute bottom-4 left-6 z-10">
-          <Badge className="bg-white/80 text-gray-900 border-gray-200 backdrop-blur-md mb-2">
-            {classData.subject}
-          </Badge>
-          <h3 className="text-lg font-bold text-gray-900 truncate max-w-55 line-clamp-2">
+          {classData.subject && (
+            <span
+              className={cn(
+                'inline-flex items-center font-semibold py-1 px-2.5 text-xs text-white rounded-md shadow-xs mb-2 bg-white/40 truncate max-w-50 line-clamp-2',
+                subjectTheme.text,
+              )}
+            >
+              {classData.subject}
+            </span>
+          )}
+          <h3 className="text-lg font-bold text-white truncate max-w-55 line-clamp-2">
             {classData.title}
           </h3>
         </div>

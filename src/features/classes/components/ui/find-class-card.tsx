@@ -1,7 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Class } from '@/types/class';
-import { ArrowRight, BookOpen, User } from 'lucide-react';
+import type { Class } from '@/types/class';
+import { ArrowRight, User } from 'lucide-react';
+import { getSubjectTheme } from '@/lib/ui/utils';
+import { cn } from '@/lib/utils';
 
 interface FindClassCardProps {
   classItem: Class;
@@ -9,16 +11,26 @@ interface FindClassCardProps {
 }
 
 export function FindClassCard({ classItem, onNavigate }: FindClassCardProps) {
+  const subjectTheme = getSubjectTheme(classItem.subject);
+
   return (
     <div className="rounded-xl border bg-muted/40 p-4 space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-0.5 min-w-0">
+        <div className="space-y-1 min-w-0">
           <h4 className="font-semibold text-sm leading-snug truncate">{classItem.title}</h4>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <BookOpen className="h-3 w-3 shrink-0" />
-            <span className="truncate">{classItem.subject}</span>
-          </div>
+          {classItem.subject && (
+            <div className="flex items-center gap-1.5 text-xs">
+              <span
+                className={cn(
+                  'inline-flex items-center font-semibold py-0.5 px-2 text-[10px] text-white rounded shadow-xs bg-linear-to-r',
+                  subjectTheme.gradient,
+                )}
+              >
+                {classItem.subject}
+              </span>
+            </div>
+          )}
         </div>
         <Badge variant="outline" className="shrink-0 font-mono text-xs">
           {classItem.courseCode}

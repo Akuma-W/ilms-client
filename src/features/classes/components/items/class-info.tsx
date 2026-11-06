@@ -83,7 +83,7 @@ export const ClassInfo = ({ classData, userData, isJoined }: ClassInfoProps) => 
   const handleDeleteClass = () => {
     toast.success('Lớp học đã được xóa thành công!');
     setIsDeleteModalOpen(false);
-    // router.push('/classes');
+    router.push('/classes');
   };
 
   if (!classData || !userData) return null;

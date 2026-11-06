@@ -1,10 +1,7 @@
 import { Metadata } from 'next';
-import { topicsServerService } from '@/features/classes/services/topics.server.service';
-import { materialsServerService } from '@/features/classes/services/materials.server.service';
 import { serverApiClient } from '@/lib/api/server-api-client';
-import { Enrollment } from '@/types/enrollment';
-import { Class } from '@/types/class';
-import { MOCK_CURRENT_CLASS, MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
+import type { Enrollment } from '@/types/enrollment';
+import { MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
 import { OverviewClient } from './overview-client';
 
 export const metadata: Metadata = {
@@ -55,8 +52,6 @@ export default async function ClassOverview({ params }: ClassOverviewProps) {
   // );
 
   // 2. Mock class data
-  const meetingUri = MOCK_CURRENT_CLASS.meetingUri || null;
-
   const initialTopicsWithMaterials = MOCK_TOPICS.filter((topic) => topic.classId === classId);
 
   return (
@@ -64,7 +59,6 @@ export default async function ClassOverview({ params }: ClassOverviewProps) {
       classId={classId}
       initialTopics={initialTopicsWithMaterials}
       isTeacher={isTeacher}
-      meetingUri={meetingUri}
     />
   );
 }

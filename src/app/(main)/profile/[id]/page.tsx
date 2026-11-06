@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Calendar, Edit, Mail, School, BookOpen, Users, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ROLE_CONFIG } from '@/config/role';
+import { ROLE_CONFIG } from '@/config';
 import Image from 'next/image';
 
 export const metadata: Metadata = {

@@ -1,15 +1,15 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { classesTabItems } from '@/config/class';
+import { CLASSES_FILTER_TABS } from '@/config';
 import { ClassSearch } from '@/features/classes/components/ui/class-search';
 import { CreateClassModal } from '@/features/classes/components/modals/create-class-modal';
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
 import { cn } from '@/lib/utils';
 import { ClassTabs } from '@/types/enum';
-import { QueryResponse } from '@/types/api';
-import { Class, ClassParams } from '@/types/class';
-import { User } from '@/types/user';
+import type { QueryResponse } from '@/types/api';
+import type { Class, ClassParams } from '@/types/class';
+import type { User } from '@/types/user';
 import { School } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
@@ -118,7 +118,7 @@ export default function ClassesClient({ user, initialData, initialParams }: Clas
       >
         <div className="overflow-x-auto no-scrollbar">
           <TabsList className="bg-transparent h-auto">
-            {classesTabItems.map((tab) => {
+            {CLASSES_FILTER_TABS.map((tab) => {
               if (user?.role !== 'teacher' && tab.value === 'created') return;
               return (
                 <TabsTrigger

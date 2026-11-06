@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import useSWR from 'swr';
-import { BookOpen, ChevronsUpDown, ExternalLink, Search, Video } from 'lucide-react';
+import { BookOpen, ChevronsUpDown, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,28 +11,21 @@ import { CreateTopicModal } from '@/features/classes/components/modals/create-to
 import { CreateMaterialModal } from '@/features/classes/components/modals/create-material-modal';
 import { TopicItem } from '@/features/classes/components/topics/topic-item';
 import { ResourcePreviewModal } from '@/features/classes/components/topics/resource-preview-modal';
-import { UnifiedResource } from '@/features/classes/components/topics/resource-card';
 import { topicsService } from '@/features/classes/services/topics.service';
 import { materialsService } from '@/features/classes/services/materials.service';
 import { getMockTopics } from '@/mocks/classes/class-data.mock';
-import type { Topic } from '@/types/topic';
+import type { Topic, UnifiedResource } from '@/types/topic';
 
 interface OverviewClientProps {
   classId: string;
   initialTopics: Topic[];
   isTeacher: boolean;
-  meetingUri: string | null;
 }
 
 /**
  * Client Component for Class Overview tab in full-width Hub-and-Spoke layout.
  */
-export function OverviewClient({
-  classId,
-  initialTopics,
-  isTeacher,
-  meetingUri,
-}: OverviewClientProps) {
+export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTopicForMaterial, setActiveTopicForMaterial] = useState<string | null>(null);
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
@@ -150,38 +143,8 @@ export function OverviewClient({
   }, [topics, searchQuery]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
-      {/* 1. Google Meet Banner */}
-      {meetingUri && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-cyan-500/30 bg-cyan-500/5 dark:bg-cyan-950/20 text-card-foreground">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">
-              <Video className="size-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">
-                Phòng học trực tuyến Google Meet
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Lớp học có sẵn đường dẫn kết nối trực tiếp với giảng viên.
-              </p>
-            </div>
-          </div>
-
-          <Button
-            asChild
-            size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium shrink-0"
-          >
-            <a href={meetingUri} target="_blank" rel="noopener noreferrer">
-              Tham gia phòng học
-              <ExternalLink className="size-3.5 ml-1.5" />
-            </a>
-          </Button>
-        </div>
-      )}
-
-      {/* 2. Topic Header & Search Toolbar */}
+    <div className="w-full space-y-6">
+      {/* 1. Topic Header & Search Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
@@ -244,11 +207,10 @@ export function OverviewClient({
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredTopics.map((topic, index) => (
+          {filteredTopics.map((topic) => (
             <TopicItem
               key={topic.id}
               topic={topic}
-              index={index}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
               isTeacher={isTeacher}

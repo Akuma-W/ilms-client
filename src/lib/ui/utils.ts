@@ -1,19 +1,37 @@
-export function getGradientFromTitle(title: string) {
-  const colors = [
-    'from-blue-500 to-indigo-500',
-    'from-purple-500 to-pink-500',
-    'from-emerald-500 to-teal-500',
-    'from-orange-500 to-red-500',
-    'from-cyan-500 to-blue-500',
-  ];
+import { CLASS_THEMES } from '@/config';
+import type { ClassTheme } from '@/types/class';
 
-  const index = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-  return colors[index];
+/**
+ * Deterministically computes a hash index (0..CLASS_THEMES.length - 1) from an input string.
+ */
+function hashStringToThemeIndex(str?: string | null): number {
+  if (!str || typeof str !== 'string') return 0;
+  const hash = str.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return Math.abs(hash) % CLASS_THEMES.length;
 }
 
-export function getColorFromTitle(title: string) {
-  const colors = ['#3B82F6', '#A855F7', '#10B981', '#F97316', '#06B6D4'];
+/**
+ * Returns complete theme configuration for any title or entity name.
+ */
+export function getThemeFromTitle(title?: string | null): ClassTheme {
+  const index = hashStringToThemeIndex(title);
+  return CLASS_THEMES[index];
+}
 
-  const index = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-  return colors[index];
+/**
+ * Returns consistent theme for a Class (by title or class object).
+ */
+export function getClassTheme(
+  classDataOrTitle?: { title?: string | null } | string | null,
+): ClassTheme {
+  const title = typeof classDataOrTitle === 'string' ? classDataOrTitle : classDataOrTitle?.title;
+  return getThemeFromTitle(title);
+}
+
+/**
+ * Returns consistent theme for a Subject (by subject name).
+ * Ensures all classes of the same subject share the identical subject theme.
+ */
+export function getSubjectTheme(subject?: string | null): ClassTheme {
+  return getThemeFromTitle(subject);
 }

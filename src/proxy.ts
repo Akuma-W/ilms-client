@@ -63,7 +63,11 @@ export async function proxy(request: NextRequest) {
   // Auto-refresh token at the Edge if access_token is expired but refresh_token exists
   if ((!validToken || isTokenExpired) && refreshToken && (isProtectedRoute || isAdminRoute)) {
     try {
-      const serverApiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || 'http://localhost:5000/api/v1';
+      const serverApiUrl =
+        process.env.INTERNAL_API_URL ||
+        process.env.NEXT_PUBLIC_SERVER_API_URL ||
+        'http://localhost:5000/api/v1';
+
       const refreshRes = await fetch(`${serverApiUrl}/auth/refresh`, {
         method: 'POST',
         headers: {

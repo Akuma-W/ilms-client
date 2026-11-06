@@ -15,11 +15,9 @@ import { Loader2, Search } from 'lucide-react';
 import { useId, useState } from 'react';
 import { FindClassCard } from '../ui/find-class-card';
 import { useRouter } from 'next/navigation';
-import { Class } from '@/types/class';
+import { COURSE_CODE_LENGTH } from '@/config';
+import type { Class, SearchStatus } from '@/types/class';
 import { classService } from '../../services/class.service';
-
-type SearchStatus = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
-const COURSE_CODE_LENGTH = 6;
 
 interface FindClassModalProps {
   trigger?: React.ReactNode;

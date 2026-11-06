@@ -2,7 +2,7 @@
 
 import { ContactSection } from '@/components/common/contact-section';
 import { Card, CardContent } from '@/components/ui/card';
-import { contacts } from '@/config/layout';
+import { FOOTER_CONTACTS } from '@/config';
 import { cn } from '@/lib/utils';
 import { MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -35,7 +35,7 @@ export function ContactClient() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Contact Info Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-5 lg:col-span-1 items-stretch">
-          {contacts.map((contact, idx) => {
+          {FOOTER_CONTACTS.map((contact, idx) => {
             const Icon = contact.icon;
 
             return (
@@ -97,7 +97,9 @@ export function ContactClient() {
         <div className="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-2">
           <MapPin className="w-12 h-12" />
           <p className="font-medium">Bản đồ vị trí KEIVerse</p>
-          <p className="text-sm">{contacts.find((c) => c.key === 'address')?.items[0].value}</p>
+          <p className="text-sm">
+            {FOOTER_CONTACTS.find((c) => c.key === 'address')?.items[0].value}
+          </p>
         </div>
         {/* Google Map */}
       </motion.div>

@@ -1,7 +1,6 @@
 import { ClassHero } from '@/features/classes/components/layout/class-hero';
-import { StickyNav } from '@/features/classes/components/layout/sticky-nav';
-import { classService } from '@/features/classes/services/class.service';
-import { enrollmentService } from '@/features/classes/services/enrollment.service';
+import { ClassNav } from '@/features/classes/components/layout/class-nav';
+import { MOCK_CURRENT_CLASS } from '@/mocks/classes/class-data.mock';
 
 export default async function ClassDetailLayout({
   children,
@@ -11,21 +10,23 @@ export default async function ClassDetailLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id: classId } = await params;
-  const classData = await classService.getClassData(classId);
-  const relation = await enrollmentService.getMyRelationInClass(classId);
+  // const classData = await classService.getClassData(classId);
+  // const relation = await enrollmentService.getMyRelationInClass(classId);
 
-  const isJoined = !!relation;
+  // const isJoined = !!relation;
+  const classData = { ...MOCK_CURRENT_CLASS, id: classId || MOCK_CURRENT_CLASS.id };
+  const isJoined = true;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-8 w-full max-w-7xl mx-auto">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-background w-full flex flex-col">
+      {/* 1. Seamless Hero Section without rounded corners */}
       <ClassHero classData={classData} />
 
-      {/* Sticky Sub-navigation */}
-      <StickyNav classId={classData.id} isJoined={isJoined} />
+      {/* 2. Refined Class Tabs Navigation (all 8 tabs) */}
+      <ClassNav classId={classData.id} isJoined={isJoined} />
 
-      {/* Main Content Area */}
-      <div className="flex-1 mt-2">{children}</div>
+      {/* 3. Main Content Area */}
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Carousel,
   CarouselContent,
@@ -7,19 +8,10 @@ import {
   CarouselPrevious,
 } from '../ui/carousel';
 import { Button } from '../ui/button';
-import Link from 'next/link';
-
-interface Banner {
-  id: string;
-  title: string;
-  subtitle: string;
-  image: string;
-  cta: string;
-  href: string;
-}
+import type { HomeBanner } from '@/types/home';
 
 interface BannerCarouselProps {
-  banners: Banner[];
+  banners: HomeBanner[];
 }
 
 export function BannerCarousel({ banners }: BannerCarouselProps) {
@@ -38,7 +30,7 @@ export function BannerCarousel({ banners }: BannerCarouselProps) {
   );
 }
 
-function BannerSlide({ banner }: { banner: Banner }) {
+function BannerSlide({ banner }: { banner: HomeBanner }) {
   return (
     <div className="relative h-125 w-full">
       <Image

@@ -5,24 +5,24 @@ import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
 
 interface InfoItemProps {
-  key?: number;
   icon: LucideIcon;
   label: string;
   value: string | null;
-  color: string;
+  iconClass?: string;
+  subtleBg?: string;
+  color?: string;
 }
 
-export function InfoItem({ key, icon: Icon, label, value, color }: InfoItemProps) {
+export function InfoItem({ icon: Icon, label, value, iconClass, subtleBg, color }: InfoItemProps) {
   return (
-    <Card
-      key={key}
-      className="group border-gray-100 shadow-sm transition-all hover:border-galaxy-blue hover:shadow-md"
-    >
+    <Card className="group border-gray-100 shadow-sm transition-all hover:border-galaxy-blue hover:shadow-md">
       <CardContent className="flex items-center gap-4 p-4">
         <div
           className={cn(
-            'w-12 h-12 rounded-xl flex items-center justify-center text-galaxy-blue group-hover:bg-galaxy group-hover:text-white transition-colors',
-            color,
+            'w-12 h-12 rounded-xl flex items-center justify-center transition-colors',
+            subtleBg || color || 'bg-blue-500/10',
+            iconClass || 'text-galaxy-blue',
+            'group-hover:bg-primary group-hover:text-white',
           )}
         >
           <Icon className="w-6 h-6" />

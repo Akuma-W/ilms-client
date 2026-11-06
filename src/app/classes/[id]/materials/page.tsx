@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
-import { topicsServerService } from '@/features/classes/services/topics.server.service';
-import { materialsServerService } from '@/features/classes/services/materials.server.service';
 import { serverApiClient } from '@/lib/api/server-api-client';
-import { Enrollment } from '@/types/enrollment';
-import { MOCK_CURRENT_CLASS, MOCK_MATERIALS, MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
+import type { Enrollment } from '@/types/enrollment';
+import { MOCK_MATERIALS, MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
 import { MaterialsClient } from './materials-client';
 
 export const metadata: Metadata = {

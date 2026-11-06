@@ -1,11 +1,10 @@
 import { Logo } from '../common/logo';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { siteConfig } from '@/config';
-import { quickLinks, contacts, socials } from '@/config/layout';
+import { SITE_CONFIG, QUICK_LINKS, FOOTER_CONTACTS, SOCIAL_LINKS } from '@/config';
 
 export function Footer() {
-  const { name, introduction } = siteConfig;
+  const { name, introduction } = SITE_CONFIG;
 
   const headingStyle = 'text-white font-semibold mb-4 uppercase tracking-wider text-sm';
 
@@ -26,7 +25,7 @@ export function Footer() {
           <div>
             <h4 className={headingStyle}>Liên kết nhanh</h4>
             <ul className="text-sm grid grid-cols-2 gap-4 sm:block sm:space-y-4">
-              {quickLinks.map((item, idx) => (
+              {QUICK_LINKS.map((item, idx) => (
                 <li key={idx}>
                   <Link href={item.href} className="hover:text-blue-400 transition-colors">
                     {item.label}
@@ -40,7 +39,7 @@ export function Footer() {
           <div>
             <h4 className={headingStyle}>Thông tin liên hệ</h4>
             <ul className="text-sm space-y-2 sm:space-y-4 ">
-              {contacts.map((contact, idx) => (
+              {FOOTER_CONTACTS.map((contact, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <contact.icon className="w-4 h-4 text-blue-400 mt-1" />
 
@@ -70,7 +69,7 @@ export function Footer() {
           <div>
             <h4 className={headingStyle}>Theo dõi chúng tôi</h4>
             <div className="flex items-center gap-4">
-              {socials.map((item, idx) => (
+              {SOCIAL_LINKS.map((item, idx) => (
                 <a
                   key={idx}
                   href={item.href}

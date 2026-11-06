@@ -1,6 +1,6 @@
 'use client';
 
-import { iconToolMap } from '@/config/tool';
+import { TOOL_ICON_MAP } from '@/config';
 import type { ToolInformation } from '@/types/tool';
 import { Sparkles, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -48,7 +48,7 @@ export function ToolsClient({ tools }: ToolsClientProps) {
         {/* Tools Layout */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
           {tools.map((tool, idx) => {
-            const Icon = iconToolMap[tool.icon];
+            const Icon = TOOL_ICON_MAP[tool.icon];
 
             return (
               <Link key={idx} href={tool.href} className="group block h-full">

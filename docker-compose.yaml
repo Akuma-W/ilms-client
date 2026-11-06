@@ -2,6 +2,7 @@ services:
   ilms-client:
     image: ilms-client:latest
     container_name: ilms-client
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -11,8 +12,15 @@ services:
         - NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=${NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY}
     environment:
       NODE_ENV: production
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://ilms-server:5000/api/v1}
     env_file:
       - .env
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.ilms-fe.loadbalancer.server.port=3000'

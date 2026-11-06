@@ -36,12 +36,7 @@ export function formatDateVi(dateStr?: string | Date | null): string {
   }
 }
 
-export interface MaterialBadgeConfig {
-  label: string;
-  bg: string;
-  text: string;
-  border: string;
-}
+import type { MaterialBadgeConfig } from '@/types/topic';
 
 export function getMaterialBadgeConfig(type?: string): MaterialBadgeConfig {
   const configs: Record<string, MaterialBadgeConfig> = {

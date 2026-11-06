@@ -9,7 +9,7 @@ import {
 } from '../ui/navigation-menu';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { navItems } from '@/config/layout';
+import { MAIN_NAV_ITEMS } from '@/config';
 
 export function Navbar() {
   const pathname = usePathname().replace(/\/$/, '');
@@ -19,7 +19,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 flex justify-center">
         <NavigationMenu>
           <NavigationMenuList className="gap-6">
-            {navItems.map((item) => {
+            {MAIN_NAV_ITEMS.map((item) => {
               const isActive = item.href === '/' ? pathname === '' : pathname.startsWith(item.href);
 
               return (

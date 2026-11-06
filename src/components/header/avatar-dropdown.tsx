@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from '@/types/user';
+import type { User } from '@/types/user';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { BookOpen, ChevronDown, LogOut, Settings, User2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Role } from '@/types/enum';
-import { ROLE_CONFIG } from '@/config/role';
+import { ROLE_CONFIG } from '@/config';
 import Link from 'next/link';
 
 interface AvatarDropdownProps {

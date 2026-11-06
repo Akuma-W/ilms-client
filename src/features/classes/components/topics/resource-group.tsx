@@ -4,7 +4,8 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ResourceCard, UnifiedResource } from './resource-card';
+import { ResourceCard } from './resource-card';
+import type { UnifiedResource } from '@/types/topic';
 
 interface ResourceGroupProps {
   title: string;
@@ -46,8 +47,8 @@ export function ResourceGroup({
       <div className="flex items-center justify-between pt-2 pb-1">
         <div className="flex items-center gap-1.5">
           {icon}
-          <span className="text-xs font-semibold text-foreground tracking-tight">{title}</span>
-          <span className="text-[11px] text-muted-foreground px-1.5 py-0.2 rounded-full bg-muted font-normal">
+          <span className="text-sm font-semibold text-foreground tracking-tight">{title}</span>
+          <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted font-medium">
             {items.length}
           </span>
         </div>
@@ -74,7 +75,7 @@ export function ResourceGroup({
 
       {/* Resources Grid / Empty State */}
       {items.length === 0 ? (
-        <div className="p-3 text-center rounded-lg border border-dashed border-border/60 bg-muted/10 text-xs text-muted-foreground">
+        <div className="p-3 text-center rounded-lg border border-dashed border-border/60 bg-muted/10 text-sm text-muted-foreground">
           {emptyMessage || `Chưa có ${title.toLowerCase()} nào được đính kèm.`}
         </div>
       ) : (

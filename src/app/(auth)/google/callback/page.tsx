@@ -5,13 +5,12 @@ import { useCurrentUser } from '@/hooks/use-current-user';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-type StatusState = 'loading' | 'success' | 'error';
+import type { AuthCallbackStatus } from '@/types/auth';
 
 export default function GoogleCallback() {
   const router = useRouter();
   const { mutateUser } = useCurrentUser();
-  const [status, setStatus] = useState<StatusState>('loading');
+  const [status, setStatus] = useState<AuthCallbackStatus>('loading');
 
   useEffect(() => {
     const handleGoogleLogin = async () => {
