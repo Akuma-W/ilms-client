@@ -1,6 +1,8 @@
 import { EnrollmentStatus, SchoolStatus } from '@/types/enum';
 import type { ClassClient } from '@/types/class';
-import type { Topic, Material, Reference } from '@/types/topic';
+import type { Topic } from '@/types/topic';
+import type { Material } from '@/types/material';
+import type { Reference } from '@/types/reference';
 import type { Assignment } from '@/types/assignment';
 import type { Quiz } from '@/types/quiz';
 import type { Forum } from '@/types/forum';
@@ -92,7 +94,9 @@ export function getMockClass(classId?: string): ClassClient {
 
 export function getMockTopics(classId?: string): Topic[] {
   if (classId) {
-    return MOCK_TOPICS.filter((t) => t.classId === classId);
+    const matched = MOCK_TOPICS.filter((t) => t.classId === classId);
+    if (matched.length > 0) return matched;
+    return MOCK_TOPICS.map((t) => ({ ...t, classId }));
   }
   return MOCK_TOPICS;
 }

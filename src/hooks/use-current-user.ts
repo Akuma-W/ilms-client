@@ -17,16 +17,19 @@ export function useCurrentUser({ initialUser }: UseCurrentUserProps = {}) {
     '/users/me',
     () => userService.getMe(),
     {
-      fallbackData: initialUser || null,
+      fallbackData: initialUser !== undefined ? initialUser : null,
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
     },
   );
 
+  const isActualLoading = initialUser !== undefined ? false : isLoading;
+  const currentUser = data !== undefined ? data : (initialUser ?? null);
+
   return {
-    user: data,
-    isLoading,
-    isAuthenticated: !!data,
+    user: currentUser,
+    isLoading: isActualLoading,
+    isAuthenticated: !!currentUser,
     mutateUser: mutate,
     error,
   };

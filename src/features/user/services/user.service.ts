@@ -1,22 +1,20 @@
-import { apiClient } from '@/lib/api/api-client';
+import { clientApiClient } from '@/lib/api/client-api-client';
 import { User } from '@/types/user';
 
+/**
+ * Client-side user service for Browser Components and hooks (e.g. useCurrentUser).
+ */
 export const userService = {
-  async getMe() {
-    const result = await apiClient<User>('/users/me', {
+  async getMe(): Promise<User | null> {
+    const result = await clientApiClient<User>('/users/me', {
       ignoreAuthError: true,
+      skipAutoRefresh: true,
     });
-
     return result.data;
   },
 
-  async getUser(id: string) {
-    const result = await apiClient<User>(`/users/${id}`);
-
-    if (!result.data) {
-      throw new Error('User not found');
-    }
-
+  async getUser(id: string): Promise<User | null> {
+    const result = await clientApiClient<User>(`/users/${id}`);
     return result.data;
   },
 };

@@ -60,7 +60,7 @@ export function ResourceGroup({
                 variant="ghost"
                 size="icon"
                 onClick={onAdd}
-                className="size-6 text-muted-foreground hover:text-foreground"
+                className="size-6 text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <Plus className="size-3" />
                 <span className="sr-only">{addTooltipText || `Thêm ${title.toLowerCase()}`}</span>

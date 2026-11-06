@@ -88,7 +88,7 @@ src/
 │       └── utils/               # Domain-specific helpers and key builders
 │
 ├── hooks/                       # Generic global React hooks (useDebounce, useMediaQuery...)
-├── lib/                         # Core utilities (api-client.ts, utils.ts)
+├── lib/                         # Core utilities (client-api-client.ts, server-api-client.ts, utils.ts)
 ├── stores/                      # Zustand global client stores (sidebar-store.ts...)
 └── types/                       # Shared TypeScript definitions (*.d.ts, index.ts)
 ```
@@ -105,20 +105,20 @@ For any page that displays dynamic backend data (e.g., Class List, Class Detail,
 
 1. **Server Page (`page.tsx`):**
    - Must be a Server Component (no `'use client'`).
-   - Responsible for reading URL searchParams/params, checking initial auth cookies, and fetching initial data on the server via `classService` or `apiClient`.
+   - Responsible for reading URL searchParams/params, checking initial auth cookies, and fetching initial data on the server via `*.server.service.ts` (using `serverApiClient`).
    - Passes `initialData` as props to the Client View Component.
 2. **Client View (`{name}-client.tsx`):**
    - Marked with `'use client'`.
    - Accepts `initialData` and passes it to the corresponding SWR hook as `fallbackData`.
-   - Handles all client interactions, modals, active tabs, filters, and mutations.
+   - Handles all client interactions, modals, active tabs, filters, and mutations via `*.service.ts` (using `clientApiClient`).
 
 ```typescript
 // Example: src/app/classes/page.tsx (Server Component)
-import { classService } from '@/features/classes/services/class.service';
+import { classServerService } from '@/features/classes/services/class.server.service';
 import { ClassesClient } from './classes-client';
 
 export default async function ClassesPage({ searchParams }: PageProps) {
-  const initialClasses = await classService.getClasses(searchParams);
+  const initialClasses = await classServerService.getClasses(searchParams);
   return <ClassesClient initialData={initialClasses} />;
 }
 ```
@@ -148,19 +148,30 @@ export function ClassesClient({ initialData }: ClassesClientProps) {
 
 ## 5. DATA FETCHING & STATE MANAGEMENT
 
-### 5.1. Server API Client (`src/lib/api/api-client.ts`)
+### 5.1. Dual API Clients Architecture (`src/lib/api/`)
 
-- All HTTP communication to the backend MUST use `apiClient<T>(url, options)`.
-- It executes in Server Action / Server context (`'use server'`), attaches credentials/cookies, and normalizes the backend response:
+To avoid Docker network loopbacks, prevent server action latency, and ensure strict separation of concerns, the client codebase uses two dedicated clients:
 
-  ```typescript
-  export interface ApiResponse<T> {
-    success: boolean;
-    message?: string;
-    data: T | null;
-    statusCode?: number;
-  }
-  ```
+1. **Client API Client (`src/lib/api/client-api-client.ts`):**
+   - Used exclusively by browser components, hooks, and Client Services (`*.service.ts`).
+   - Uses `window.location.origin` or `NEXT_PUBLIC_API_URL` with `credentials: 'include'`.
+   - Never accesses Server Actions or Next.js server runtime.
+
+2. **Server API Client (`src/lib/api/server-api-client.ts`):**
+   - Used exclusively by Server Components, SSR layouts, and Server Services (`*.server.service.ts`).
+   - Resolves internal network addresses (`INTERNAL_API_URL` / `http://server:5000/api/v1` in Docker, `http://localhost:5000/api/v1` locally).
+   - Reads auth cookies via `next/headers` and forwards them in HTTP headers.
+
+3. **Response normalization contract:**
+
+   ```typescript
+   export interface ApiResponse<T> {
+     success: boolean;
+     message?: string;
+     data: T | null;
+     statusCode?: number;
+   }
+   ```
 
 ### 5.2. SWR Custom Hooks (`features/{feature}/hooks/`)
 

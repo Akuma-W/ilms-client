@@ -1,12 +1,12 @@
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { ClassSidebar } from '@/features/classes/components/sidebar/class-sidebar';
-import { userService } from '@/features/user/services/user.service';
-import { enrollmentService } from '@/features/classes/services/enrollment.service';
+import { userServerService } from '@/features/user/services/user.server.service';
+import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
 
 export default async function ClassLayout({ children }: { children: React.ReactNode }) {
-  const user = await userService.getMe();
-  const data = await enrollmentService.getStarredClasses();
+  const user = await userServerService.getMe();
+  const data = await enrollmentServerService.getStarredClasses();
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -28,6 +28,8 @@ export default async function ClassLayout({ children }: { children: React.ReactN
           <main className="flex-1">{children}</main>
         </div>
       </div>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

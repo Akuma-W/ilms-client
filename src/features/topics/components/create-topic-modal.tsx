@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -24,8 +25,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { CreateTopicFormValues, createTopicSchema } from '../../schemas/topic.schema';
-import { topicsService } from '../../services/topics.service';
+import { CreateTopicFormValues, createTopicSchema } from '../schemas/topic.schema';
+import { topicsService } from '../services/topics.service';
 
 interface CreateTopicModalProps {
   classId: string;
@@ -56,6 +57,12 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
     formState: { isSubmitting },
   } = form;
 
+  const handleClose = () => {
+    if (isSubmitting) return;
+    setIsOpen(false);
+    reset(DEFAULT_VALUES);
+  };
+
   const onSubmit = async (values: CreateTopicFormValues) => {
     try {
       const res = await topicsService.createTopic(classId, {
@@ -64,34 +71,25 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
       });
 
       if (!res.success) {
-        throw new Error(res.message || 'Tạo bài giảng thất bại');
+        throw new Error(res.message || 'Tạo chủ đề thất bại');
       }
 
-      toast.success('Tạo bài giảng thành công!');
+      toast.success('Tạo chủ đề bài giảng thành công!');
       onSuccess();
-      handleOpenChange(false);
+      handleClose();
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Đã có lỗi xảy ra, vui lòng thử lại.';
-      toast.error('Tạo bài giảng thất bại', { description: message });
-    }
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    if (isSubmitting) return;
-    setIsOpen(open);
-
-    if (!open) {
-      setTimeout(() => reset(DEFAULT_VALUES), 150);
+      toast.error('Lỗi khi tạo chủ đề', {
+        description: error instanceof Error ? error.message : 'Vui lòng thử lại sau.',
+      });
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white h-9 px-4 rounded-lg shadow-sm font-medium transition-colors">
-          <Plus className="w-4 h-4 mr-1.5" />
-          Thêm chủ đề mới
+        <Button className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm h-9 px-3 font-medium cursor-pointer">
+          <Plus className="size-4" />
+          Thêm chủ đề
         </Button>
       </DialogTrigger>
 
@@ -100,35 +98,34 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
         onInteractOutside={(e) => isSubmitting && e.preventDefault()}
         onEscapeKeyDown={(e) => isSubmitting && e.preventDefault()}
       >
-        <DialogHeader className="flex flex-row items-center gap-3 space-y-0 pb-2 border-b border-border/50">
+        <DialogHeader className="flex flex-row items-center gap-3 space-y-0 pb-3 border-b border-border/50">
           <div className="flex items-center justify-center size-9 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shrink-0">
             <BookOpen className="size-4.5" />
           </div>
           <div>
             <DialogTitle className="text-base font-semibold text-foreground">
-              Tạo bài giảng / Chuyên đề mới
+              Tạo chủ đề bài giảng mới
             </DialogTitle>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Phân nhóm nội dung học tập và tài liệu theo từng chương.
-            </p>
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              Phân nhóm tài liệu, bài tập và bài giảng theo tiến độ học.
+            </DialogDescription>
           </div>
         </DialogHeader>
 
         <Form {...form}>
-          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-3" noValidate>
+          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2" noValidate>
             <FormField
               control={control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-medium text-foreground">
-                    Tiêu đề bài giảng <span className="text-destructive">*</span>
+                  <FormLabel className="text-xs font-semibold text-foreground">
+                    Tiêu đề chủ đề <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="VD: Chương 1: Giới thiệu và Kiến trúc Client-Server"
-                      disabled={isSubmitting}
-                      className="rounded-lg h-9 text-sm"
+                      placeholder="vd: Chương 1 - Giới thiệu lập trình Web"
+                      className="h-9 text-xs rounded-lg bg-background"
                       {...field}
                     />
                   </FormControl>
@@ -142,15 +139,13 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-medium text-foreground">
-                    Mô tả ngắn (Tùy chọn)
+                  <FormLabel className="text-xs font-semibold text-foreground">
+                    Mô tả chủ đề
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Mô tả mục tiêu và nội dung cốt lõi của chuyên đề này..."
-                      rows={3}
-                      className="resize-none rounded-lg text-sm"
-                      disabled={isSubmitting}
+                      placeholder="Tóm tắt nội dung chính hoặc mục tiêu học tập của chương này..."
+                      className="text-xs rounded-lg bg-background resize-none min-h-20"
                       {...field}
                     />
                   </FormControl>
@@ -163,21 +158,23 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
 
         <DialogFooter className="gap-2 pt-2 border-t border-border/50">
           <Button
+            type="button"
             variant="outline"
             size="sm"
-            className="cursor-pointer rounded-lg text-xs h-8.5"
-            onClick={() => handleOpenChange(false)}
+            className="rounded-lg text-xs h-8.5 cursor-pointer"
+            onClick={handleClose}
             disabled={isSubmitting}
           >
             Hủy
           </Button>
           <Button
+            type="submit"
+            form={formId}
             size="sm"
-            className="cursor-pointer bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium"
-            onClick={handleSubmit(onSubmit)}
+            className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium cursor-pointer"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Đang tạo...' : 'Tạo mới'}
+            {isSubmitting ? 'Đang tạo...' : 'Tạo chủ đề'}
           </Button>
         </DialogFooter>
       </DialogContent>

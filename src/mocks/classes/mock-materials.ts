@@ -1,5 +1,5 @@
 import { FileType } from '@/types/enum';
-import type { Material } from '@/types/topic';
+import type { Material } from '@/types/material';
 
 export const MOCK_MATERIALS: Material[] = [
   // Topic 1 Materials

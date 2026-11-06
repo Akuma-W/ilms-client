@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
-import { serverApiClient } from '@/lib/api/server-api-client';
-import type { Enrollment } from '@/types/enrollment';
-import { MOCK_MATERIALS, MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
+import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
+import { MOCK_MATERIALS, getMockTopics } from '@/mocks/classes/class-data.mock';
 import { MaterialsClient } from './materials-client';
 
 export const metadata: Metadata = {
@@ -20,33 +19,11 @@ export default async function ClassMaterials({ params }: ClassMaterialsProps) {
   const { id: classId } = await params;
 
   // 1. Check user relation to determine teacher privileges
-  const relationRes = await serverApiClient<Enrollment>(`/enrollments/me/${classId}`, {
-    ignoreAuthError: true,
-  });
-  const isTeacher = relationRes.data?.roleIn === 'teacher';
+  const relation = await enrollmentServerService.getMyRelationInClass(classId);
+  const isTeacher = relation?.roleIn === 'teacher';
 
-  // // 2. Fetch topics
-  // const rawTopics = await topicsServerService.getTopics(classId);
-  // const topics = Array.isArray(rawTopics) ? rawTopics : [];
-
-  // // 3. Resolve materials for each topic and flatten
-  // const materialsWithTopicInfo = await Promise.all(
-  //   topics.map(async (topic) => {
-  //     try {
-  //       const materials = await materialsServerService.getMaterials(topic.id);
-  //       const matList = Array.isArray(materials) ? materials : [];
-  //       return matList.map((material) => ({
-  //         ...material,
-  //         topicTitle: topic.title,
-  //       }));
-  //     } catch {
-  //       return [];
-  //     }
-  //   }),
-  // );
-
-  // Mock data
-  const topics = MOCK_TOPICS;
+  // 2. Mock data (mapped to current classId)
+  const topics = getMockTopics(classId);
   const materialsWithTopicInfo = MOCK_MATERIALS.map((item) => {
     return {
       ...item,

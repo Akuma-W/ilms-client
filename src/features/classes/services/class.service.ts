@@ -1,10 +1,13 @@
-import { apiClient } from '@/lib/api/api-client';
+import { clientApiClient } from '@/lib/api/client-api-client';
 import { QueryResponse } from '@/types/api';
 import { Class, CreateClassPayload } from '@/types/class';
 
+/**
+ * Client-side class service for Browser Components (CSR, SWR, Modals).
+ */
 export const classService = {
   async createClass(payload: CreateClassPayload) {
-    const result = await apiClient<Class>('/classes', {
+    const result = await clientApiClient<Class>('/classes', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -20,7 +23,7 @@ export const classService = {
     if (params.search) query.set('search', params.search);
 
     const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
-    const result = await apiClient<QueryResponse<Class>>(url);
+    const result = await clientApiClient<QueryResponse<Class>>(url);
 
     if (!result.success || !result.data) {
       return null;
@@ -39,7 +42,7 @@ export const classService = {
     const url = query.toString()
       ? `/classes/me/created?${query.toString()}`
       : '/classes/me/created';
-    const result = await apiClient<QueryResponse<Class>>(url);
+    const result = await clientApiClient<QueryResponse<Class>>(url);
 
     if (!result.success || !result.data) {
       return null;
@@ -49,18 +52,12 @@ export const classService = {
   },
 
   async getClassByCourseCode(courseCode: string) {
-    const result = await apiClient<Class>(`/classes/code/${courseCode}`);
-
+    const result = await clientApiClient<Class>(`/classes/code/${courseCode}`);
     return result;
   },
 
   async getClassData(id: string) {
-    const result = await apiClient<Class>(`/classes/${id}`);
-
-    if (!result.data) {
-      throw new Error('Invalid Data');
-    }
-
+    const result = await clientApiClient<Class>(`/classes/${id}`);
     return result.data;
   },
 };

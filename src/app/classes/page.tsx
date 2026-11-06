@@ -1,8 +1,8 @@
 import { ClassTabs } from '@/types/enum';
 import { Metadata } from 'next';
 import ClassesClient from './classes-client';
-import { fetchClasses } from '@/features/classes/utils/classes.utils';
-import { userService } from '@/features/user/services/user.service';
+import { fetchClassesServer } from '@/features/classes/utils/classes.server.utils';
+import { userServerService } from '@/features/user/services/user.server.service';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
@@ -33,9 +33,9 @@ export default async function Classes({ searchParams }: ClassesProps) {
   const page = Number(params.page) || 1;
   const limit = Number(params.limit) || 10;
 
-  const initialData = await fetchClasses(tab, { search, page, limit });
+  const initialData = await fetchClassesServer(tab, { search, page, limit });
 
-  const user = await userService.getMe();
+  const user = await userServerService.getMe();
 
   return (
     <ClassesClient

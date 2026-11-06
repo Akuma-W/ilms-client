@@ -1,12 +1,15 @@
-import { apiClient } from '@/lib/api/api-client';
+import { clientApiClient } from '@/lib/api/client-api-client';
 import { QueryResponse } from '@/types/api';
 import { Class } from '@/types/class';
 import { Enrollment, JoinClassResponse } from '@/types/enrollment';
 import { EnrollmentStatus } from '@/types/enum';
 
+/**
+ * Client-side enrollment service for Browser Components (CSR, SWR, Star, Join).
+ */
 export const enrollmentService = {
   async joinClass(payload: EnrollmentStatus) {
-    const result = await apiClient<JoinClassResponse>('/enrollments/join', {
+    const result = await clientApiClient<JoinClassResponse>('/enrollments/join', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -15,13 +18,12 @@ export const enrollmentService = {
   },
 
   async getMyRelationInClass(classId: string) {
-    const result = await apiClient<Enrollment>(`/enrollments/me/${classId}`);
-
+    const result = await clientApiClient<Enrollment>(`/enrollments/me/${classId}`);
     return result.data;
   },
 
   async getStarredClasses() {
-    const result = await apiClient<{
+    const result = await clientApiClient<{
       classes: Class[];
       total: number;
     }>('/enrollments/me/star');
@@ -52,7 +54,7 @@ export const enrollmentService = {
     if (params.search) query.set('search', params.search);
 
     const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
-    const result = await apiClient<QueryResponse<Class>>(url);
+    const result = await clientApiClient<QueryResponse<Class>>(url);
 
     if (!result.success || !result.data) {
       return null;
@@ -62,7 +64,7 @@ export const enrollmentService = {
   },
 
   async toggleStar(enrollmentId: string) {
-    const result = await apiClient(`/enrollments/${enrollmentId}/star`, {
+    const result = await clientApiClient(`/enrollments/${enrollmentId}/star`, {
       method: 'PATCH',
     });
 

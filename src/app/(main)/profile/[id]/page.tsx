@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { userService } from '@/features/user/services/user.service';
+import { userServerService } from '@/features/user/services/user.server.service';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Calendar, Edit, Mail, School, BookOpen, Users, Star } from 'lucide-react';
@@ -19,7 +19,10 @@ interface ProfileProps {
 export default async function Profile({ params }: ProfileProps) {
   const { id: userId } = await params;
 
-  const [user, currentUser] = await Promise.all([userService.getUser(userId), userService.getMe()]);
+  const [user, currentUser] = await Promise.all([
+    userServerService.getUser(userId),
+    userServerService.getMe(),
+  ]);
 
   if (!user) {
     redirect('/404');

@@ -1,10 +1,10 @@
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { Navbar } from '@/components/layout/navbar';
-import { userService } from '@/features/user/services/user.service';
+import { userServerService } from '@/features/user/services/user.server.service';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const user = await userService.getMe();
+  const user = await userServerService.getMe();
 
   return (
     <div className="flex min-h-svh flex-col">

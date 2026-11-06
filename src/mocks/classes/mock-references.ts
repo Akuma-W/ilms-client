@@ -1,4 +1,4 @@
-import type { Reference } from '@/types/topic';
+import type { Reference } from '@/types/reference';
 
 export const MOCK_REFERENCES: Reference[] = [
   // Topic 1 References

@@ -1,25 +1,7 @@
-import { FileType } from './enum';
 import type { Assignment } from './assignment';
 import type { Quiz } from './quiz';
-
-export interface Reference {
-  id: string;
-  title: string;
-  url: string;
-  description?: string | null;
-  topicId: string;
-  createdAt?: string;
-}
-
-export interface Material {
-  id: string;
-  title: string;
-  materialType: FileType;
-  fileUrl: string | null;
-  externalUrl: string | null;
-  topicId: string;
-  createdAt: string;
-}
+import type { Material } from './material';
+import type { Reference } from './reference';
 
 export interface Topic {
   id: string;
@@ -40,12 +22,7 @@ export interface CreateTopicPayload {
   description?: string;
 }
 
-export interface CreateMaterialPayload {
-  title: string;
-  materialType: FileType;
-  fileUrl?: string;
-  externalUrl?: string;
-}
+export type UpdateTopicPayload = Partial<CreateTopicPayload>;
 
 export type UnifiedResource =
   | { kind: 'material'; data: Material }
@@ -53,13 +30,4 @@ export type UnifiedResource =
   | { kind: 'assignment'; data: Assignment }
   | { kind: 'quiz'; data: Quiz };
 
-export type MaterialWithTopic = Material & {
-  topicTitle?: string;
-};
-
-export interface MaterialBadgeConfig {
-  label: string;
-  bg: string;
-  text: string;
-  border: string;
-}
+export type ResourceCreationType = 'material' | 'reference' | 'assignment' | 'quiz';

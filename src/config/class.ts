@@ -1,6 +1,8 @@
 import {
   BarChart,
   BookOpen,
+  Bookmark,
+  ClipboardList,
   Edit,
   FileText,
   HelpCircle,
@@ -13,6 +15,45 @@ import {
 import type { ClassroomTabConfig, ClassTheme } from '@/types/class';
 
 export const COURSE_CODE_LENGTH = 6;
+
+export const TOPIC_RESOURCE_MENU_ITEMS = [
+  {
+    type: 'material' as const,
+    label: 'Bài giảng học tập',
+    description: 'Tải lên PDF, Slide, Video hoặc liên kết ngoài',
+    icon: FileText,
+    color: 'text-cyan-600 dark:text-cyan-400',
+    bgColor: 'bg-cyan-500/10',
+    borderColor: 'border-cyan-500/20',
+  },
+  {
+    type: 'reference' as const,
+    label: 'Tài liệu tham khảo',
+    description: 'Liên kết website hoặc tệp đọc thêm mở rộng',
+    icon: Bookmark,
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+    borderColor: 'border-emerald-500/20',
+  },
+  {
+    type: 'assignment' as const,
+    label: 'Bài tập về nhà',
+    description: 'Giao bài tập có hạn nộp và chấm điểm',
+    icon: ClipboardList,
+    color: 'text-amber-600 dark:text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    borderColor: 'border-amber-500/20',
+  },
+  {
+    type: 'quiz' as const,
+    label: 'Bài kiểm tra trắc nghiệm',
+    description: 'Tạo bài trắc nghiệm tính giờ làm bài',
+    icon: HelpCircle,
+    color: 'text-indigo-600 dark:text-indigo-400',
+    bgColor: 'bg-indigo-500/10',
+    borderColor: 'border-indigo-500/20',
+  },
+] as const;
 
 export const CLASS_SIDEBAR_NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/classes?tab=discovery' },

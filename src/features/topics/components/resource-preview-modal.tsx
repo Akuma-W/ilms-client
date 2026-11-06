@@ -12,16 +12,14 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {
-  getYouTubeEmbedUrl,
-  getMaterialBadgeConfig,
-  formatDateVi,
-} from '../../utils/resource.utils';
+import { getYouTubeEmbedUrl, getMaterialBadgeConfig, formatDateVi } from '../utils/resource.utils';
+import { isDirectFileUrl } from '@/features/upload/utils/file.utils';
 import type { UnifiedResource } from '@/types/topic';
 
 interface ResourcePreviewModalProps {
@@ -58,14 +56,14 @@ export function ResourcePreviewModal({
                 const badge = getMaterialBadgeConfig(resource.data.materialType);
                 return (
                   <span
-                    className={`px-2 py-0.5 text-[11px] font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
+                    className={`px-2 py-0.5 text-xs font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
                   >
                     {badge.label}
                   </span>
                 );
               })()}
             {isReference && (
-              <span className="px-2 py-0.5 text-[11px] font-medium rounded border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
+              <span className="px-2 py-0.5 text-xs font-medium rounded border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
                 Tài liệu tham khảo
               </span>
             )}
@@ -76,15 +74,19 @@ export function ResourcePreviewModal({
               </span>
             )}
           </div>
-          <DialogTitle className="text-base md:text-lg font-bold text-foreground">
+          <DialogTitle className="text-lg md:text-xl font-bold text-foreground">
             {title}
           </DialogTitle>
-          {createdAt && (
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Calendar className="size-3" />
-              Đã cập nhật vào ngày {createdAt}
-            </p>
-          )}
+          <DialogDescription className="text-xs text-muted-foreground flex items-center gap-1">
+            {createdAt ? (
+              <>
+                <Calendar className="size-3" />
+                Đã cập nhật vào ngày {createdAt}
+              </>
+            ) : (
+              'Xem trước chi tiết nội dung tài nguyên'
+            )}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Modal Body */}
@@ -134,10 +136,10 @@ export function ResourcePreviewModal({
               <div className="size-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto mb-3">
                 <LinkIcon className="size-6" />
               </div>
-              <h4 className="text-sm font-semibold text-foreground">
+              <h4 className="text-base font-semibold text-foreground">
                 Liên kết tài nguyên bên ngoài
               </h4>
-              <p className="text-xs text-muted-foreground mt-1 truncate max-w-md mx-auto">
+              <p className="text-sm text-muted-foreground mt-1 truncate max-w-md mx-auto">
                 {resource.data.externalUrl}
               </p>
             </div>
@@ -146,9 +148,11 @@ export function ResourcePreviewModal({
               <div className="size-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
                 <ExternalLink className="size-6" />
               </div>
-              <h4 className="text-sm font-semibold text-foreground">Tài liệu tham khảo mở rộng</h4>
+              <h4 className="text-base font-semibold text-foreground">
+                Tài liệu tham khảo mở rộng
+              </h4>
               {resource.data.description && (
-                <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                <p className="text-sm text-muted-foreground mt-1.5 max-w-md mx-auto leading-relaxed">
                   {resource.data.description}
                 </p>
               )}
@@ -161,7 +165,7 @@ export function ResourcePreviewModal({
               <div className="size-12 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-3">
                 <FileText className="size-6" />
               </div>
-              <h4 className="text-sm font-semibold text-foreground">Tệp tin học tập</h4>
+              <h4 className="text-base font-semibold text-foreground">Tệp tin học tập</h4>
               <p className="text-xs text-muted-foreground mt-1 truncate max-w-md mx-auto">
                 {isMaterial ? resource.data.fileUrl : 'Tệp đính kèm'}
               </p>
@@ -175,7 +179,7 @@ export function ResourcePreviewModal({
             variant="outline"
             size="sm"
             onClick={() => onOpenChange(false)}
-            className="text-xs rounded-lg"
+            className="text-xs rounded-lg cursor-pointer"
           >
             Đóng
           </Button>
@@ -185,7 +189,7 @@ export function ResourcePreviewModal({
               <Button
                 size="sm"
                 asChild
-                className="bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg"
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg cursor-pointer"
               >
                 <a
                   href={resource.data.externalUrl || '#'}
@@ -202,7 +206,7 @@ export function ResourcePreviewModal({
               <Button
                 size="sm"
                 asChild
-                className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-lg"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-lg cursor-pointer"
               >
                 <a href={resource.data.fileUrl} target="_blank" rel="noopener noreferrer" download>
                   <Download className="size-3.5 mr-1.5" />
@@ -215,11 +219,25 @@ export function ResourcePreviewModal({
               <Button
                 size="sm"
                 asChild
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg cursor-pointer"
               >
-                <a href={resource.data.url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-3.5 mr-1.5" />
-                  Mở trang tham khảo
+                <a
+                  href={resource.data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  {...(isDirectFileUrl(resource.data.url) ? { download: true } : {})}
+                >
+                  {isDirectFileUrl(resource.data.url) ? (
+                    <>
+                      <Download className="size-3.5 mr-1.5" />
+                      Tải tệp tham khảo
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="size-3.5 mr-1.5" />
+                      Mở trang tham khảo
+                    </>
+                  )}
                 </a>
               </Button>
             )}

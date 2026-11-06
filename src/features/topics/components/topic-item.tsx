@@ -3,7 +3,6 @@
 import {
   ChevronDown,
   ChevronUp,
-  Plus,
   Pencil,
   Trash2,
   FileText,
@@ -15,7 +14,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResourceGroup } from './resource-group';
-import type { Topic, UnifiedResource } from '@/types/topic';
+import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
+import { ResourceAddDropdown } from '@/components/resources';
 
 interface TopicItemProps {
   topic: Topic;
@@ -24,7 +24,7 @@ interface TopicItemProps {
   isTeacher?: boolean;
   mode?: 'overview' | 'materials';
   onToggleExpand: () => void;
-  onAddResource?: (topicId: string) => void;
+  onAddResource?: (topicId: string, type?: ResourceCreationType) => void;
   onEditTopic?: (topic: Topic) => void;
   onDeleteTopic?: (topicId: string) => void;
   onPreviewResource?: (resource: UnifiedResource) => void;
@@ -71,8 +71,6 @@ export function TopicItem({
       ? materials.length + references.length
       : materials.length + references.length + assignments.length + quizzes.length;
 
-  const addTooltipLabel = mode === 'materials' ? 'Thêm tài liệu' : 'Thêm tài nguyên';
-
   return (
     <div
       className={`rounded-xl border transition-all ${
@@ -99,14 +97,18 @@ export function TopicItem({
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-foreground truncate">{topic.title}</h4>
-              <span className="text-xs text-muted-foreground px-2.5 py-0.5 rounded-full bg-muted font-medium">
+              <h3 className="text-lg font-semibold text-foreground tracking-tight truncate">
+                {topic.title}
+              </h3>
+              <span className="text-xs text-muted-foreground px-2.5 py-0.5 rounded-full bg-muted font-medium shrink-0">
                 {totalCount} {mode === 'materials' ? 'tài liệu' : 'tài nguyên'}
               </span>
             </div>
 
             {topic.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{topic.description}</p>
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+                {topic.description}
+              </p>
             )}
           </div>
         </div>
@@ -116,23 +118,11 @@ export function TopicItem({
           {isTeacher && (
             <>
               {onAddResource && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddResource(topic.id);
-                      }}
-                      className="size-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"
-                    >
-                      <Plus className="size-4" />
-                      <span className="sr-only">{addTooltipLabel}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">{addTooltipLabel}</TooltipContent>
-                </Tooltip>
+                <ResourceAddDropdown
+                  mode={mode}
+                  variant="icon"
+                  onSelect={(type) => onAddResource(topic.id, type)}
+                />
               )}
 
               {onEditTopic && (
@@ -145,7 +135,7 @@ export function TopicItem({
                         e.stopPropagation();
                         onEditTopic(topic);
                       }}
-                      className="size-8 text-muted-foreground hover:text-foreground"
+                      className="size-8 text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                       <Pencil className="size-3.5" />
                       <span className="sr-only">Chỉnh sửa chủ đề</span>
@@ -165,7 +155,7 @@ export function TopicItem({
                         e.stopPropagation();
                         onDeleteTopic(topic.id);
                       }}
-                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
                     >
                       <Trash2 className="size-3.5" />
                       <span className="sr-only">Xóa chủ đề</span>
@@ -210,7 +200,7 @@ export function TopicItem({
                 onPreview={onPreviewResource}
                 onEdit={onEditResource}
                 onDelete={onDeleteResource}
-                onAdd={onAddResource ? () => onAddResource(topic.id) : undefined}
+                onAdd={onAddResource ? () => onAddResource(topic.id, 'material') : undefined}
               />
 
               {/* 2. References */}
@@ -225,7 +215,7 @@ export function TopicItem({
                 onPreview={onPreviewResource}
                 onEdit={onEditResource}
                 onDelete={onDeleteResource}
-                onAdd={onAddResource ? () => onAddResource(topic.id) : undefined}
+                onAdd={onAddResource ? () => onAddResource(topic.id, 'reference') : undefined}
               />
 
               {/* 3 & 4. Assignments & Quizzes only in overview mode */}
@@ -241,6 +231,7 @@ export function TopicItem({
                     addTooltipText="Thêm bài tập"
                     onEdit={onEditResource}
                     onDelete={onDeleteResource}
+                    onAdd={onAddResource ? () => onAddResource(topic.id, 'assignment') : undefined}
                   />
 
                   <ResourceGroup
@@ -253,6 +244,7 @@ export function TopicItem({
                     addTooltipText="Thêm bài trắc nghiệm"
                     onEdit={onEditResource}
                     onDelete={onDeleteResource}
+                    onAdd={onAddResource ? () => onAddResource(topic.id, 'quiz') : undefined}
                   />
                 </>
               )}

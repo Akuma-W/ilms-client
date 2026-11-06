@@ -1,20 +1,24 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
-import { BookOpen, ChevronsUpDown, Search } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { CreateTopicModal } from '@/features/classes/components/modals/create-topic-modal';
-import { CreateMaterialModal } from '@/features/classes/components/modals/create-material-modal';
-import { TopicItem } from '@/features/classes/components/topics/topic-item';
-import { ResourcePreviewModal } from '@/features/classes/components/topics/resource-preview-modal';
-import { topicsService } from '@/features/classes/services/topics.service';
-import { materialsService } from '@/features/classes/services/materials.service';
+import { CreateTopicModal } from '@/features/topics/components/create-topic-modal';
+import { TopicItem } from '@/features/topics/components/topic-item';
+import { ResourcePreviewModal } from '@/features/topics/components/resource-preview-modal';
+import { MaterialModal } from '@/features/materials/components/material-modal';
+import { ReferenceModal } from '@/features/references/components/reference-modal';
+import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
+import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-toolbar';
+import { topicsService } from '@/features/topics/services/topics.service';
+import { materialsService } from '@/features/materials/services/materials.service';
+import { referencesService } from '@/features/references/services/references.service';
 import { getMockTopics } from '@/mocks/classes/class-data.mock';
-import type { Topic, UnifiedResource } from '@/types/topic';
+import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
+import type { Material } from '@/types/material';
+import type { Reference } from '@/types/reference';
 
 interface OverviewClientProps {
   classId: string;
@@ -26,40 +30,42 @@ interface OverviewClientProps {
  * Client Component for Class Overview tab in full-width Hub-and-Spoke layout.
  */
 export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewClientProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTopicForMaterial, setActiveTopicForMaterial] = useState<string | null>(null);
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
+
+  const [materialModal, setMaterialModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    topicId?: string;
+    material?: Material | null;
+  }>({ isOpen: false, mode: 'create' });
+
+  const [referenceModal, setReferenceModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    topicId?: string;
+    reference?: Reference | null;
+  }>({ isOpen: false, mode: 'create' });
+
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    type: 'material' | 'reference' | 'topic';
+    id: string;
+    name: string;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    type: 'material',
+    id: '',
+    name: '',
+    isDeleting: false,
+  });
 
   // SWR for reactive topics with mock fallback
   const { data: topics = [], mutate } = useSWR(
     `classes/${classId}/overview-data`,
-    async () => {
-      try {
-        const fetchedTopics = await topicsService.getTopics(classId);
-        const safeTopics = Array.isArray(fetchedTopics) ? fetchedTopics : [];
-
-        // Mock data
-        if (safeTopics.length === 0) {
-          return getMockTopics(classId);
-        }
-
-        return await Promise.all(
-          safeTopics.map(async (topic) => {
-            try {
-              const materials = await materialsService.getMaterials(topic.id);
-              return {
-                ...topic,
-                materials: Array.isArray(materials) ? materials : [],
-              };
-            } catch {
-              return { ...topic, materials: [] };
-            }
-          }),
-        );
-      } catch {
-        return getMockTopics(classId);
-      }
-    },
+    () => topicsService.getTopicsWithResources(classId),
     {
       fallbackData: initialTopics.length > 0 ? initialTopics : getMockTopics(classId),
       revalidateOnMount: false,
@@ -91,41 +97,87 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
     setExpandedTopics(nextState);
   };
 
-  const handleDeleteTopic = async (topicId: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa chủ đề này cùng toàn bộ tài liệu bên trong không?')) {
-      return;
-    }
-
-    try {
-      const res = await topicsService.deleteTopic(topicId);
-      if (!res.success) throw new Error(res.message);
-      toast.success('Xóa chủ đề thành công!');
-      mutate();
-    } catch (error) {
-      toast.error('Xóa chủ đề thất bại', {
-        description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
-      });
+  const handleAddResource = (topicId: string, type?: ResourceCreationType) => {
+    if (type === 'reference') {
+      setReferenceModal({ isOpen: true, mode: 'create', topicId, reference: null });
+    } else if (type === 'assignment') {
+      router.push(`/classes/${classId}/assignments?topicId=${topicId}`);
+    } else if (type === 'quiz') {
+      router.push(`/classes/${classId}/quizzes?topicId=${topicId}`);
+    } else {
+      setMaterialModal({ isOpen: true, mode: 'create', topicId, material: null });
     }
   };
 
-  const handleDeleteResource = async (resource: UnifiedResource) => {
-    if (resource.kind !== 'material') {
-      toast.info(`Chức năng quản lý ${resource.kind} đang được đồng bộ.`);
-      return;
+  const handleEditResource = (resource: UnifiedResource) => {
+    if (resource.kind === 'material') {
+      setMaterialModal({
+        isOpen: true,
+        mode: 'edit',
+        topicId: resource.data.topicId,
+        material: resource.data,
+      });
+    } else if (resource.kind === 'reference') {
+      setReferenceModal({
+        isOpen: true,
+        mode: 'edit',
+        topicId: resource.data.topicId,
+        reference: resource.data,
+      });
+    } else if (resource.kind === 'assignment') {
+      router.push(`/classes/${classId}/assignments/${resource.data.id}`);
+    } else if (resource.kind === 'quiz') {
+      router.push(`/classes/${classId}/quizzes/${resource.data.id}`);
     }
-    if (!confirm('Bạn có chắc chắn muốn xóa tài liệu này không?')) {
-      return;
-    }
+  };
 
+  const handleDeleteResource = (resource: UnifiedResource) => {
+    if (resource.kind === 'material' || resource.kind === 'reference') {
+      setDeleteModal({
+        isOpen: true,
+        type: resource.kind,
+        id: resource.data.id,
+        name: resource.data.title,
+        isDeleting: false,
+      });
+    } else {
+      toast.info('Vui lòng quản lý bài tập/trắc nghiệm tại tab chuyên biệt.');
+    }
+  };
+
+  const handleDeleteTopic = (topicId: string) => {
+    const targetTopic = topics.find((t) => t.id === topicId);
+    setDeleteModal({
+      isOpen: true,
+      type: 'topic',
+      id: topicId,
+      name: targetTopic?.title || 'Chủ đề này',
+      isDeleting: false,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
     try {
-      const res = await materialsService.deleteMaterial(resource.data.id);
+      const { type, id } = deleteModal;
+      const res =
+        type === 'material'
+          ? await materialsService.deleteMaterial(id)
+          : type === 'reference'
+            ? await referencesService.deleteReference(id)
+            : await topicsService.deleteTopic(id);
+
       if (!res.success) throw new Error(res.message);
-      toast.success('Xóa tài liệu thành công!');
+      const label =
+        type === 'topic' ? 'chủ đề' : type === 'material' ? 'bài giảng' : 'tài liệu tham khảo';
+      toast.success(`Xóa ${label} thành công!`);
       mutate();
+      setDeleteModal((prev) => ({ ...prev, isOpen: false, isDeleting: false }));
     } catch (error) {
-      toast.error('Xóa tài liệu thất bại', {
+      toast.error('Xóa thất bại', {
         description: error instanceof Error ? error.message : 'Vui lòng thử lại.',
       });
+      setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -144,51 +196,21 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
 
   return (
     <div className="w-full space-y-6">
-      {/* 1. Topic Header & Search Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">
-            Tổng quan Chủ đề bài giảng
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Lộ trình học tập được sắp xếp theo từng chủ đề bài học.
-          </p>
-        </div>
+      {/* 1. Topic Header Toolbar (Unified ClassTabToolbar) */}
+      <ClassTabToolbar
+        title="Tổng quan Chủ đề bài giảng"
+        description="Lộ trình học tập được sắp xếp theo từng chủ đề bài học."
+        icon={BookOpen}
+        iconColorClassName="text-cyan-600 dark:text-cyan-400"
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Tìm kiếm tài nguyên..."
+        onToggleExpandAll={toggleExpandAll}
+        showExpandAll={topics.length > 0}
+        actions={isTeacher && <CreateTopicModal classId={classId} onSuccess={() => mutate()} />}
+      />
 
-        <div className="flex items-center gap-2">
-          <div className="relative w-48 sm:w-64">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Tìm kiếm tài nguyên..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 text-xs h-8.5 rounded-lg"
-            />
-          </div>
-
-          {topics.length > 0 && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleExpandAll}
-                  className="size-8.5 shrink-0 rounded-lg"
-                >
-                  <ChevronsUpDown className="size-4" />
-                  <span className="sr-only">Mở/Thu gọn tất cả</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Mở rộng / Thu gọn tất cả</TooltipContent>
-            </Tooltip>
-          )}
-
-          {isTeacher && <CreateTopicModal classId={classId} onSuccess={() => mutate()} />}
-        </div>
-      </div>
-
-      {/* 3. Topics Accordion List */}
+      {/* 2. Topics Accordion List */}
       {filteredTopics.length === 0 ? (
         <div className="text-center py-12 px-4 rounded-xl border border-dashed border-border bg-card/50">
           <div className="flex items-center justify-center size-12 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 mx-auto mb-3">
@@ -201,7 +223,7 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
             {searchQuery
               ? 'Vui lòng thử tìm kiếm với từ khóa khác.'
               : isTeacher
-                ? 'Hãy bấm nút "Thêm bài giảng mới" để thiết lập lộ trình học tập cho sinh viên.'
+                ? 'Hãy bấm nút "Thêm chủ đề" để thiết lập lộ trình học tập cho sinh viên.'
                 : 'Giảng viên chưa đăng tải nội dung bài giảng cho học phần này.'}
           </p>
         </div>
@@ -216,32 +238,72 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
               isTeacher={isTeacher}
               mode="overview"
               onToggleExpand={() => toggleExpand(topic.id)}
-              onAddResource={(topicId) => setActiveTopicForMaterial(topicId)}
+              onAddResource={handleAddResource}
+              onEditResource={handleEditResource}
+              onDeleteResource={handleDeleteResource}
               onDeleteTopic={handleDeleteTopic}
               onPreviewResource={(item) => setPreviewResource(item)}
-              onDeleteResource={handleDeleteResource}
             />
           ))}
         </div>
       )}
 
-      {/* 4. Preview Modal */}
+      {/* 3. Resource Preview Modal */}
       <ResourcePreviewModal
         resource={previewResource}
         isOpen={Boolean(previewResource)}
         onOpenChange={(open) => !open && setPreviewResource(null)}
       />
 
-      {/* 5. Create Material Modal */}
-      {activeTopicForMaterial && (
-        <CreateMaterialModal
-          topicId={activeTopicForMaterial}
-          topics={topics}
-          isOpen={Boolean(activeTopicForMaterial)}
-          onOpenChange={(open) => !open && setActiveTopicForMaterial(null)}
-          onSuccess={() => mutate()}
-        />
-      )}
+      {/* 4. Material Modal (Unified Create & Edit) */}
+      <MaterialModal
+        topicId={materialModal.topicId}
+        topics={topics}
+        isOpen={materialModal.isOpen}
+        mode={materialModal.mode}
+        initialData={materialModal.material}
+        onOpenChange={(open) => setMaterialModal((prev) => ({ ...prev, isOpen: open }))}
+        onSuccess={() => mutate()}
+      />
+
+      {/* 5. Reference Modal (Unified Create & Edit) */}
+      <ReferenceModal
+        topicId={referenceModal.topicId}
+        topics={topics}
+        isOpen={referenceModal.isOpen}
+        mode={referenceModal.mode}
+        initialData={referenceModal.reference}
+        onOpenChange={(open) => setReferenceModal((prev) => ({ ...prev, isOpen: open }))}
+        onSuccess={() => mutate()}
+      />
+
+      {/* 6. Universal Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={deleteModal.isOpen}
+        onOpenChange={(open) => setDeleteModal((prev) => ({ ...prev, isOpen: open }))}
+        title={
+          deleteModal.type === 'topic'
+            ? 'Xác nhận xóa chủ đề'
+            : deleteModal.type === 'material'
+              ? 'Xác nhận xóa bài giảng'
+              : 'Xác nhận xóa tài liệu tham khảo'
+        }
+        description={
+          deleteModal.type === 'topic'
+            ? 'Toàn bộ bài giảng và tài liệu học tập thuộc chủ đề này sẽ bị xóa vĩnh viễn.'
+            : undefined
+        }
+        itemTypeLabel={
+          deleteModal.type === 'topic'
+            ? 'chủ đề bài học'
+            : deleteModal.type === 'material'
+              ? 'bài giảng học tập'
+              : 'tài liệu tham khảo'
+        }
+        itemName={deleteModal.name}
+        isDeleting={deleteModal.isDeleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

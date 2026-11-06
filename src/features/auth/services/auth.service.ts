@@ -1,5 +1,5 @@
 import { CLIENT_API_URL } from '@/config';
-import { apiClient } from '@/lib/api/api-client';
+import { clientApiClient } from '@/lib/api/client-api-client';
 import { PromiseResponse } from '@/types/api';
 import { GoogleRegisterDto, GoogleUser, RegisterDto } from '@/types/auth';
 
@@ -7,7 +7,7 @@ export const authService = {
   async register(data: RegisterDto): PromiseResponse<{
     userId: string;
   }> {
-    const result = await apiClient<{ userId: string }>('/auth/register', {
+    const result = await clientApiClient<{ userId: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -24,23 +24,22 @@ export const authService = {
   },
 
   async getGoogleUser(): Promise<GoogleUser | null> {
-    const { data } = await apiClient<GoogleUser>('/auth/google/me');
+    const { data } = await clientApiClient<GoogleUser>('/auth/google/me');
     return data;
   },
 
   async googleRegister(data: GoogleRegisterDto): PromiseResponse<{
     userId: string;
   }> {
-    return apiClient<{ userId: string }>('/auth/google/register', {
+    return clientApiClient<{ userId: string }>('/auth/google/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
   async logout(): Promise<string> {
-    const { message } = await apiClient<null>('/auth/logout', {
+    const { message } = await clientApiClient<null>('/auth/logout', {
       method: 'POST',
-      credentials: 'include',
     });
 
     return message;
