@@ -32,7 +32,6 @@ import {
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { late } from 'zod/v3';
 
 interface InfoClientProps {
   classData: Class | null;
@@ -85,7 +84,7 @@ export function InfoClient({ classData, userData, relation }: InfoClientProps) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Class Details */}
       <Card className="border-gray-100 shadow-sm overflow-hidden rounded-3xl">
         <CardHeader className="bg-gray-50/50 border-b border-gray-100 p-6 flex flex-row items-center justify-between">

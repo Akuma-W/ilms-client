@@ -17,7 +17,7 @@ export default async function ClassDetailLayout({
   const isJoined = !!relation;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-8 w-full">
+    <div className="min-h-screen bg-gray-50 px-8 w-full max-w-7xl mx-auto">
       {/* Hero Section */}
       <ClassHero classData={classData} />
 

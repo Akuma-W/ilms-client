@@ -36,7 +36,7 @@ export function StickyNav({ classId, isJoined }: { classId: string; isJoined?: b
       )}
     >
       <div className="container mx-auto lg:max-w-7xl sm:max-w-lg">
-        <div className="h-16 flex gap-2 overflow-x-auto no-scrollbar justify-start items-center">
+        <div className="h-14 flex gap-2 overflow-x-auto no-scrollbar justify-start items-center">
           <Tabs value={activeTab?.value} className="w-full">
             <TabsList className="bg-transparent border-b border-gray-200 rounded-none h-16 w-full justify-start p-0">
               {tabs.map((tab) => (

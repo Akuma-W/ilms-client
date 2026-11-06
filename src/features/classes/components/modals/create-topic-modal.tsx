@@ -91,7 +91,7 @@ export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) 
       <DialogTrigger asChild>
         <Button className="cursor-pointer bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-600 dark:hover:bg-cyan-500 text-white h-9 px-4 rounded-lg shadow-sm font-medium transition-colors">
           <Plus className="w-4 h-4 mr-1.5" />
-          Thêm bài giảng mới
+          Thêm chủ đề mới
         </Button>
       </DialogTrigger>
 

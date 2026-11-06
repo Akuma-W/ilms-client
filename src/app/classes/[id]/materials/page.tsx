@@ -3,6 +3,7 @@ import { topicsServerService } from '@/features/classes/services/topics.server.s
 import { materialsServerService } from '@/features/classes/services/materials.server.service';
 import { serverApiClient } from '@/lib/api/server-api-client';
 import { Enrollment } from '@/types/enrollment';
+import { MOCK_CURRENT_CLASS, MOCK_MATERIALS, MOCK_TOPICS } from '@/mocks/classes/class-data.mock';
 import { MaterialsClient } from './materials-client';
 
 export const metadata: Metadata = {
@@ -26,25 +27,34 @@ export default async function ClassMaterials({ params }: ClassMaterialsProps) {
   });
   const isTeacher = relationRes.data?.roleIn === 'teacher';
 
-  // 2. Fetch topics
-  const rawTopics = await topicsServerService.getTopics(classId);
-  const topics = Array.isArray(rawTopics) ? rawTopics : [];
+  // // 2. Fetch topics
+  // const rawTopics = await topicsServerService.getTopics(classId);
+  // const topics = Array.isArray(rawTopics) ? rawTopics : [];
 
-  // 3. Resolve materials for each topic and flatten
-  const materialsWithTopicInfo = await Promise.all(
-    topics.map(async (topic) => {
-      try {
-        const materials = await materialsServerService.getMaterials(topic.id);
-        const matList = Array.isArray(materials) ? materials : [];
-        return matList.map((material) => ({
-          ...material,
-          topicTitle: topic.title,
-        }));
-      } catch {
-        return [];
-      }
-    }),
-  );
+  // // 3. Resolve materials for each topic and flatten
+  // const materialsWithTopicInfo = await Promise.all(
+  //   topics.map(async (topic) => {
+  //     try {
+  //       const materials = await materialsServerService.getMaterials(topic.id);
+  //       const matList = Array.isArray(materials) ? materials : [];
+  //       return matList.map((material) => ({
+  //         ...material,
+  //         topicTitle: topic.title,
+  //       }));
+  //     } catch {
+  //       return [];
+  //     }
+  //   }),
+  // );
+
+  // Mock data
+  const topics = MOCK_TOPICS;
+  const materialsWithTopicInfo = MOCK_MATERIALS.map((item) => {
+    return {
+      ...item,
+      topicTitle: topics.find((topic) => topic.id === item.topicId)?.title,
+    };
+  });
 
   const flattenedMaterials = materialsWithTopicInfo.flat();
 
