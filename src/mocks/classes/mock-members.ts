@@ -61,3 +61,35 @@ export const MOCK_MEMBERS: ClassMemberItem[] = [
     joinedAt: '2026-03-05T14:30:00Z',
   })),
 ];
+
+let mutableMockMembers = MOCK_MEMBERS.map((m, idx) => ({
+  id: m.id,
+  userId: m.userId,
+  user: m.user,
+  role: m.role,
+  status: m.status,
+  joinedAt: m.joinedAt,
+  studentCode: m.role === Role.student ? `2252${(1001 + idx).toString()}` : undefined,
+}));
+
+export const getMockMembers = () => [...mutableMockMembers];
+
+export const approveMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, status: EnrollmentStatus.approved } : m,
+  );
+};
+
+export const rejectMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.filter((m) => m.id !== memberId);
+};
+
+export const removeMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.filter((m) => m.id !== memberId);
+};
+
+export const updateMockMemberRole = (memberId: string, newRole: Role) => {
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, role: newRole } : m,
+  );
+};

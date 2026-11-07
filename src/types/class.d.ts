@@ -74,3 +74,16 @@ export interface ClassTheme {
 }
 
 export type SearchStatus = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
+
+export interface StudentClassProgress {
+  averageScore: number;
+  assignmentsCompleted: number;
+  totalAssignments: number;
+  assignmentRate: number; // percentage
+  quizzesCompleted: number;
+  totalQuizzes: number;
+  quizRate: number; // percentage
+  meetAttended: number;
+  totalMeetings: number;
+  meetRate: number; // percentage
+}

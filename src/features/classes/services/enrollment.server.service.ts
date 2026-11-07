@@ -15,7 +15,8 @@ export const enrollmentServerService = {
       const result = await serverApiClient<Enrollment>(`/enrollments/me/${classId}`, {
         ignoreAuthError: true,
       });
-      if (result.success !== false && result.data !== null && result.data !== undefined) {
+      if (result.success !== false) {
+        //&& result.data !== null && result.data !== undefined
         return result.data;
       }
     } catch {

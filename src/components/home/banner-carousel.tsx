@@ -37,6 +37,7 @@ function BannerSlide({ banner }: { banner: HomeBanner }) {
         src={banner.image}
         alt={banner.title}
         fill
+        sizes="100vw"
         className="object-cover"
         priority={banner.id === '1'}
       />

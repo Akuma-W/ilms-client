@@ -101,6 +101,7 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
                 src={classData.teacher.avatar}
                 alt={classData.teacher.fullName}
                 fill
+                sizes="32px"
                 className="object-cover"
                 referrerPolicy="no-referrer"
               />

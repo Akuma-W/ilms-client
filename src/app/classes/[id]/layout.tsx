@@ -16,7 +16,9 @@ export default async function ClassDetailLayout({
     enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
   ]);
 
-  const isJoined = relation !== null && relation !== undefined;
+  const isJoined = Boolean(
+    relation && (relation.status === 'approved' || relation.roleIn === 'teacher'),
+  );
 
   return (
     <div className="min-h-screen bg-background w-full flex flex-col">
