@@ -5,6 +5,8 @@ export interface AssignmentMaterial {
   id: string;
   fileUrl: string;
   fileType: FileType | null;
+  fileName?: string;
+  fileSize?: number;
   createdAt?: string;
   assignmentId: string;
 }
@@ -47,4 +49,36 @@ export interface Assignment {
   submissions?: Submission[];
   submissionCount?: number;
   totalStudents?: number;
+}
+
+export type AssignmentFilterStatus = 'all' | 'pending' | 'submitted' | 'graded' | 'overdue';
+
+export interface CreateAssignmentPayload {
+  title: string;
+  description?: string | null;
+  dueAt?: string | null;
+  maxScore?: number;
+  topicId?: string | null;
+  materials?: {
+    fileUrl: string;
+    fileType: FileType | null;
+    fileName?: string;
+    fileSize?: number;
+  }[];
+}
+
+export interface SubmitAssignmentPayload {
+  textAnswer?: string | null;
+  files?: {
+    id?: string;
+    fileUrl: string;
+    fileType: FileType | null;
+    fileName?: string;
+    fileSize?: number;
+  }[];
+}
+
+export interface GradeSubmissionPayload {
+  score: number;
+  feedback?: string | null;
 }

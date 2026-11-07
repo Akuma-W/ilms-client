@@ -24,13 +24,16 @@ export function Header({ initialUser }: HeaderProps) {
   });
 
   const handleLogout = async () => {
-    await logoutAction();
+    try {
+      await logoutAction();
+    } catch {
+      // Ignore network errors during logout
+    }
 
-    // clear cache user
-    await mutateUser(undefined, false);
-
-    // Redirect to login
+    // Clear user cache and refresh page state
+    await mutateUser(null, false);
     router.push('/login');
+    router.refresh();
   };
 
   return (

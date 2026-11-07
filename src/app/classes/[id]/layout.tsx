@@ -1,6 +1,7 @@
 import { ClassHero } from '@/features/classes/components/layout/class-hero';
 import { ClassNav } from '@/features/classes/components/layout/class-nav';
-import { MOCK_CURRENT_CLASS } from '@/mocks/classes/class-data.mock';
+import { classServerService } from '@/features/classes/services/class.server.service';
+import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
 
 export default async function ClassDetailLayout({
   children,
@@ -10,12 +11,12 @@ export default async function ClassDetailLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id: classId } = await params;
-  // const classData = await classService.getClassData(classId);
-  // const relation = await enrollmentService.getMyRelationInClass(classId);
+  const [classData, relation] = await Promise.all([
+    classServerService.getClassData(classId),
+    enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
+  ]);
 
-  // const isJoined = !!relation;
-  const classData = { ...MOCK_CURRENT_CLASS, id: classId || MOCK_CURRENT_CLASS.id };
-  const isJoined = true;
+  const isJoined = relation !== null && relation !== undefined;
 
   return (
     <div className="min-h-screen bg-background w-full flex flex-col">

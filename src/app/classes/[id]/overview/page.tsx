@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
-import { getMockTopics } from '@/mocks/classes/class-data.mock';
+import { userServerService } from '@/features/user/services/user.server.service';
+import { classServerService } from '@/features/classes/services/class.server.service';
+import { topicsService } from '@/features/topics/services/topics.service';
 import { OverviewClient } from './overview-client';
 
 export const metadata: Metadata = {
@@ -18,12 +20,18 @@ interface ClassOverviewProps {
 export default async function ClassOverview({ params }: ClassOverviewProps) {
   const { id: classId } = await params;
 
-  // 1. Check user relation in class to determine teacher privileges
-  const relation = await enrollmentServerService.getMyRelationInClass(classId);
-  const isTeacher = relation?.roleIn === 'teacher';
+  // 1. Check user relation in class to determine teacher privileges (Must be teacher of THIS class)
+  const [relation, currentUser, classData] = await Promise.all([
+    enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
+    userServerService.getMe().catch(() => null),
+    classServerService.getClassData(classId).catch(() => null),
+  ]);
+  const isTeacher =
+    relation?.roleIn === 'teacher' ||
+    Boolean(classData && currentUser && classData.teacherId === currentUser.id);
 
-  // 2. Mock class data (mapped to current classId)
-  const initialTopicsWithMaterials = getMockTopics(classId);
+  // 2. Fetch topics and nested resources via service
+  const initialTopicsWithMaterials = await topicsService.getTopicsWithResources(classId);
 
   return (
     <OverviewClient

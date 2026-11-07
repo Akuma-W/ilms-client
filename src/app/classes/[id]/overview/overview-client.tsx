@@ -15,7 +15,6 @@ import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-
 import { topicsService } from '@/features/topics/services/topics.service';
 import { materialsService } from '@/features/materials/services/materials.service';
 import { referencesService } from '@/features/references/services/references.service';
-import { getMockTopics } from '@/mocks/classes/class-data.mock';
 import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
 import type { Material } from '@/types/material';
 import type { Reference } from '@/types/reference';
@@ -62,12 +61,12 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
     isDeleting: false,
   });
 
-  // SWR for reactive topics with mock fallback
+  // SWR for reactive topics with service-encapsulated fallback
   const { data: topics = [], mutate } = useSWR(
     `classes/${classId}/overview-data`,
     () => topicsService.getTopicsWithResources(classId),
     {
-      fallbackData: initialTopics.length > 0 ? initialTopics : getMockTopics(classId),
+      fallbackData: topicsService.getInitialTopics(classId, initialTopics),
       revalidateOnMount: false,
     },
   );

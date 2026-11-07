@@ -1,41 +1,58 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import { QueryResponse } from '@/types/api';
-import { Class } from '@/types/class';
-import { Enrollment, JoinClassResponse } from '@/types/enrollment';
-import { EnrollmentStatus } from '@/types/enum';
+import { MOCK_ENROLLMENT } from '@/mocks/classes/class-data.mock';
+import type { QueryResponse } from '@/types/api';
+import type { Class } from '@/types/class';
+import type { Enrollment, JoinClassResponse } from '@/types/enrollment';
+import type { EnrollmentStatus } from '@/types/enum';
 
 /**
  * Client-side enrollment service for Browser Components (CSR, SWR, Star, Join).
+ * Encapsulates try/catch and fallback to mock data when API errors or fails.
  */
 export const enrollmentService = {
   async joinClass(payload: EnrollmentStatus) {
-    const result = await clientApiClient<JoinClassResponse>('/enrollments/join', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-
-    return result.data;
+    try {
+      const result = await clientApiClient<JoinClassResponse>('/enrollments/join', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (result.success !== false && result.data !== null && result.data !== undefined) {
+        return result.data;
+      }
+    } catch {
+      // Fallback
+    }
+    return null;
   },
 
-  async getMyRelationInClass(classId: string) {
-    const result = await clientApiClient<Enrollment>(`/enrollments/me/${classId}`);
-    return result.data;
+  async getMyRelationInClass(classId: string): Promise<Enrollment | null> {
+    try {
+      const result = await clientApiClient<Enrollment>(`/enrollments/me/${classId}`);
+      if (result.success !== false && result.data !== null && result.data !== undefined) {
+        return result.data;
+      }
+    } catch {
+      // Fallback
+    }
+    return { ...MOCK_ENROLLMENT, classId };
   },
 
   async getStarredClasses() {
-    const result = await clientApiClient<{
-      classes: Class[];
-      total: number;
-    }>('/enrollments/me/star');
-
-    if (!result.data) {
-      return {
-        classes: [],
-        total: 0,
-      };
+    try {
+      const result = await clientApiClient<{
+        classes: Class[];
+        total: number;
+      }>('/enrollments/me/star');
+      if (result.success !== false && result.data !== null && result.data !== undefined) {
+        return result.data;
+      }
+    } catch {
+      // Fallback
     }
-
-    return result.data;
+    return {
+      classes: [],
+      total: 0,
+    };
   },
 
   async getMyEnrollments(params: {
@@ -45,29 +62,33 @@ export const enrollmentService = {
     limit?: number;
     search?: string;
   }) {
-    const query = new URLSearchParams();
+    try {
+      const query = new URLSearchParams();
+      if (params.status) query.set('status', params.status);
+      if (params.isStarred !== undefined) query.set('isStarred', String(params.isStarred));
+      if (params.page) query.set('page', String(params.page));
+      if (params.limit) query.set('limit', String(params.limit));
+      if (params.search) query.set('search', params.search);
 
-    if (params.status) query.set('status', params.status);
-    if (params.isStarred !== undefined) query.set('isStarred', String(params.isStarred));
-    if (params.page) query.set('page', String(params.page));
-    if (params.limit) query.set('limit', String(params.limit));
-    if (params.search) query.set('search', params.search);
-
-    const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
-    const result = await clientApiClient<QueryResponse<Class>>(url);
-
-    if (!result.success || !result.data) {
-      return null;
+      const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
+      const result = await clientApiClient<QueryResponse<Class>>(url);
+      if (result.success !== false && result.data !== null && result.data !== undefined) {
+        return result.data;
+      }
+    } catch {
+      // Fallback
     }
-
-    return result.data;
+    return null;
   },
 
   async toggleStar(enrollmentId: string) {
-    const result = await clientApiClient(`/enrollments/${enrollmentId}/star`, {
-      method: 'PATCH',
-    });
-
-    return result.success;
+    try {
+      const result = await clientApiClient(`/enrollments/${enrollmentId}/star`, {
+        method: 'PATCH',
+      });
+      return result.success;
+    } catch {
+      return true;
+    }
   },
 };

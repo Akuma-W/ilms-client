@@ -34,7 +34,7 @@ export function ResourceTopicSelect({
   // When a topic is pre-selected / fixed, display a prominent read-only badge
   if (isReadOnly || (disabled && selectedTopic)) {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 w-full">
         <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
           <Layers className="size-3.5 text-emerald-500" />
           Chủ đề bài học
@@ -58,19 +58,21 @@ export function ResourceTopicSelect({
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
+      <Label className="text-sm font-medium flex items-center gap-1.5 text-foreground">
         <Layers className="size-3.5 text-emerald-500" />
         Chủ đề bài học <span className="text-destructive">*</span>
       </Label>
 
       <Select value={selectedTopicId} onValueChange={onTopicChange} disabled={disabled}>
-        <SelectTrigger className="h-9 text-sm rounded-lg bg-background">
-          <SelectValue placeholder="Chọn chủ đề" />
+        <SelectTrigger className="h-10 text-sm rounded-xl bg-background w-full max-w-full overflow-hidden text-left">
+          <span className="truncate block flex-1 text-left">
+            <SelectValue placeholder="Chọn chủ đề" />
+          </span>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
           {topics.map((t) => (
-            <SelectItem key={t.id} value={t.id} className="text-sm cursor-pointer">
-              {t.title}
+            <SelectItem key={t.id} value={t.id} className="text-sm cursor-pointer max-w-full">
+              <span className="truncate block">{t.title}</span>
             </SelectItem>
           ))}
         </SelectContent>
