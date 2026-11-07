@@ -58,3 +58,45 @@ export interface Quiz {
   publications?: QuizPublication[];
   attempts?: QuizAttempt[];
 }
+
+export type QuizFilterTab = 'all' | 'open' | 'completed' | 'closed';
+
+export interface QuizClassItem extends Quiz {
+  publicationId: string;
+  classId: string;
+  topicId?: string | null;
+  topicName?: string | null;
+  openAt: string;
+  closeAt: string;
+  submittedCount: number;
+  totalStudents: number;
+  currentUserAttempt?: QuizAttempt | null;
+}
+
+export interface PublishQuizInput {
+  quizId: string;
+  topicId?: string | null;
+  openAt: string;
+  closeAt: string;
+}
+
+export interface QuizStudentStatItem {
+  studentId: string;
+  fullName: string;
+  email: string;
+  avatarUrl?: string | null;
+  isSubmitted: boolean;
+  score: number | null;
+  submittedAt?: string | null;
+}
+
+export interface QuizClassStats {
+  quizId: string;
+  quizTitle: string;
+  submittedCount: number;
+  unsubmittedCount: number;
+  totalStudents: number;
+  averageScore: number;
+  passRatePercent: number;
+  students: QuizStudentStatItem[];
+}
