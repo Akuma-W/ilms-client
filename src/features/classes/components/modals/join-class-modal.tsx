@@ -12,13 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { enrollmentService } from '@/features/classes/services/enrollment.service';
+import { EnrollmentStatus } from '@/types/enum';
 import type { Class } from '@/types/class';
 
 interface JoinClassModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   classData: Class;
-  onSuccess?: () => void;
+  onSuccess?: (status?: EnrollmentStatus) => void;
 }
 
 /**
@@ -35,12 +37,24 @@ export function JoinClassModal({
   const handleConfirmJoin = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate API call or enroll request
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      toast.success(
-        'Đã gửi yêu cầu tham gia lớp học thành công!\nVui lòng chờ giảng viên phê duyệt.',
-      );
-      onSuccess?.();
+      const enrollment = await enrollmentService.joinClass({
+        classId: classData.id,
+      });
+
+      if (!enrollment) {
+        toast.error('Gửi yêu cầu tham gia thất bại. Vui lòng thử lại sau.');
+        return;
+      }
+
+      if (enrollment.status === EnrollmentStatus.approved) {
+        toast.success('Tham gia lớp học thành công!');
+      } else {
+        toast.success(
+          'Đã gửi yêu cầu tham gia lớp học thành công!\nVui lòng chờ giảng viên phê duyệt.',
+        );
+      }
+
+      onSuccess?.(enrollment.status);
       onOpenChange(false);
     } catch {
       toast.error('Gửi yêu cầu thất bại. Vui lòng thử lại sau.');

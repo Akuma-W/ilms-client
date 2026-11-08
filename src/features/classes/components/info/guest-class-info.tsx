@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   BookOpen,
   Calendar,
@@ -10,6 +11,7 @@ import {
   Info,
   LogIn,
   User2,
+  Users,
   XCircle,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -33,6 +35,7 @@ interface GuestClassInfoProps {
  * Provides class overview and enrollment request CTA or status feedback.
  */
 export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
+  const router = useRouter();
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [requestStatus, setRequestStatus] = useState<EnrollmentStatus | 'none'>(
     relation?.status || 'none',
@@ -67,6 +70,13 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
       icon: Globe,
       label: 'Chế độ lớp học',
       value: classData.isPrivate ? 'Riêng tư' : 'Công khai',
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
+    },
+    {
+      icon: Users,
+      label: 'Sĩ số',
+      value: `${classData.totalStudents ?? 0} sinh viên`,
       subtleBg: classTheme.subtleBg,
       iconClass: classTheme.icon,
     },
@@ -227,7 +237,14 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
         isOpen={isJoinModalOpen}
         onOpenChange={setIsJoinModalOpen}
         classData={classData}
-        onSuccess={() => setRequestStatus(EnrollmentStatus.pending)}
+        onSuccess={(status) => {
+          if (status === EnrollmentStatus.approved) {
+            router.push(`/classes/${classData.id}/overview`);
+            router.refresh();
+          } else {
+            setRequestStatus(EnrollmentStatus.pending);
+          }
+        }}
       />
     </div>
   );

@@ -1,5 +1,4 @@
 import { serverApiClient } from '@/lib/api/server-api-client';
-import { MOCK_ENROLLMENT } from '@/mocks/classes/class-data.mock';
 import type { QueryResponse } from '@/types/api';
 import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
@@ -22,7 +21,7 @@ export const enrollmentServerService = {
     } catch {
       // Fallback
     }
-    return { ...MOCK_ENROLLMENT, classId };
+    return null;
   },
 
   async getStarredClasses(): Promise<{

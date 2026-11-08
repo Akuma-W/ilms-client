@@ -59,6 +59,7 @@ export const MOCK_CURRENT_CLASS: ClassClient = {
   school: MOCK_SCHOOL,
   teacher: MOCK_TEACHER,
   enrollment: MOCK_ENROLLMENT,
+  totalStudents: 32,
 
   schoolName: MOCK_SCHOOL.name,
   teacherName: MOCK_TEACHER.fullName,

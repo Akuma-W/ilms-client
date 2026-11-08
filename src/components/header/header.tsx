@@ -37,13 +37,16 @@ export function Header({ initialUser }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
-      <div className="container mx-auto flex px-4 py-3 max-w-7xl items-center justify-between">
-        {/* <SiteLogo /> */}
-        <Logo withText withSlogan className="hidden sm:flex" />
-        <Logo withText size="md" className="flex sm:hidden" />
+    <header className="sticky top-0 z-50 w-full border-b border-indigo-200/70 bg-gradient-to-r from-sky-50/95 via-indigo-50/85 to-slate-50/95 dark:from-slate-900/95 dark:via-indigo-950/40 dark:to-slate-900/95 text-slate-800 dark:text-slate-100 shadow-xs backdrop-blur-md h-16 relative">
+      {/* Subtle Galaxy Accent Border Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 opacity-70 pointer-events-none" />
 
-        {/* Toolbar */}
+      <div className="container mx-auto flex h-full px-4 max-w-7xl items-center justify-between">
+        {/* Brand Logo with vivid Galaxy signature colors */}
+        <Logo variant="light" withText withSlogan className="hidden sm:flex" />
+        <Logo variant="light" withText size="md" className="flex sm:hidden" />
+
+        {/* Toolbar Actions */}
         <div className="flex items-center gap-3">
           {isLoading ? (
             <AvatarSkeleton />
@@ -52,7 +55,7 @@ export function Header({ initialUser }: HeaderProps) {
               <Link href="/login">
                 <Button
                   variant="ghost"
-                  className="cursor-pointer text-gray-900 hover:hover:text-galaxy-blue hover:bg-blue-50 transition-colors"
+                  className="text-slate-800 font-bold hover:text-indigo-950 hover:bg-white/80 border border-transparent hover:border-indigo-200/60 transition-all"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
                   Đăng nhập
@@ -61,7 +64,7 @@ export function Header({ initialUser }: HeaderProps) {
               <Link href="/register">
                 <Button
                   variant="default"
-                  className="cursor-pointer bg-galaxy hover:opacity-90 text-white shadow-md"
+                  className="bg-galaxy hover:opacity-90 text-white font-bold shadow-sm"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Đăng ký
@@ -69,29 +72,37 @@ export function Header({ initialUser }: HeaderProps) {
               </Link>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2.5">
               <Button
                 variant="ghost"
                 size="icon"
-                className="cursor-pointer relative text-gray-600 hover:bg-gray-100"
+                className="relative text-slate-700 hover:text-indigo-950 hover:bg-white/80 hover:border-indigo-200/80 border border-indigo-100/80 size-9 rounded-xl transition-all shadow-2xs"
+                title="Thông báo"
               >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+                <Bell className="w-4.5 h-4.5" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-indigo-100" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="cursor-pointer text-gray-600 hover:bg-gray-100"
+                className="text-slate-700 hover:text-indigo-950 hover:bg-white/80 hover:border-indigo-200/80 border border-indigo-100/80 size-9 rounded-xl transition-all shadow-2xs"
+                title="Tin nhắn"
               >
-                <MessageCircle className="w-5 h-5" />
+                <MessageCircle className="w-4.5 h-4.5" />
               </Button>
               <AvatarDropdown user={user} onLogout={handleLogout} />
             </div>
           )}
+
+          {/* Mobile Navigation Drawer Trigger */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden text-gray-600">
-                <Menu className="w-6 h-6" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-slate-800 hover:text-indigo-950 hover:bg-white/80 size-9 rounded-xl"
+              >
+                <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
             <MobileSidebar user={user} logout={handleLogout} />

@@ -84,4 +84,34 @@ export const classService = {
     }
     return getMockClass(id);
   },
+
+  async updateClass(id: string, payload: Partial<CreateClassPayload>) {
+    try {
+      const result = await clientApiClient<{ message: string }>(`/classes/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      });
+      return result;
+    } catch {
+      // Fallback
+    }
+    return {
+      success: false,
+      message: 'Cập nhật thông tin lớp học thất bại',
+      data: null,
+      statusCode: 500,
+    };
+  },
+
+  async deleteClass(id: string) {
+    try {
+      const result = await clientApiClient<{ message: string }>(`/classes/${id}`, {
+        method: 'DELETE',
+      });
+      return result;
+    } catch {
+      // Fallback
+    }
+    return { success: false, message: 'Xóa lớp học thất bại', data: null, statusCode: 500 };
+  },
 };

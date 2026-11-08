@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Globe, Loader2, Lock, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { classService } from '@/features/classes/services/class.service';
 import type { Class } from '@/types/class';
 
 interface EditClassModalProps {
@@ -39,6 +40,16 @@ export function EditClassModal({
   const [isPrivate, setIsPrivate] = useState<boolean>(classData.isPrivate ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (isOpen) {
+      setTitle(classData.title);
+      setSubject(classData.subject);
+      setSemester(classData.semester || '');
+      setDescription(classData.description || '');
+      setIsPrivate(classData.isPrivate ?? false);
+    }
+  }, [isOpen, classData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !subject.trim() || !semester.trim()) {
@@ -48,7 +59,18 @@ export function EditClassModal({
 
     setIsSubmitting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const res = await classService.updateClass(classData.id, {
+        title: title.trim(),
+        subject: subject.trim(),
+        semester: semester.trim(),
+        description: description.trim() || undefined,
+        isPrivate,
+      });
+
+      if (res && res.success === false) {
+        throw new Error(res.message || 'Cập nhật thất bại');
+      }
+
       const updated: Class = {
         ...classData,
         title: title.trim(),
@@ -60,8 +82,10 @@ export function EditClassModal({
       toast.success('Cập nhật thông tin lớp học thành công!');
       onSuccess?.(updated);
       onOpenChange(false);
-    } catch {
-      toast.error('Cập nhật thất bại. Vui lòng thử lại sau.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Cập nhật thất bại. Vui lòng thử lại sau.',
+      );
     } finally {
       setIsSubmitting(false);
     }

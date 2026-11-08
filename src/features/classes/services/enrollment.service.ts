@@ -2,7 +2,7 @@ import { clientApiClient } from '@/lib/api/client-api-client';
 import { MOCK_ENROLLMENT } from '@/mocks/classes/class-data.mock';
 import type { QueryResponse } from '@/types/api';
 import type { Class } from '@/types/class';
-import type { Enrollment, JoinClassResponse } from '@/types/enrollment';
+import type { Enrollment } from '@/types/enrollment';
 import type { EnrollmentStatus } from '@/types/enum';
 
 /**
@@ -10,11 +10,14 @@ import type { EnrollmentStatus } from '@/types/enum';
  * Encapsulates try/catch and fallback to mock data when API errors or fails.
  */
 export const enrollmentService = {
-  async joinClass(payload: EnrollmentStatus) {
+  async joinClass(
+    payload: { classId: string; roleIn?: string; isStarred?: boolean } | string,
+  ): Promise<Enrollment | null> {
     try {
-      const result = await clientApiClient<JoinClassResponse>('/enrollments/join', {
+      const body = typeof payload === 'string' ? { classId: payload } : payload;
+      const result = await clientApiClient<Enrollment>('/enrollments/join', {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(body),
       });
       if (result.success !== false && result.data !== null && result.data !== undefined) {
         return result.data;
@@ -90,5 +93,17 @@ export const enrollmentService = {
     } catch {
       return true;
     }
+  },
+
+  async leaveClass(classId: string) {
+    try {
+      const result = await clientApiClient<{ message: string }>(`/enrollments/${classId}/leave`, {
+        method: 'DELETE',
+      });
+      return result;
+    } catch {
+      // Fallback
+    }
+    return { success: false, message: 'Rời lớp học thất bại', data: null, statusCode: 500 };
   },
 };

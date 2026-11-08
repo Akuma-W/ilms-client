@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { CreateTopicModal } from '@/features/topics/components/create-topic-modal';
+import { TopicModal } from '@/features/topics/components/topic-modal';
 import { TopicItem } from '@/features/topics/components/topic-item';
 import { ResourcePreviewModal } from '@/features/topics/components/resource-preview-modal';
 import { MaterialModal } from '@/features/materials/components/material-modal';
@@ -46,6 +47,12 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
     topicId?: string;
     reference?: Reference | null;
   }>({ isOpen: false, mode: 'create' });
+
+  const [topicModal, setTopicModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    topic?: Topic | null;
+  }>({ isOpen: false, mode: 'create', topic: null });
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -238,6 +245,13 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
               mode="overview"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}
+              onEditTopic={(topic) =>
+                setTopicModal({
+                  isOpen: true,
+                  mode: 'edit',
+                  topic,
+                })
+              }
               onEditResource={handleEditResource}
               onDeleteResource={handleDeleteResource}
               onDeleteTopic={handleDeleteTopic}
@@ -302,6 +316,16 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
         itemName={deleteModal.name}
         isDeleting={deleteModal.isDeleting}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* 7. Topic Modal (Create & Edit) */}
+      <TopicModal
+        classId={classId}
+        isOpen={topicModal.isOpen}
+        mode={topicModal.mode}
+        initialData={topicModal.topic}
+        onOpenChange={(open) => setTopicModal((prev) => ({ ...prev, isOpen: open }))}
+        onSuccess={() => mutate()}
       />
     </div>
   );

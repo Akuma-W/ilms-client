@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { InfoItem } from '@/features/classes/components/items/info-item';
+import { classService } from '@/features/classes/services/class.service';
 import { EditClassModal } from '../modals/edit-class-modal';
 import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
 import type { Class } from '@/types/class';
@@ -43,7 +44,7 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
 
   const classTheme = getClassTheme(currentClass);
   const subjectTheme = getSubjectTheme(currentClass?.subject);
-  const studentCount = (currentClass as unknown as { totalStudents?: number }).totalStudents ?? 12;
+  const studentCount = currentClass.totalStudents ?? 0;
 
   const handleClassUpdated = (updated: Class) => {
     setCurrentClass(updated);
@@ -53,12 +54,17 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
   const handleDeleteClass = async () => {
     setIsDeleting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const res = await classService.deleteClass(currentClass.id);
+      if (res && res.success === false) {
+        throw new Error(res.message || 'Xóa lớp học thất bại');
+      }
       toast.success('Lớp học đã được xóa vĩnh viễn thành công.');
       setIsDeleteModalOpen(false);
       router.push('/classes?tab=created');
-    } catch {
-      toast.error('Xóa lớp học thất bại. Vui lòng thử lại sau.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Xóa lớp học thất bại. Vui lòng thử lại sau.',
+      );
       setIsDeleting(false);
     }
   };

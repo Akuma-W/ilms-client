@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Class } from '@/types/class';
-import { ArrowRight, User } from 'lucide-react';
+import { ArrowRight, User, Users } from 'lucide-react';
 import { getSubjectTheme } from '@/lib/ui/utils';
 import { cn } from '@/lib/utils';
 
@@ -42,10 +42,18 @@ export function FindClassCard({ classItem, onNavigate }: FindClassCardProps) {
         <p className="text-xs text-muted-foreground line-clamp-2">{classItem.description}</p>
       )}
 
-      {/* Teacher */}
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <User className="h-3 w-3 shrink-0" />
-        <span>{classItem.teacher.fullName}</span>
+      {/* Teacher and Total Students */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <User className="h-3 w-3 shrink-0" />
+          <span>{classItem.teacher.fullName}</span>
+        </div>
+        {classItem.totalStudents !== undefined && (
+          <div className="flex items-center gap-1 font-medium">
+            <Users className="h-3 w-3 shrink-0 text-muted-foreground" />
+            <span>{classItem.totalStudents} sinh viên</span>
+          </div>
+        )}
       </div>
 
       {/* CTA — Link đến /classes/[id]/info */}

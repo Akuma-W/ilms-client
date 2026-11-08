@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { BookOpen, ChevronRight, Star } from 'lucide-react';
+import { BookOpen, ChevronRight, Star, Users } from 'lucide-react';
 import Image from 'next/image';
 import type { Class } from '@/types/class';
 import { Button } from '@/components/ui/button';
@@ -117,6 +117,12 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
               Giảng viên
             </span>
           </div>
+          {classData.totalStudents !== undefined && (
+            <div className="ml-auto flex items-center gap-1 text-[11px] font-medium text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-md">
+              <Users className="w-3.5 h-3.5" />
+              <span>{classData.totalStudents}</span>
+            </div>
+          )}
         </div>
 
         {/* CTA Button */}

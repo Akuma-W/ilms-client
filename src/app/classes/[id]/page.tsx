@@ -11,13 +11,15 @@ interface ClassDetailProps {
  */
 export default async function ClassDetail({ params }: ClassDetailProps) {
   const { id: classId } = await params;
-  let isJoined = true;
+  let isJoined = false;
 
   try {
     const relation = await enrollmentServerService.getMyRelationInClass(classId);
-    isJoined = !!relation;
+    isJoined = Boolean(
+      relation && (relation.status === 'approved' || relation.roleIn === 'teacher'),
+    );
   } catch {
-    isJoined = true;
+    isJoined = false;
   }
 
   if (isJoined) {

@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const createTopicSchema = z.object({
+export const topicSchema = z.object({
   title: z
     .string()
     .min(3, 'Tiêu đề bài giảng ít nhất 3 ký tự')
@@ -12,4 +12,4 @@ export const createTopicSchema = z.object({
     .or(z.literal('')),
 });
 
-export type CreateTopicFormValues = z.infer<typeof createTopicSchema>;
+export type TopicFormValues = z.infer<typeof topicSchema>;

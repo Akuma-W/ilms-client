@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { BookOpen, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { TopicItem } from '@/features/topics/components/topic-item';
+import { TopicModal } from '@/features/topics/components/topic-modal';
 import { ResourcePreviewModal } from '@/features/topics/components/resource-preview-modal';
 import { MaterialModal } from '@/features/materials/components/material-modal';
 import { ReferenceModal } from '@/features/references/components/reference-modal';
@@ -50,6 +51,12 @@ export function MaterialsClient({
     topicId?: string;
     reference?: Reference | null;
   }>({ isOpen: false, mode: 'create' });
+
+  const [topicModal, setTopicModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    topic?: Topic | null;
+  }>({ isOpen: false, mode: 'create', topic: null });
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -251,6 +258,13 @@ export function MaterialsClient({
               mode="materials"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}
+              onEditTopic={(topic) =>
+                setTopicModal({
+                  isOpen: true,
+                  mode: 'edit',
+                  topic,
+                })
+              }
               onEditResource={handleEditResource}
               onDeleteResource={handleDeleteResource}
               onDeleteTopic={handleDeleteTopic}
@@ -315,6 +329,16 @@ export function MaterialsClient({
         itemName={deleteModal.name}
         isDeleting={deleteModal.isDeleting}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* 7. Topic Modal (Create & Edit) */}
+      <TopicModal
+        classId={classId}
+        isOpen={topicModal.isOpen}
+        mode={topicModal.mode}
+        initialData={topicModal.topic}
+        onOpenChange={(open) => setTopicModal((prev) => ({ ...prev, isOpen: open }))}
+        onSuccess={() => mutate()}
       />
     </div>
   );

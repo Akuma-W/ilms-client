@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { InfoItem } from '@/features/classes/components/items/info-item';
+import { enrollmentService } from '@/features/classes/services/enrollment.service';
 import {
   studentProgressService,
   type StudentClassProgress,
@@ -57,12 +58,17 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
   const handleConfirmLeave = async () => {
     setIsLeaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      const res = await enrollmentService.leaveClass(classData.id);
+      if (res && res.success === false) {
+        throw new Error(res.message || 'Rời lớp thất bại');
+      }
       toast.success('Bạn đã rời khỏi lớp học thành công.');
       setIsLeaveModalOpen(false);
       router.push('/classes?tab=joined');
-    } catch {
-      toast.error('Rời lớp thất bại. Vui lòng thử lại sau.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Rời lớp thất bại. Vui lòng thử lại sau.',
+      );
       setIsLeaving(false);
     }
   };

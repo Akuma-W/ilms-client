@@ -10,21 +10,18 @@ export default async function ClassLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <div className="sticky top-0 z-50">
-        <Header initialUser={user} />
-        <div className="bg-galaxy-dark w-full py-2" />
-      </div>
+      {/* Top Header */}
+      <Header initialUser={user} />
 
-      {/* Main layout */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="hidden md:block">
+      {/* Main Classroom Workspace Layout */}
+      <div className="flex flex-1 min-h-[calc(100vh-4rem)] relative items-start">
+        {/* Sticky Fixed Desktop Class Sidebar */}
+        <aside className="hidden md:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] self-start z-30">
           <ClassSidebar initialStarredClasses={data} />
-        </div>
+        </aside>
 
-        {/* Content */}
-        <div className="flex flex-col w-full transition-all duration-300">
+        {/* Dynamic Classroom Content Area */}
+        <div className="flex flex-col flex-1 min-w-0 transition-all duration-200">
           <main className="flex-1">{children}</main>
         </div>
       </div>
