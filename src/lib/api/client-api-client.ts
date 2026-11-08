@@ -38,8 +38,10 @@ export async function clientApiClient<T>(
     ? endpoint
     : `${CLIENT_API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
+  const isFormData = typeof FormData !== 'undefined' && options?.body instanceof FormData;
+
   const defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...options?.headers,
   };
 

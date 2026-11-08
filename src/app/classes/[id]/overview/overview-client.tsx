@@ -73,8 +73,7 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
     `classes/${classId}/overview-data`,
     () => topicsService.getTopicsWithResources(classId),
     {
-      fallbackData: topicsService.getInitialTopics(classId, initialTopics),
-      revalidateOnMount: false,
+      fallbackData: initialTopics,
     },
   );
 

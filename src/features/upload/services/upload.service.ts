@@ -1,5 +1,10 @@
-import { CLIENT_API_URL } from '@/config';
+import { clientApiClient } from '@/lib/api/client-api-client';
 import type { UploadResult } from '@/types/upload';
+
+interface StorageUploadResponse {
+  path: string;
+  url: string;
+}
 
 /**
  * Universal file upload service communicating with MinIO storage controller.
@@ -7,23 +12,28 @@ import type { UploadResult } from '@/types/upload';
 export const uploadService = {
   async uploadFile(formData: FormData, folder: string = 'materials'): Promise<UploadResult> {
     try {
-      const targetUrl = `${CLIENT_API_URL}/storage/upload?folder=${encodeURIComponent(folder)}`;
-      const res = await fetch(targetUrl, {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await clientApiClient<StorageUploadResponse>(
+        `/storage/upload?folder=${encodeURIComponent(folder)}`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
 
-      if (!res.ok) {
-        throw new Error(`Upload failed with status: ${res.status}`);
+      if (res.success === false || !res.data) {
+        return {
+          success: false,
+          message: res.message || 'Tải lên tệp thất bại',
+          data: null,
+        };
       }
 
-      const json = await res.json();
-      const payload = json.data || json;
+      const payload = res.data;
       return {
         success: true,
         data: {
-          url: payload.url || payload.fileUrl || '',
-          key: payload.key || payload.fileKey || '',
+          url: payload.url || (payload as { fileUrl?: string }).fileUrl || '',
+          key: payload.path || (payload as { key?: string }).key || '',
         },
       };
     } catch (error) {

@@ -24,7 +24,7 @@ export const referencesService = {
       if (res.success !== false && res.data !== null && res.data !== undefined) {
         const raw = res.data;
         const list = Array.isArray(raw) ? raw : typeof raw === 'object' ? Object.values(raw) : [];
-        if (list.length > 0) return list;
+        return list;
       }
     } catch {
       // Fallback

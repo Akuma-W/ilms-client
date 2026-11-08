@@ -97,7 +97,10 @@ export function getMockTopics(classId?: string): Topic[] {
   if (classId) {
     const matched = MOCK_TOPICS.filter((t) => t.classId === classId);
     if (matched.length > 0) return matched;
-    return MOCK_TOPICS.map((t) => ({ ...t, classId }));
+    if (classId === MOCK_CURRENT_CLASS.id) {
+      return MOCK_TOPICS;
+    }
+    return [];
   }
   return MOCK_TOPICS;
 }

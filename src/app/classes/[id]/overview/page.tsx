@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
 import { userServerService } from '@/features/user/services/user.server.service';
 import { classServerService } from '@/features/classes/services/class.server.service';
-import { topicsService } from '@/features/topics/services/topics.service';
+import { topicsServerService } from '@/features/topics/services/topics.server.service';
 import { OverviewClient } from './overview-client';
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default async function ClassOverview({ params }: ClassOverviewProps) {
     Boolean(classData && currentUser && classData.teacherId === currentUser.id);
 
   // 2. Fetch topics and nested resources via service
-  const initialTopicsWithMaterials = await topicsService.getTopicsWithResources(classId);
+  const initialTopicsWithMaterials = await topicsServerService.getTopicsWithResources(classId);
 
   return (
     <OverviewClient

@@ -1,5 +1,6 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import { MOCK_MATERIALS, getMockTopics } from '@/mocks/classes/class-data.mock';
+import { topicsService } from '@/features/topics/services/topics.service';
+import { MOCK_MATERIALS } from '@/mocks/classes/class-data.mock';
 import type { CreateMaterialPayload, Material, UpdateMaterialPayload } from '@/types/material';
 import type { Topic } from '@/types/topic';
 
@@ -25,7 +26,7 @@ export const materialsService = {
       if (res.success !== false && res.data !== null && res.data !== undefined) {
         const raw = res.data;
         const list = Array.isArray(raw) ? raw : typeof raw === 'object' ? Object.values(raw) : [];
-        if (list.length > 0) return list;
+        return list;
       }
     } catch {
       // Fallback to mock
@@ -40,11 +41,22 @@ export const materialsService = {
     topics: Topic[];
     materials: (Material & { topicTitle?: string })[];
   }> {
-    const topicList = topics && topics.length > 0 ? topics : getMockTopics(classId);
-    const materialsWithTopic = localMaterials.map((item) => ({
-      ...item,
-      topicTitle: topicList.find((t) => t.id === item.topicId)?.title,
-    }));
+    const topicList =
+      topics && topics.length > 0 ? topics : await topicsService.getTopicsWithResources(classId);
+    const materialsWithTopic: (Material & { topicTitle?: string })[] = [];
+
+    for (const topic of topicList) {
+      const topicMats = Array.isArray(topic.materials)
+        ? topic.materials
+        : await this.getMaterials(topic.id);
+      for (const m of topicMats) {
+        materialsWithTopic.push({
+          ...m,
+          topicTitle: topic.title,
+        });
+      }
+    }
+
     return {
       topics: topicList,
       materials: materialsWithTopic,

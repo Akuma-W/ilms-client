@@ -71,8 +71,7 @@ export function MaterialsClient({
     `classes/${classId}/materials-data`,
     () => topicsService.getTopicsWithResources(classId),
     {
-      fallbackData: topicsService.getInitialTopics(classId, initialTopics),
-      revalidateOnMount: false,
+      fallbackData: initialTopics,
     },
   );
 

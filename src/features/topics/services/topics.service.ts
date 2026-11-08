@@ -11,8 +11,8 @@ let localTopics: Topic[] = [];
  * Encapsulates try/catch and fallback to mock data when API errors or fails.
  */
 export const topicsService = {
-  getInitialTopics(classId: string, initialTopics: Topic[] = []): Topic[] {
-    if (Array.isArray(initialTopics) && initialTopics.length > 0) {
+  getInitialTopics(classId: string, initialTopics?: Topic[]): Topic[] {
+    if (Array.isArray(initialTopics)) {
       return initialTopics;
     }
     if (localTopics.length > 0) {
@@ -30,7 +30,7 @@ export const topicsService = {
       if (res.success !== false && res.data !== null && res.data !== undefined) {
         const raw = res.data;
         const list = Array.isArray(raw) ? raw : typeof raw === 'object' ? Object.values(raw) : [];
-        if (list.length > 0) return list;
+        return list;
       }
     } catch {
       // Fallback
@@ -43,11 +43,14 @@ export const topicsService = {
       const fetchedTopics = await this.getTopics(classId);
       const safeTopics = Array.isArray(fetchedTopics) ? fetchedTopics : [];
       if (safeTopics.length === 0) {
-        return getMockTopics(classId);
+        return [];
       }
 
       return await Promise.all(
         safeTopics.map(async (topic) => {
+          if (Array.isArray(topic.materials) && Array.isArray(topic.references)) {
+            return topic;
+          }
           try {
             const [materials, references] = await Promise.all([
               materialsService.getMaterials(topic.id),
