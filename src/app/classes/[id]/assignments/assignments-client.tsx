@@ -43,13 +43,12 @@ export function AssignmentsClient({
     isDeleting: boolean;
   }>({ isOpen: false, assignment: null, isDeleting: false });
 
-  // SWR for assignments with service-encapsulated fallback
+  // SWR for assignments with automatic revalidation on mount
   const { data: assignments = [], mutate } = useSWR(
     `classes/${classId}/assignments-data`,
     () => assignmentsService.getAssignments(classId),
     {
-      fallbackData: assignmentsService.getInitialAssignments(classId, initialAssignments),
-      revalidateOnMount: false,
+      fallbackData: initialAssignments,
     },
   );
 

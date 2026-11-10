@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Award, CheckCircle2, Clock, FileEdit, Loader2, MessageSquare, Send } from 'lucide-react';
+import { CheckCircle2, FileEdit, Loader2, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ResourceDropzone } from '@/components/resources/resource-dropzone';
 import { AssignmentFileQueue } from '../assignment-file-queue';
+import { StudentSubmissionView } from './student-submission-view';
 import { submissionService } from '../../services/submission.service';
 import { inferMaterialTypeFromFileName } from '@/features/upload/utils/file.utils';
-import { formatAssignmentDate } from '../../utils/assignment.utils';
+import { uploadService } from '@/features/upload/services/upload.service';
 import type { Assignment, Submission, SubmissionFile } from '@/types/assignment';
 import type { FileType } from '@/types/enum';
 import type { User } from '@/types/user';
@@ -28,7 +29,6 @@ interface StudentSubmissionWorkCardProps {
 interface StudentSubmissionFormProps {
   assignment: Assignment;
   submission?: Submission | null;
-  currentUser?: User | null;
   mode: 'create' | 'edit';
   onCancel: () => void;
   onSubmissionChange: (submission: Submission) => void;
@@ -40,29 +40,41 @@ interface StudentSubmissionFormProps {
 function StudentSubmissionForm({
   assignment,
   submission,
-  currentUser,
   mode,
   onCancel,
   onSubmissionChange,
 }: StudentSubmissionFormProps) {
   const [textAnswer, setTextAnswer] = useState(submission?.textAnswer || '');
   const [files, setFiles] = useState<SubmissionFile[]>(submission?.files || []);
+  const [stagedFiles, setStagedFiles] = useState<Map<string, File>>(() => new Map());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFilesSelected = (newRawFiles: File[]) => {
-    const formatted: SubmissionFile[] = newRawFiles.map((f, idx) => ({
-      id: `sf-draft-${Date.now()}-${idx}`,
-      fileUrl: URL.createObjectURL(f),
-      fileType: inferMaterialTypeFromFileName(f.name) as FileType | null,
-      fileName: f.name,
-      fileSize: f.size,
-      submissionId: submission?.id || 'draft',
-    }));
+    const updatedMap = new Map(stagedFiles);
+    const formatted: SubmissionFile[] = newRawFiles.map((f, idx) => {
+      const tempUrl = URL.createObjectURL(f);
+      updatedMap.set(tempUrl, f);
+      return {
+        id: `sf-draft-${Date.now()}-${idx}`,
+        fileUrl: tempUrl,
+        fileType: inferMaterialTypeFromFileName(f.name) as FileType | null,
+        fileName: f.name,
+        fileSize: f.size,
+        submissionId: submission?.id || 'draft',
+      };
+    });
+    setStagedFiles(updatedMap);
     setFiles((prev) => [...prev, ...formatted]);
     toast.success(`Đã thêm ${newRawFiles.length} tệp bài làm`);
   };
 
   const handleRemoveFile = (index: number) => {
+    const fileToRemove = files[index];
+    if (fileToRemove && stagedFiles.has(fileToRemove.fileUrl)) {
+      const updatedMap = new Map(stagedFiles);
+      updatedMap.delete(fileToRemove.fileUrl);
+      setStagedFiles(updatedMap);
+    }
     setFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
 
@@ -74,28 +86,37 @@ function StudentSubmissionForm({
 
     setIsSubmitting(true);
     try {
+      const uploadedFiles = await Promise.all(
+        files.map(async (f) => {
+          const rawFile = stagedFiles.get(f.fileUrl);
+          if (rawFile) {
+            const formData = new FormData();
+            formData.append('file', rawFile);
+            const uploadRes = await uploadService.uploadFile(formData, 'submissions');
+            if (!uploadRes.success || !uploadRes.data?.url) {
+              throw new Error(uploadRes.message || `Tải lên tệp ${rawFile.name} thất bại`);
+            }
+            return {
+              ...f,
+              fileUrl: uploadRes.data.url,
+            };
+          }
+          return f;
+        }),
+      );
+
+      const payload = {
+        textAnswer: textAnswer.trim() || null,
+        files: uploadedFiles,
+      };
+
       if (mode === 'create') {
-        const res = await submissionService.submitAssignment(
-          assignment.id,
-          {
-            textAnswer: textAnswer.trim() || null,
-            files,
-          },
-          currentUser,
-        );
+        const res = await submissionService.submitAssignment(assignment.id, payload);
         if (!res.success) throw new Error(res.message);
         toast.success(res.message);
         onSubmissionChange(res.data);
       } else if (submission) {
-        const res = await submissionService.updateSubmission(
-          assignment.id,
-          submission.id,
-          {
-            textAnswer: textAnswer.trim() || null,
-            files,
-          },
-          currentUser,
-        );
+        const res = await submissionService.updateSubmission(submission.id, payload);
         if (!res.success) throw new Error(res.message);
         toast.success(res.message);
         onSubmissionChange(res.data);
@@ -187,102 +208,6 @@ function StudentSubmissionForm({
 }
 
 /**
- * Read-only view for a submitted student work.
- * Contains NO submit or edit buttons per UX specification.
- */
-function StudentSubmissionView({
-  assignment,
-  submission,
-}: {
-  assignment: Assignment;
-  submission: Submission;
-}) {
-  const isGraded = submission.score !== null && submission.score !== undefined;
-
-  return (
-    <div className="bg-card rounded-2xl border border-border p-5 sm:p-6 shadow-xs space-y-5">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/70">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center size-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
-            <Send className="size-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-foreground text-lg">Bài làm của bạn</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Đã gửi vào: {formatAssignmentDate(submission.submittedAt)}
-            </p>
-          </div>
-        </div>
-
-        {/* Status Badge */}
-        {isGraded ? (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 self-start sm:self-auto">
-            <CheckCircle2 className="size-3.5" />
-            Đã chấm điểm
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400 self-start sm:self-auto">
-            <Clock className="size-3.5" />
-            Đã nộp bài
-          </span>
-        )}
-      </div>
-
-      {/* Graded Result Card */}
-      {isGraded && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
-          <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400">
-            <Award className="size-5" />
-            <span className="text-xs font-semibold uppercase tracking-wider">Kết quả đánh giá</span>
-          </div>
-          <div className="text-3xl font-black text-foreground">
-            {submission.score}{' '}
-            <span className="text-sm font-normal text-muted-foreground">
-              / {assignment.maxScore} đ
-            </span>
-          </div>
-          {submission.feedback && (
-            <div className="mt-3 p-3.5 rounded-xl bg-card border border-border/70 text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-                <MessageSquare className="size-3.5 text-amber-500" />
-                Nhận xét của giáo viên:
-              </div>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {submission.feedback}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Submitted Content */}
-      <div className="space-y-4">
-        {submission.textAnswer && (
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-muted-foreground">
-              Lời giải / Ghi chú đã gửi:
-            </Label>
-            <div className="p-4 rounded-xl bg-muted/20 border border-border/60 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-              {submission.textAnswer}
-            </div>
-          </div>
-        )}
-
-        {submission.files && submission.files.length > 0 && (
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-muted-foreground">
-              Tệp bài làm đã nộp:
-            </Label>
-            <AssignmentFileQueue files={submission.files} readonly />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
  * Main Section 3 component for Student Submission Work.
  * Follows progressive disclosure:
  * - Hidden when unsubmitted and form not open.
@@ -293,7 +218,6 @@ function StudentSubmissionView({
 export function StudentSubmissionWorkCard({
   assignment,
   submission,
-  currentUser,
   isFormOpen,
   isEditing,
   onCancelForm,
@@ -307,7 +231,6 @@ export function StudentSubmissionWorkCard({
       <StudentSubmissionForm
         key="create-form"
         assignment={assignment}
-        currentUser={currentUser}
         mode="create"
         onCancel={onCancelForm}
         onSubmissionChange={onSubmissionChange}
@@ -322,7 +245,6 @@ export function StudentSubmissionWorkCard({
         key={`edit-form-${submission.id}`}
         assignment={assignment}
         submission={submission}
-        currentUser={currentUser}
         mode="edit"
         onCancel={onCancelEdit}
         onSubmissionChange={onSubmissionChange}

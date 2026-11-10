@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { useCurrentUser } from '@/hooks/use-current-user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';

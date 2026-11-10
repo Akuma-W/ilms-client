@@ -10,7 +10,7 @@ interface StorageUploadResponse {
  * Universal file upload service communicating with MinIO storage controller.
  */
 export const uploadService = {
-  async uploadFile(formData: FormData, folder: string = 'materials'): Promise<UploadResult> {
+  async uploadFile(formData: FormData, folder: string = 'general'): Promise<UploadResult> {
     try {
       const res = await clientApiClient<StorageUploadResponse>(
         `/storage/upload?folder=${encodeURIComponent(folder)}`,

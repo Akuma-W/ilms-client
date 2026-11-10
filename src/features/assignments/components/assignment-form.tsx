@@ -16,6 +16,8 @@ import { AssignmentFileQueue } from './assignment-file-queue';
 import { assignmentsService } from '../services/assignments.service';
 import { assignmentFormSchema, type AssignmentFormValues } from '../schemas/assignment.schema';
 import { inferMaterialTypeFromFileName } from '@/features/upload/utils/file.utils';
+import { uploadService } from '@/features/upload/services/upload.service';
+import { getDefaultDueAt, formatIsoForDatetimeInput } from '../utils/assignment.utils';
 import type { Assignment, CreateAssignmentPayload } from '@/types/assignment';
 import type { Topic } from '@/types/topic';
 import type { FileType } from '@/types/enum';
@@ -42,25 +44,7 @@ export function AssignmentForm({
   const [currentAssignment, setCurrentAssignment] = useState<Assignment | null>(
     initialData || null,
   );
-
-  // Format existing ISO dueAt string or generate default today 23:59
-  const getDefaultDueAt = () => {
-    const today = new Date();
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}T23:59`;
-  };
-
-  const formatIsoForDatetimeInput = (isoStr?: string | null) => {
-    if (!isoStr) return '';
-    try {
-      const d = new Date(isoStr);
-      if (isNaN(d.getTime())) return '';
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch {
-      return '';
-    }
-  };
+  const [stagedFiles, setStagedFiles] = useState<Map<string, File>>(() => new Map());
 
   const form = useForm<AssignmentFormValues>({
     resolver: zodResolver(assignmentFormSchema),
@@ -106,17 +90,29 @@ export function AssignmentForm({
   }, [mode, initialData, assignmentId, defaultTopicId, form]);
 
   const handleFilesDropped = (files: File[]) => {
-    const newItems = files.map((file) => ({
-      fileUrl: URL.createObjectURL(file),
-      fileType: inferMaterialTypeFromFileName(file.name) as FileType,
-      fileName: file.name,
-      fileSize: file.size,
-    }));
+    const updatedMap = new Map(stagedFiles);
+    const newItems = files.map((file) => {
+      const tempUrl = URL.createObjectURL(file);
+      updatedMap.set(tempUrl, file);
+      return {
+        fileUrl: tempUrl,
+        fileType: inferMaterialTypeFromFileName(file.name) as FileType,
+        fileName: file.name,
+        fileSize: file.size,
+      };
+    });
+    setStagedFiles(updatedMap);
     form.setValue('materials', [...materials, ...newItems], { shouldValidate: true });
     toast.success(`Đã thêm ${files.length} tệp đề bài`);
   };
 
   const handleRemoveMaterial = (index: number) => {
+    const item = materials[index];
+    if (item && stagedFiles.has(item.fileUrl)) {
+      const updatedMap = new Map(stagedFiles);
+      updatedMap.delete(item.fileUrl);
+      setStagedFiles(updatedMap);
+    }
     const updated = materials.filter((_, idx) => idx !== index);
     form.setValue('materials', updated, { shouldValidate: true });
   };
@@ -124,32 +120,54 @@ export function AssignmentForm({
   const onSubmit = async (values: AssignmentFormValues) => {
     setIsSubmitting(true);
     try {
+      // 1. Upload any staged local files to MinIO storage first
+      const uploadedMaterials = await Promise.all(
+        (values.materials || []).map(async (m) => {
+          const rawFile = stagedFiles.get(m.fileUrl);
+          if (rawFile) {
+            const formData = new FormData();
+            formData.append('file', rawFile);
+            const uploadRes = await uploadService.uploadFile(formData, 'assignments');
+            if (!uploadRes.success || !uploadRes.data?.url) {
+              throw new Error(uploadRes.message || `Tải lên tệp ${rawFile.name} thất bại`);
+            }
+            return {
+              fileUrl: uploadRes.data.key || uploadRes.data.url,
+              fileType: (m.fileType as FileType) || null,
+              fileName: m.fileName,
+              fileSize: m.fileSize,
+            };
+          }
+          return {
+            fileUrl: m.fileUrl,
+            fileType: (m.fileType as FileType) || null,
+            fileName: m.fileName,
+            fileSize: m.fileSize,
+          };
+        }),
+      );
+
       const isoDueAt = values.dueAt ? new Date(values.dueAt).toISOString() : null;
       const payload: CreateAssignmentPayload = {
         title: values.title.trim(),
         description: values.description?.trim() || null,
         dueAt: isoDueAt,
         maxScore: Number(values.maxScore) || 10,
-        topicId: values.topicId || null,
-        materials: values.materials?.map((m) => ({
-          fileUrl: m.fileUrl,
-          fileType: (m.fileType as FileType) || null,
-          fileName: m.fileName,
-          fileSize: m.fileSize,
-        })),
+        topicId: values.topicId ? values.topicId : undefined,
+        materials: uploadedMaterials,
       };
 
       if (mode === 'create') {
         const res = await assignmentsService.createAssignment(classId, payload);
         if (!res.success) throw new Error(res.message);
-        toast.success('Giao bài tập mới thành công!');
+        toast.success(res.message || 'Giao bài tập mới thành công!');
         router.push(`/classes/${classId}/assignments`);
       } else {
         const idToUpdate = initialData?.id || currentAssignment?.id || assignmentId;
         if (!idToUpdate) throw new Error('Không tìm thấy mã bài tập.');
         const res = await assignmentsService.updateAssignment(idToUpdate, payload);
         if (!res.success) throw new Error(res.message);
-        toast.success('Cập nhật bài tập thành công!');
+        toast.success(res.message || 'Cập nhật bài tập thành công!');
         router.push(`/classes/${classId}/assignments/${idToUpdate}`);
       }
     } catch (error) {

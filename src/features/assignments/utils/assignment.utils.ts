@@ -146,3 +146,27 @@ export function getStudentSubmission(
   if (!assignment || !assignment.submissions || !studentId) return undefined;
   return assignment.submissions.find((s) => s.studentId === studentId);
 }
+
+/**
+ * Returns default assignment deadline (today at 23:59).
+ */
+export function getDefaultDueAt(): string {
+  const today = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}T23:59`;
+}
+
+/**
+ * Formats ISO date string to datetime-local input format (YYYY-MM-DDTHH:mm).
+ */
+export function formatIsoForDatetimeInput(isoStr?: string | null): string {
+  if (!isoStr) return '';
+  try {
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  } catch {
+    return '';
+  }
+}

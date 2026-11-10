@@ -62,7 +62,7 @@ export function GradeSubmissionDialog({
 
     setIsSaving(true);
     try {
-      const res = await submissionService.gradeSubmission(assignment.id, submission.id, {
+      const res = await submissionService.gradeSubmission(submission.id, {
         score: scoreNum,
         feedback: feedback.trim() || null,
       });

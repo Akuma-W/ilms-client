@@ -2,6 +2,7 @@
 
 import { SWRConfig } from 'swr';
 
+// Global SWR configuration provider with unified fetcher and cache policies
 export function SWRProvider({ children }: { children: React.ReactNode }) {
   return (
     <SWRConfig
@@ -23,7 +24,7 @@ export function SWRProvider({ children }: { children: React.ReactNode }) {
         },
         revalidateOnFocus: false,
         revalidateOnReconnect: true,
-        dedupingInterval: 5000, // 5 seconds
+        dedupingInterval: 5000,
         keepPreviousData: true,
         errorRetryCount: 3,
       }}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
-import { SWRProvider } from '@/features/providers/swr-provider';
+import { SWRProvider } from '@/components/providers/swr-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { BackendConnectionModal } from '@/components/common/backend-connection-modal';
 

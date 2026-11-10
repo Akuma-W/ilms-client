@@ -6,7 +6,7 @@ import { Bell, LogIn, Menu, MessageCircle, UserPlus } from 'lucide-react';
 import { AvatarDropdown } from './avatar-dropdown';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/hooks/use-current-user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 import { Sheet, SheetTrigger } from '../ui/sheet';
 import { MobileSidebar } from '../layout/mobile-sidebar';
 import { AvatarSkeleton } from './avatar-skeleton';
@@ -37,9 +37,9 @@ export function Header({ initialUser }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-indigo-200/70 bg-gradient-to-r from-sky-50/95 via-indigo-50/85 to-slate-50/95 dark:from-slate-900/95 dark:via-indigo-950/40 dark:to-slate-900/95 text-slate-800 dark:text-slate-100 shadow-xs backdrop-blur-md h-16 relative">
+    <header className="sticky top-0 z-50 w-full border-b border-indigo-200/70 bg-linear-to-r from-sky-50/95 via-indigo-50/85 to-slate-50/95 dark:from-slate-900/95 dark:via-indigo-950/40 dark:to-slate-900/95 text-slate-800 dark:text-slate-100 shadow-xs backdrop-blur-md h-16">
       {/* Subtle Galaxy Accent Border Line */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 opacity-70 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-cyan-400 via-indigo-500 to-purple-500 opacity-70 pointer-events-none" />
 
       <div className="container mx-auto flex h-full px-4 max-w-7xl items-center justify-between">
         {/* Brand Logo with vivid Galaxy signature colors */}

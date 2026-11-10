@@ -1,8 +1,23 @@
 'use client';
 
-import { FileText, FileCode, Film, FileArchive, Trash2, ExternalLink } from 'lucide-react';
-import { formatFileSize } from '@/features/upload/utils/file.utils';
+import { useState } from 'react';
+import {
+  FileText,
+  FileCode,
+  Film,
+  FileArchive,
+  Trash2,
+  ExternalLink,
+  Eye,
+  Download,
+} from 'lucide-react';
+import {
+  formatFileSize,
+  getCleanDisplayName,
+  resolveStorageUrl,
+} from '@/features/upload/utils/file.utils';
 import { Button } from '@/components/ui/button';
+import { AssignmentFilePreviewModal } from './assignment-file-preview-modal';
 import { FileType } from '@/types/enum';
 
 interface QueuedFile {
@@ -23,6 +38,8 @@ export function AssignmentFileQueue({
   onRemove,
   readonly = false,
 }: AssignmentFileQueueProps) {
+  const [previewFile, setPreviewFile] = useState<QueuedFile | null>(null);
+
   if (!files || files.length === 0) return null;
 
   const getFileIcon = (file: QueuedFile) => {
@@ -45,60 +62,111 @@ export function AssignmentFileQueue({
   };
 
   return (
-    <div className="space-y-2 mt-3">
-      <div className="flex items-center justify-between text-xs text-muted-foreground font-medium">
-        <span>Danh sách tệp đính kèm ({files.length}):</span>
-      </div>
-      <div className="space-y-2">
-        {files.map((file, idx) => {
-          const displayName = file.fileName || file.fileUrl.split('/').pop() || `Tệp ${idx + 1}`;
-          const formattedSize = formatFileSize(file.fileSize);
+    <>
+      <div className="space-y-2 mt-3">
+        <div className="flex items-center justify-between text-xs text-muted-foreground font-medium">
+          <span>Danh sách tệp đính kèm ({files.length}):</span>
+          <span className="text-[11px] italic">Bấm vào tệp để đọc hoặc xem trước</span>
+        </div>
+        <div className="space-y-2">
+          {files.map((file, idx) => {
+            const displayName = getCleanDisplayName(file.fileUrl, file.fileName);
+            const formattedSize = formatFileSize(file.fileSize);
+            const resolvedUrl = resolveStorageUrl(file.fileUrl);
 
-          return (
-            <div
-              key={`${file.fileUrl}-${idx}`}
-              className="flex items-center justify-between gap-3 p-2.5 rounded-xl border border-border bg-card/60 text-sm hover:bg-card transition-colors"
-            >
-              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <div className="size-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0">
-                  {getFileIcon(file)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground text-xs line-clamp-1">{displayName}</p>
-                  {formattedSize && (
-                    <p className="text-[11px] text-muted-foreground">{formattedSize}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 shrink-0">
-                <a
-                  href={file.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="size-7 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                  title="Mở liên kết tệp"
+            return (
+              <div
+                key={`${file.fileUrl}-${idx}`}
+                className="group flex items-center justify-between gap-3 p-2.5 rounded-xl border border-border bg-card/60 text-sm hover:bg-card hover:border-amber-500/40 transition-colors"
+              >
+                {/* Clickable file item area */}
+                <div
+                  onClick={() => setPreviewFile(file)}
+                  className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
+                  title="Bấm để đọc hoặc xem trước tệp"
                 >
-                  <ExternalLink className="size-3.5" />
-                </a>
+                  <div className="size-8 rounded-lg bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-amber-500/10 transition-colors">
+                    {getFileIcon(file)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-foreground text-xs line-clamp-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                      {displayName}
+                    </p>
+                    {formattedSize && (
+                      <p className="text-[11px] text-muted-foreground">{formattedSize}</p>
+                    )}
+                  </div>
+                </div>
 
-                {!readonly && onRemove && (
+                {/* Actions */}
+                <div className="flex items-center gap-1 shrink-0">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => onRemove(idx)}
-                    className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
-                    title="Xóa tệp này"
+                    onClick={() => setPreviewFile(file)}
+                    className="size-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                    title="Đọc / Xem trước tệp"
                   >
-                    <Trash2 className="size-3.5" />
+                    <Eye className="size-3.5" />
                   </Button>
-                )}
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="size-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                    title="Tải tệp tin về máy"
+                  >
+                    <a
+                      href={resolvedUrl}
+                      download={displayName}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Download className="size-3.5" />
+                    </a>
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="size-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                    title="Mở liên kết trong tab mới"
+                  >
+                    <a href={resolvedUrl} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="size-3.5" />
+                    </a>
+                  </Button>
+
+                  {!readonly && onRemove && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onRemove(idx)}
+                      className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg"
+                      title="Xóa tệp này"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {/* File Preview and Reading Modal */}
+      <AssignmentFilePreviewModal
+        file={previewFile}
+        isOpen={!!previewFile}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
+      />
+    </>
   );
 }

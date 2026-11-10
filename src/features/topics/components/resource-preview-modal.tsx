@@ -8,7 +8,9 @@ import {
   ExternalLink,
   Layers,
   Calendar,
+  ClipboardList,
 } from 'lucide-react';
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +21,11 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { getYouTubeEmbedUrl, getMaterialBadgeConfig, formatDateVi } from '../utils/resource.utils';
-import { isDirectFileUrl } from '@/features/upload/utils/file.utils';
+import {
+  isDirectFileUrl,
+  resolveStorageUrl,
+  getCleanDisplayName,
+} from '@/features/upload/utils/file.utils';
 import type { UnifiedResource } from '@/types/topic';
 
 interface ResourcePreviewModalProps {
@@ -30,7 +36,7 @@ interface ResourcePreviewModalProps {
 }
 
 /**
- * Preview modal for video streaming, external links, and uploaded files.
+ * Preview modal for video streaming, external links, assignments, and uploaded files.
  */
 export function ResourcePreviewModal({
   resource,
@@ -42,6 +48,7 @@ export function ResourcePreviewModal({
 
   const isMaterial = resource.kind === 'material';
   const isReference = resource.kind === 'reference';
+  const isAssignment = resource.kind === 'assignment';
 
   const title = resource.data.title;
   const createdAt = formatDateVi(resource.data.createdAt);
@@ -65,6 +72,11 @@ export function ResourcePreviewModal({
             {isReference && (
               <span className="px-2 py-0.5 text-xs font-medium rounded border bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
                 Tài liệu tham khảo
+              </span>
+            )}
+            {isAssignment && (
+              <span className="px-2 py-0.5 text-xs font-medium rounded border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20">
+                Bài tập
               </span>
             )}
             {topicTitle && (
@@ -111,13 +123,10 @@ export function ResourcePreviewModal({
                   );
                 }
                 if (resource.data.fileUrl) {
+                  const resolvedUrl = resolveStorageUrl(resource.data.fileUrl);
                   return (
                     <div className="aspect-video w-full rounded-xl overflow-hidden border border-border bg-black">
-                      <video
-                        src={resource.data.fileUrl}
-                        controls
-                        className="w-full h-full object-contain"
-                      >
+                      <video src={resolvedUrl} controls className="w-full h-full object-contain">
                         Trình duyệt của bạn không hỗ trợ phát video này.
                       </video>
                     </div>
@@ -159,6 +168,61 @@ export function ResourcePreviewModal({
               <p className="text-xs text-muted-foreground mt-2 truncate max-w-md mx-auto font-mono">
                 {resource.data.url}
               </p>
+            </div>
+          ) : isAssignment ? (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  <ClipboardList className="size-4" />
+                  <span>Yêu cầu & Hướng dẫn làm bài</span>
+                </div>
+                <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                  {resource.data.description || 'Không có hướng dẫn văn bản cho bài tập này.'}
+                </p>
+              </div>
+
+              {resource.data.materials && resource.data.materials.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-muted-foreground">
+                    Tài liệu & đề bài đính kèm ({resource.data.materials.length}):
+                  </h4>
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                    {resource.data.materials.map((mat, idx) => {
+                      const resolvedUrl = resolveStorageUrl(mat.fileUrl);
+                      const name = getCleanDisplayName(mat.fileUrl, mat.fileName);
+                      return (
+                        <div
+                          key={mat.id || idx}
+                          className="flex items-center justify-between p-2 rounded-lg border border-border bg-card text-xs"
+                        >
+                          <div className="flex items-center gap-2 truncate flex-1 min-w-0 mr-2">
+                            <FileText className="size-4 text-emerald-500 shrink-0" />
+                            <span className="truncate font-medium">{name}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              asChild
+                              className="h-7 px-2 text-[11px] rounded-md gap-1"
+                            >
+                              <a
+                                href={resolvedUrl}
+                                download={name}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Download className="size-3" />
+                                Tải về
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="p-6 rounded-xl border border-cyan-500/20 bg-cyan-500/5 text-center">
@@ -208,7 +272,12 @@ export function ResourcePreviewModal({
                 asChild
                 className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-lg cursor-pointer"
               >
-                <a href={resource.data.fileUrl} target="_blank" rel="noopener noreferrer" download>
+                <a
+                  href={resolveStorageUrl(resource.data.fileUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                >
                   <Download className="size-3.5 mr-1.5" />
                   Tải tệp tin
                 </a>
@@ -222,7 +291,7 @@ export function ResourcePreviewModal({
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg cursor-pointer"
               >
                 <a
-                  href={resource.data.url}
+                  href={resolveStorageUrl(resource.data.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   {...(isDirectFileUrl(resource.data.url) ? { download: true } : {})}
@@ -239,6 +308,22 @@ export function ResourcePreviewModal({
                     </>
                   )}
                 </a>
+              </Button>
+            )}
+
+            {isAssignment && (
+              <Button
+                size="sm"
+                asChild
+                className="bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg cursor-pointer"
+              >
+                <Link
+                  href={`/classes/${resource.data.classId}/assignments/${resource.data.id}`}
+                  onClick={() => onOpenChange(false)}
+                >
+                  <ExternalLink className="size-3.5 mr-1.5" />
+                  Xem chi tiết bài tập
+                </Link>
               </Button>
             )}
           </div>

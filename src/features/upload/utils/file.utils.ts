@@ -79,3 +79,35 @@ export function getBaseFileName(fileName: string): string {
   if (lastDotIndex <= 0) return fileName;
   return fileName.substring(0, lastDotIndex);
 }
+
+/**
+ * Resolves a storage key, relative path, or full URL to a reachable endpoint.
+ */
+export function resolveStorageUrl(urlOrPath?: string | null): string {
+  if (!urlOrPath || typeof urlOrPath !== 'string') return '';
+  const trimmed = urlOrPath.trim();
+  if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  const apiBase = process.env.NEXT_PUBLIC_CLIENT_API_URL || 'http://localhost:5000/api/v1';
+  const cleanPath = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+  return `${apiBase}/storage/file?path=${encodeURIComponent(cleanPath)}`;
+}
+
+/**
+ * Returns a human-friendly file name without query parameters and timestamp prefixes.
+ */
+export function getCleanDisplayName(urlOrPath?: string | null, fallbackName?: string): string {
+  if (fallbackName && fallbackName.trim()) return fallbackName.trim();
+  if (!urlOrPath) return 'Tệp đính kèm';
+  try {
+    const rawName = urlOrPath.split('?')[0].split('/').pop() || 'Tệp đính kèm';
+    const cleaned = decodeURIComponent(rawName).replace(/^(\d{10,14}|[0-9a-fA-F-]{36})-/, '');
+    return cleaned || 'Tệp đính kèm';
+  } catch {
+    return urlOrPath.split('/').pop() || 'Tệp đính kèm';
+  }
+}
