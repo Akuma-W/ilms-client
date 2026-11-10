@@ -1,42 +1,32 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import {
-  createMockComment,
-  createMockForum,
-  deleteMockComment,
-  deleteMockForum,
-  getMockForumById,
-  getMockForums,
-  updateMockComment,
-  updateMockForum,
-} from '@/mocks/classes/mock-forums';
-import { MOCK_CURRENT_USER } from '@/mocks/classes/mock-users';
 import type {
-  Comment,
-  CreateCommentInput,
   CreateForumInput,
   Forum,
-  UpdateCommentInput,
   UpdateForumInput,
 } from '@/types/forum';
-import type { User } from '@/types/user';
 
 /**
  * Client-side forums service for Browser Components (CSR, SWR, Mutations).
- * Encapsulates clientApiClient and fallback to mock data when API errors or fails.
+ * Connects directly to backend REST API under /api/v1/.
  */
 export const forumsService = {
   /**
-   * Fetches discussion topics for a class with automatic mock fallback.
+   * Fetches discussion topics for a classroom.
    */
   async getForums(classId: string): Promise<Forum[]> {
     try {
       const res = await clientApiClient<Forum[]>(`/classes/${classId}/forums`);
-      if (res && res.success !== false && Array.isArray(res.data)) {
-        return res.data;
+      if (res && res.success !== false) {
+        if (Array.isArray(res.data)) {
+          return res.data;
+        }
+        if (res.data && typeof res.data === 'object') {
+          return Object.values(res.data) as Forum[];
+        }
       }
-      return getMockForums(classId);
+      return [];
     } catch {
-      return getMockForums(classId);
+      return [];
     }
   },
 
@@ -49,19 +39,18 @@ export const forumsService = {
       if (res && res.success !== false && res.data) {
         return res.data;
       }
-      return getMockForumById(forumId);
+      return null;
     } catch {
-      return getMockForumById(forumId);
+      return null;
     }
   },
 
   /**
-   * Creates a new discussion topic.
+   * Creates a new discussion topic in a classroom.
    */
   async createForum(
     classId: string,
     input: CreateForumInput,
-    currentUser?: User | null,
   ): Promise<{ success: boolean; data?: Forum; message: string }> {
     try {
       const res = await clientApiClient<Forum>(`/classes/${classId}/forums`, {
@@ -75,47 +64,17 @@ export const forumsService = {
           message: 'Tạo chủ đề thảo luận thành công!',
         };
       }
-    } catch {
-      // Fallback to in-memory mock
+      return {
+        success: false,
+        message: res?.message || 'Không thể tạo chủ đề thảo luận.',
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ.';
+      return {
+        success: false,
+        message: errorMsg,
+      };
     }
-
-    const mockItem = createMockForum(classId, input, currentUser || MOCK_CURRENT_USER);
-    return {
-      success: true,
-      data: mockItem,
-      message: 'Tạo chủ đề thảo luận thành công!',
-    };
-  },
-
-  /**
-   * Adds a new comment or reply to an existing discussion.
-   */
-  async createComment(
-    input: CreateCommentInput,
-    currentUser?: User | null,
-  ): Promise<{ success: boolean; data?: Comment; message: string }> {
-    try {
-      const res = await clientApiClient<Comment>(`/forums/${input.forumId}/comments`, {
-        method: 'POST',
-        body: JSON.stringify(input),
-      });
-      if (res && res.success !== false && res.data) {
-        return {
-          success: true,
-          data: res.data,
-          message: 'Gửi bình luận thành công!',
-        };
-      }
-    } catch {
-      // Fallback to in-memory mock
-    }
-
-    const mockComment = createMockComment(input, currentUser || MOCK_CURRENT_USER);
-    return {
-      success: true,
-      data: mockComment,
-      message: 'Gửi bình luận thành công!',
-    };
   },
 
   /**
@@ -133,48 +92,21 @@ export const forumsService = {
       if (res && res.success !== false && res.data) {
         return { success: true, data: res.data, message: 'Đã cập nhật bài viết!' };
       }
-    } catch {
-      // Fallback to mock
+      return {
+        success: false,
+        message: res?.message || 'Không thể cập nhật bài viết.',
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ.';
+      return {
+        success: false,
+        message: errorMsg,
+      };
     }
-
-    const mockUpdated = updateMockForum(forumId, input);
-    return {
-      success: true,
-      data: mockUpdated || undefined,
-      message: 'Đã cập nhật bài viết!',
-    };
   },
 
   /**
-   * Updates an existing comment.
-   */
-  async updateComment(
-    forumId: string,
-    commentId: string,
-    input: UpdateCommentInput,
-  ): Promise<{ success: boolean; data?: Comment; message: string }> {
-    try {
-      const res = await clientApiClient<Comment>(`/forums/${forumId}/comments/${commentId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(input),
-      });
-      if (res && res.success !== false && res.data) {
-        return { success: true, data: res.data, message: 'Đã cập nhật bình luận!' };
-      }
-    } catch {
-      // Fallback to mock
-    }
-
-    const mockUpdated = updateMockComment(forumId, commentId, input);
-    return {
-      success: true,
-      data: mockUpdated || undefined,
-      message: 'Đã cập nhật bình luận!',
-    };
-  },
-
-  /**
-   * Deletes a discussion topic.
+   * Soft deletes a discussion topic.
    */
   async deleteForum(forumId: string): Promise<{ success: boolean; message: string }> {
     try {
@@ -182,35 +114,18 @@ export const forumsService = {
         method: 'DELETE',
       });
       if (res && res.success !== false) {
-        return { success: true, message: 'Đã xóa chủ đề thảo luận.' };
+        return { success: true, message: 'Đã xóa chủ đề thảo luận thành công.' };
       }
-    } catch {
-      // Fallback to mock
+      return {
+        success: false,
+        message: res?.message || 'Không thể xóa chủ đề thảo luận.',
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Lỗi kết nối máy chủ.';
+      return {
+        success: false,
+        message: errorMsg,
+      };
     }
-
-    deleteMockForum(forumId);
-    return { success: true, message: 'Đã xóa chủ đề thảo luận.' };
-  },
-
-  /**
-   * Deletes a comment or reply.
-   */
-  async deleteComment(
-    forumId: string,
-    commentId: string,
-  ): Promise<{ success: boolean; message: string }> {
-    try {
-      const res = await clientApiClient<unknown>(`/forums/${forumId}/comments/${commentId}`, {
-        method: 'DELETE',
-      });
-      if (res && res.success !== false) {
-        return { success: true, message: 'Đã xóa bình luận.' };
-      }
-    } catch {
-      // Fallback to mock
-    }
-
-    deleteMockComment(forumId, commentId);
-    return { success: true, message: 'Đã xóa bình luận.' };
   },
 };

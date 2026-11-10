@@ -130,7 +130,7 @@ export function ForumsClient({
         toast.error('Không thể cập nhật bài viết. Vui lòng thử lại!');
       }
     } else {
-      const res = await forumsService.createForum(classId, data, currentUser);
+      const res = await forumsService.createForum(classId, data);
       if (res.success && res.data) {
         toast.success(res.message);
         setForums((prev) => [res.data as Forum, ...prev]);

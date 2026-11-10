@@ -95,8 +95,9 @@ export function CommentItem({
     );
   }
 
-  const canDelete = isTeacher || (currentUser && comment.authorId === currentUser.id);
-  const canEdit = currentUser && comment.authorId === currentUser.id;
+  const isOwnComment = Boolean(currentUser && comment.authorId === currentUser.id);
+  const canDelete = isTeacher || isOwnComment;
+  const canEdit = isOwnComment;
   const isTeacherAuthor = comment.author?.role === Role.teacher;
 
   const formattedDate = formatForumDateTime(comment.createdAt);
@@ -155,6 +156,15 @@ export function CommentItem({
                 <span className="text-xs sm:text-sm font-semibold text-foreground truncate">
                   {authorDisplayName}
                 </span>
+
+                {isOwnComment && (
+                  <Badge
+                    variant="secondary"
+                    className="text-[9px] px-1.5 py-0 h-4 bg-primary/10 text-primary border border-primary/20 font-medium"
+                  >
+                    Bạn
+                  </Badge>
+                )}
 
                 {comment.isAnonymous && (
                   <Badge

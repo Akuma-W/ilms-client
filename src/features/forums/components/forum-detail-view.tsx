@@ -107,6 +107,15 @@ export function ForumDetailView({
                       : forum.author?.fullName || 'Thành viên'}
                   </span>
 
+                  {currentUser && forum.createdBy === currentUser.id && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 font-medium"
+                    >
+                      Bạn
+                    </Badge>
+                  )}
+
                   {forum.isAnonymous && (
                     <Badge
                       variant="outline"

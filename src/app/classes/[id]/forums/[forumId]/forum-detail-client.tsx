@@ -10,6 +10,7 @@ import { CommentInput } from '@/features/forums/components/comment-input';
 import { CommentItem } from '@/features/forums/components/comment-item';
 import { CreateForumModal } from '@/features/forums/components/create-forum-modal';
 import { forumsService } from '@/features/forums/services/forums.service';
+import { commentsService } from '@/features/forums/services/comments.service';
 import type {
   CreateCommentFormData,
   CreateForumFormData,
@@ -63,15 +64,12 @@ export function ForumDetailClient({
   };
 
   const handleAddComment = async (data: CreateCommentFormData) => {
-    const res = await forumsService.createComment(
-      {
-        forumId: forum.id,
-        content: data.content,
-        isAnonymous: data.isAnonymous,
-        parentId: data.parentId || null,
-      },
-      currentUser,
-    );
+    const res = await commentsService.createComment({
+      forumId: forum.id,
+      content: data.content,
+      isAnonymous: data.isAnonymous,
+      parentId: data.parentId || null,
+    });
 
     if (res.success && res.data) {
       toast.success(res.message);
@@ -111,7 +109,7 @@ export function ForumDetailClient({
   };
 
   const handleEditComment = async (commentId: string, newContent: string) => {
-    const res = await forumsService.updateComment(forum.id, commentId, { content: newContent });
+    const res = await commentsService.updateComment(forum.id, commentId, { content: newContent });
     if (res.success) {
       toast.success(res.message);
       const now = new Date().toISOString();
@@ -139,7 +137,7 @@ export function ForumDetailClient({
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    const res = await forumsService.deleteComment(forum.id, commentId);
+    const res = await commentsService.deleteComment(forum.id, commentId);
     if (res.success) {
       toast.success(res.message);
       setForum((prev) => {

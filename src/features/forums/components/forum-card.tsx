@@ -90,6 +90,15 @@ export function ForumCard({
                   {forum.isAnonymous ? 'Học viên ẩn danh' : forum.author?.fullName || 'Thành viên'}
                 </span>
 
+                {currentUser && forum.createdBy === currentUser.id && (
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-1.5 py-0 h-4.5 bg-primary/10 text-primary border border-primary/20 font-medium"
+                  >
+                    Bạn
+                  </Badge>
+                )}
+
                 {forum.isAnonymous && (
                   <Badge
                     variant="outline"

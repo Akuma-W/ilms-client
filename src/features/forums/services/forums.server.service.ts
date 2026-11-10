@@ -1,10 +1,9 @@
 import { serverApiClient } from '@/lib/api/server-api-client';
-import { getMockForumById, getMockForums } from '@/mocks/classes/mock-forums';
 import type { Forum } from '@/types/forum';
 
 /**
  * Server-side forums service for Server Components (SSR).
- * Encapsulates serverApiClient and fallback to mock data when API errors or fails.
+ * Connects directly to backend REST API under /api/v1/ with HttpOnly Cookie forwarding.
  */
 export const forumsServerService = {
   /**
@@ -15,12 +14,17 @@ export const forumsServerService = {
       const res = await serverApiClient<Forum[]>(`/classes/${classId}/forums`, {
         ignoreAuthError: true,
       });
-      if (res && res.success !== false && Array.isArray(res.data)) {
-        return res.data;
+      if (res && res.success !== false) {
+        if (Array.isArray(res.data)) {
+          return res.data;
+        }
+        if (res.data && typeof res.data === 'object') {
+          return Object.values(res.data) as Forum[];
+        }
       }
-      return getMockForums(classId);
+      return [];
     } catch {
-      return getMockForums(classId);
+      return [];
     }
   },
 
@@ -35,9 +39,9 @@ export const forumsServerService = {
       if (res && res.success !== false && res.data) {
         return res.data;
       }
-      return getMockForumById(forumId);
+      return null;
     } catch {
-      return getMockForumById(forumId);
+      return null;
     }
   },
 };
