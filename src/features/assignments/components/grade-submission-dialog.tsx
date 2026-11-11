@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { formatAssignmentDate } from '../utils/assignment.utils';
+import { resolveStorageUrl } from '@/features/upload/utils/file.utils';
 import type { Assignment, Submission } from '@/types/assignment';
 import { submissionService } from '../services/submission.service';
 
@@ -155,7 +156,7 @@ export function GradeSubmissionDialog({
                   {submission.files.map((file, idx) => (
                     <a
                       key={`${file.fileUrl}-${idx}`}
-                      href={file.fileUrl}
+                      href={resolveStorageUrl(file.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-card hover:border-amber-500 text-sm group transition-all"

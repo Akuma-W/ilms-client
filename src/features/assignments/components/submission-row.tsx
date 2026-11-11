@@ -4,6 +4,7 @@ import { Award, CheckCircle2, ExternalLink, FileText, Pencil } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatAssignmentDate } from '../utils/assignment.utils';
+import { resolveStorageUrl } from '@/features/upload/utils/file.utils';
 import type { Assignment, Submission } from '@/types/assignment';
 
 interface SubmissionRowProps {
@@ -68,7 +69,7 @@ export function SubmissionRow({
               {sub.files.map((file, idx) => (
                 <a
                   key={`${file.fileUrl}-${idx}`}
-                  href={file.fileUrl}
+                  href={resolveStorageUrl(file.fileUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background border border-border hover:border-amber-500 text-xs font-medium text-foreground transition-colors"

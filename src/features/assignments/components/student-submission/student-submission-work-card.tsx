@@ -98,7 +98,7 @@ function StudentSubmissionForm({
             }
             return {
               ...f,
-              fileUrl: uploadRes.data.url,
+              fileUrl: uploadRes.data.key || uploadRes.data.url,
             };
           }
           return f;

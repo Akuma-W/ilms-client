@@ -13,8 +13,8 @@ export interface Material {
 export interface CreateMaterialPayload {
   title: string;
   materialType: FileType;
-  fileUrl?: string;
-  externalUrl?: string;
+  fileUrl?: string | null;
+  externalUrl?: string | null;
 }
 
 export type UpdateMaterialPayload = Partial<CreateMaterialPayload>;

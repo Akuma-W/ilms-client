@@ -18,7 +18,10 @@ export function formatFileSize(bytes?: number | null): string {
 
 export function isDirectFileUrl(url?: string | null): boolean {
   if (!url || typeof url !== 'string') return false;
-  const cleanUrl = url.split('?')[0].toLowerCase();
+  const target = url.includes('path=')
+    ? decodeURIComponent(url.split('path=')[1].split('&')[0])
+    : url.split('?')[0];
+  const cleanUrl = target.toLowerCase();
   const fileExtensions = [
     '.pdf',
     '.ppt',
@@ -81,7 +84,7 @@ export function getBaseFileName(fileName: string): string {
 }
 
 /**
- * Resolves a storage key, relative path, or full URL to a reachable endpoint.
+ * Resolves a storage key, relative path, or legacy MinIO/external URL to a reachable endpoint.
  */
 export function resolveStorageUrl(urlOrPath?: string | null): string {
   if (!urlOrPath || typeof urlOrPath !== 'string') return '';
@@ -89,11 +92,55 @@ export function resolveStorageUrl(urlOrPath?: string | null): string {
   if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
     return trimmed;
   }
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+
+  const apiBase = process.env.NEXT_PUBLIC_CLIENT_API_URL || 'http://localhost:5000/api/v1';
+
+  // Already a storage proxy URL
+  if (trimmed.includes('/storage/file?path=')) {
     return trimmed;
   }
-  const apiBase = process.env.NEXT_PUBLIC_CLIENT_API_URL || 'http://localhost:5000/api/v1';
-  const cleanPath = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+
+  // Check if it's an HTTP/HTTPS URL
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    try {
+      const parsed = new URL(trimmed);
+      const isMinioHost =
+        parsed.port === '9000' ||
+        parsed.port === '9090' ||
+        parsed.hostname.includes('minio') ||
+        parsed.hostname === 'files.localhost';
+      const hasMinioSignature =
+        parsed.searchParams.has('X-Amz-Signature') ||
+        parsed.searchParams.has('X-Amz-Algorithm');
+      const hasBucketPath =
+        parsed.pathname.includes('/keiverse/') ||
+        parsed.pathname.includes('/ilms-bucket/');
+
+      // If it's a legacy MinIO presigned or direct link saved in DB, extract object key
+      if (isMinioHost || hasMinioSignature || hasBucketPath) {
+        const rawPath = parsed.pathname.replace(/^\/+/, '');
+        const segments = rawPath.split('/');
+        let cleanObjectKey = rawPath;
+        if (
+          segments.length > 1 &&
+          (segments[0] === 'keiverse' ||
+            segments[0] === 'ilms-bucket' ||
+            isMinioHost)
+        ) {
+          cleanObjectKey = segments.slice(1).join('/');
+        }
+        return `${apiBase}/storage/file?path=${encodeURIComponent(cleanObjectKey)}`;
+      }
+
+      // Truly external URL (YouTube, Google Drive, web reference, etc.)
+      return trimmed;
+    } catch {
+      return trimmed;
+    }
+  }
+
+  // Relative storage path/key (e.g. 'materials/123.pdf', 'assignments/abc.docx')
+  const cleanPath = trimmed.split('?')[0].replace(/^\/+/, '');
   return `${apiBase}/storage/file?path=${encodeURIComponent(cleanPath)}`;
 }
 
@@ -104,7 +151,10 @@ export function getCleanDisplayName(urlOrPath?: string | null, fallbackName?: st
   if (fallbackName && fallbackName.trim()) return fallbackName.trim();
   if (!urlOrPath) return 'Tệp đính kèm';
   try {
-    const rawName = urlOrPath.split('?')[0].split('/').pop() || 'Tệp đính kèm';
+    const target = urlOrPath.includes('path=')
+      ? decodeURIComponent(urlOrPath.split('path=')[1].split('&')[0])
+      : urlOrPath.split('?')[0];
+    const rawName = target.split('/').pop() || 'Tệp đính kèm';
     const cleaned = decodeURIComponent(rawName).replace(/^(\d{10,14}|[0-9a-fA-F-]{36})-/, '');
     return cleaned || 'Tệp đính kèm';
   } catch {

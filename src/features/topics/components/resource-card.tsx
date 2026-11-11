@@ -19,7 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMaterialBadgeConfig, formatDateVi } from '../utils/resource.utils';
-import { isDirectFileUrl } from '@/features/upload/utils/file.utils';
+import { isDirectFileUrl, resolveStorageUrl } from '@/features/upload/utils/file.utils';
 import { cn } from '@/lib/utils';
 import type { UnifiedResource } from '@/types/topic';
 
@@ -228,17 +228,17 @@ export function ResourceCard({
         {/* Material Direct Action */}
         {item.kind === 'material' && (
           <>
-            {item.data.materialType === 'link' ? (
+            {item.data.externalUrl ? (
               <ActionBtn
                 icon={ExternalLink}
                 tooltip="Mở liên kết"
-                href={item.data.externalUrl || '#'}
+                href={item.data.externalUrl}
               />
             ) : (
               <ActionBtn
                 icon={Download}
                 tooltip="Tải tệp tin"
-                href={item.data.fileUrl || '#'}
+                href={resolveStorageUrl(item.data.fileUrl) || '#'}
                 download={true}
               />
             )}
@@ -250,7 +250,7 @@ export function ResourceCard({
           <ActionBtn
             icon={isRefFile ? Download : ExternalLink}
             tooltip={isRefFile ? 'Tải tệp tham khảo' : 'Mở tài liệu tham khảo'}
-            href={item.data.url}
+            href={isRefFile ? resolveStorageUrl(item.data.url) : item.data.url}
             download={isRefFile}
           />
         )}
