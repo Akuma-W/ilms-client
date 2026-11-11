@@ -1,5 +1,8 @@
+'use client';
+
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import {
   Table,
@@ -9,20 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { TeacherGradesPagination } from './teacher-grades-pagination';
 import { GradeMatrixRow } from './grade-matrix-row';
 import { GradeAnalyticsCards } from './grade-analytics-cards';
 import { CategoryManagementModal } from './category-management-modal';
 import { TeacherGradesToolbar } from './teacher-grades-toolbar';
 import { calculateFinalScore } from '../utils/grade.utils';
 import { exportGradesToCsv } from '../utils/export.utils';
+import { sortGradeRows, type GradeSortField, type GradeSortOrder } from '../utils/grade-sort.utils';
 import type { ClassGradeMatrixRow, GradeCategory } from '@/types/grade';
 
 interface TeacherGradesViewProps {
@@ -32,7 +29,13 @@ interface TeacherGradesViewProps {
     updates: { studentId: string; categoryId: string; score: number }[],
   ) => Promise<void>;
   onSaveCategories?: (
-    updated: { id?: string; name: string; weightPercent: number; isDeleted?: boolean }[],
+    updated: {
+      id?: string;
+      name: string;
+      weightPercent: number;
+      orderIndex?: number;
+      isDeleted?: boolean;
+    }[],
   ) => Promise<void>;
   className?: string;
 }
@@ -41,7 +44,7 @@ const ITEMS_PER_PAGE = 10;
 
 /**
  * Teacher grade matrix view with compact analytics cards, inline spreadsheet editing,
- * category management modal, CSV export, and stable shadcn Table/Pagination.
+ * sortable headers, input validation bounds [0, 10], and CSV export.
  */
 export function TeacherGradesView({
   categories,
@@ -55,6 +58,13 @@ export function TeacherGradesView({
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
+  const [sortField, setSortField] = useState<GradeSortField>('index');
+  const [sortOrder, setSortOrder] = useState<GradeSortOrder>('asc');
+
+  // Categories ordered by sequence index
+  const sortedCategories = [...categories].sort(
+    (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0),
+  );
 
   // Initialize draft scores map: studentId -> { categoryId -> score }
   const [draftScores, setDraftScores] = useState<Record<string, Record<string, number | null>>>(
@@ -67,6 +77,24 @@ export function TeacherGradesView({
     },
   );
 
+  // Validate all entered draft scores strictly between 0 and 10
+  const hasInvalidScore = Object.values(draftScores).some((scoresMap) =>
+    Object.values(scoresMap).some(
+      (score) => score !== null && score !== undefined && (score < 0 || score > 10),
+    ),
+  );
+
+  // Sort direction handler
+  const handleSort = (field: GradeSortField) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder(field === 'finalScore' ? 'desc' : 'asc');
+    }
+    setPage(1);
+  };
+
   // Filter students by search term
   const filteredRows = rows.filter((r) => {
     const nameMatch = r.studentName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -74,20 +102,35 @@ export function TeacherGradesView({
     return nameMatch || codeMatch;
   });
 
-  const totalPages = Math.ceil(filteredRows.length / ITEMS_PER_PAGE) || 1;
+  // Apply sorting
+  const sortedRows = sortGradeRows(
+    filteredRows,
+    sortField,
+    sortOrder,
+    isEditing ? draftScores : undefined,
+  );
+
+  const totalPages = Math.ceil(sortedRows.length / ITEMS_PER_PAGE) || 1;
   const safePage = Math.min(Math.max(1, page), totalPages);
-  const paginatedRows = filteredRows.slice(
+  const paginatedRows = sortedRows.slice(
     (safePage - 1) * ITEMS_PER_PAGE,
     safePage * ITEMS_PER_PAGE,
   );
 
-  // Overall classroom analytics
+  // Overall classroom analytics: compute only on students with graded records
   const totalStudents = rows.length;
-  const passingStudents = rows.filter((r) => r.finalScore >= 5.0).length;
+  const gradedRows = rows.filter((r) => r.finalScore !== null && r.finalScore !== undefined);
+  const passingStudents = gradedRows.filter(
+    (r) => r.finalScore !== null && r.finalScore >= 5.0,
+  ).length;
   const averageClassScore =
-    totalStudents > 0
-      ? (rows.reduce((sum, r) => sum + r.finalScore, 0) / totalStudents).toFixed(2)
-      : '0.00';
+    gradedRows.length > 0
+      ? (
+          gradedRows.reduce((sum, r) => sum + (r.finalScore ?? 0), 0) / gradedRows.length
+        ).toFixed(2)
+      : '—';
+  const passingRate =
+    gradedRows.length > 0 ? Math.round((passingStudents / gradedRows.length) * 100) : 0;
 
   const handleScoreChange = (studentId: string, categoryId: string, score: number | null) => {
     setDraftScores((prev) => ({
@@ -110,6 +153,11 @@ export function TeacherGradesView({
   };
 
   const handleSaveGrades = async () => {
+    if (hasInvalidScore) {
+      toast.error('Có điểm không hợp lệ! Vui lòng chỉ nhập điểm trong khoảng từ 0 đến 10.');
+      return;
+    }
+
     setIsSaving(true);
     try {
       const updates: { studentId: string; categoryId: string; score: number }[] = [];
@@ -131,14 +179,25 @@ export function TeacherGradesView({
     }
   };
 
+  const renderSortIndicator = (field: GradeSortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="size-3 text-muted-foreground/50 inline-block ml-1" />;
+    }
+    return sortOrder === 'asc' ? (
+      <ArrowUp className="size-3 text-primary inline-block ml-1" />
+    ) : (
+      <ArrowDown className="size-3 text-primary inline-block ml-1" />
+    );
+  };
+
   return (
     <div className="space-y-6">
-      {/* 3 Compact, Vibrant Analytics Cards */}
+      {/* 3 Compact Analytics Cards */}
       <GradeAnalyticsCards
         totalStudents={totalStudents}
         averageScore={averageClassScore}
         passingStudents={passingStudents}
-        passingRate={totalStudents > 0 ? Math.round((passingStudents / totalStudents) * 100) : 0}
+        passingRate={passingRate}
       />
 
       {/* Main Grade Matrix Card */}
@@ -147,47 +206,72 @@ export function TeacherGradesView({
         <TeacherGradesToolbar
           isEditing={isEditing}
           searchTerm={searchTerm}
-          categoryCount={categories.length}
+          categoryCount={sortedCategories.length}
           isSaving={isSaving}
           hasCategoriesHandler={Boolean(onSaveCategories)}
+          hasInvalidScore={hasInvalidScore}
           onSearchChange={(val) => {
             setSearchTerm(val);
             setPage(1);
           }}
           onOpenCategories={() => setIsCategoryModalOpen(true)}
-          onExportCsv={() => exportGradesToCsv(categories, rows, className)}
+          onExportCsv={() => exportGradesToCsv(sortedCategories, rows, className)}
           onStartEdit={() => setIsEditing(true)}
           onCancelEdit={handleCancelEdit}
           onSaveGrades={handleSaveGrades}
         />
 
-        {/* Matrix Table with primary theme accent and bold headers */}
+        {/* Matrix Table with primary theme accent and sortable headers */}
         <Table>
           <TableHeader className="bg-primary/5 dark:bg-primary/10 border-b border-primary/20">
             <TableRow className="border-b border-primary/20 text-xs font-bold uppercase tracking-wider">
-              <TableHead className="py-3 px-3 text-center w-14 font-bold text-foreground">
-                STT
+              <TableHead
+                className="py-3 px-3 text-center w-14 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
+                onClick={() => handleSort('index')}
+              >
+                <span>STT</span>
+                {renderSortIndicator('index')}
               </TableHead>
-              <TableHead className="py-3 px-4 w-28 font-bold text-foreground">MSSV</TableHead>
-              <TableHead className="py-3 px-4 min-w-45 font-bold text-foreground">
-                Sinh viên
+              <TableHead
+                className="py-3 px-4 w-28 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
+                onClick={() => handleSort('code')}
+              >
+                <span>MSSV</span>
+                {renderSortIndicator('code')}
               </TableHead>
-              {categories.map((cat) => (
+              <TableHead
+                className="py-3 px-4 min-w-45 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
+                onClick={() => handleSort('name')}
+              >
+                <span>Sinh viên</span>
+                {renderSortIndicator('name')}
+              </TableHead>
+              {sortedCategories.map((cat) => (
                 <TableHead
                   key={cat.id}
-                  className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground"
+                  className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
+                  onClick={() => handleSort(cat.id)}
                 >
                   <div className="flex flex-col items-center">
-                    <span className="font-bold text-foreground">{cat.name}</span>
+                    <div className="flex items-center">
+                      <span className="font-bold text-foreground">{cat.name}</span>
+                      {renderSortIndicator(cat.id)}
+                    </div>
                     <span className="text-[11px] font-mono text-primary font-semibold">
                       {Math.round(cat.weight > 1 ? cat.weight : cat.weight * 100)}%
                     </span>
                   </div>
                 </TableHead>
               ))}
-              <TableHead className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground">
+              <TableHead
+                className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
+                onClick={() => handleSort('finalScore')}
+              >
                 <div className="flex flex-col items-center">
-                  <span className="font-bold text-primary">Tổng kết</span>
+                  <div className="flex items-center">
+                    <span className="font-bold text-primary">Tổng kết</span>
+                    {renderSortIndicator('finalScore')}
+                  </div>
                   <span className="text-[11px] font-mono text-muted-foreground">Hệ 10</span>
                 </div>
               </TableHead>
@@ -200,7 +284,7 @@ export function TeacherGradesView({
             {paginatedRows.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5 + categories.length}
+                  colSpan={5 + sortedCategories.length}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
                   Không tìm thấy sinh viên nào phù hợp với từ khóa.
@@ -209,13 +293,13 @@ export function TeacherGradesView({
             ) : (
               paginatedRows.map((row, idx) => {
                 const studentDraft = draftScores[row.studentId] || row.scores;
-                const computedScore = calculateFinalScore(categories, studentDraft);
+                const computedScore = calculateFinalScore(sortedCategories, studentDraft);
 
                 return (
                   <GradeMatrixRow
                     key={row.studentId}
                     row={row}
-                    categories={categories}
+                    categories={sortedCategories}
                     index={(safePage - 1) * ITEMS_PER_PAGE + idx}
                     isEditing={isEditing}
                     draftScores={studentDraft}
@@ -229,53 +313,13 @@ export function TeacherGradesView({
         </Table>
 
         {/* Pagination Footer */}
-        {totalPages > 1 && (
-          <div className="p-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span>
-              Hiển thị {(safePage - 1) * ITEMS_PER_PAGE + 1} -{' '}
-              {Math.min(safePage * ITEMS_PER_PAGE, filteredRows.length)} trên tổng số{' '}
-              {filteredRows.length} sinh viên
-            </span>
-            <Pagination className="mx-0 w-auto justify-end">
-              <PaginationContent className="gap-1">
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (safePage > 1) setPage(safePage - 1);
-                    }}
-                    className={safePage <= 1 ? 'pointer-events-none opacity-50' : ''}
-                  />
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <PaginationItem key={p}>
-                    <PaginationLink
-                      href="#"
-                      isActive={p === safePage}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setPage(p);
-                      }}
-                    >
-                      {p}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (safePage < totalPages) setPage(safePage + 1);
-                    }}
-                    className={safePage >= totalPages ? 'pointer-events-none opacity-50' : ''}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
+        <TeacherGradesPagination
+          safePage={safePage}
+          totalPages={totalPages}
+          totalItems={sortedRows.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       </Card>
 
       {/* Category Management Modal */}
@@ -283,7 +327,7 @@ export function TeacherGradesView({
         <CategoryManagementModal
           isOpen={isCategoryModalOpen}
           onOpenChange={setIsCategoryModalOpen}
-          categories={categories}
+          categories={sortedCategories}
           onSaveCategories={onSaveCategories}
         />
       )}

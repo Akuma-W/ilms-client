@@ -12,6 +12,7 @@ interface GradeAnalyticsCardsProps {
 
 /**
  * Compact, low-profile analytics tiles displaying student count, class average, and pass rate.
+ * Uses emerald, indigo, and galaxy primary palette accents.
  */
 export function GradeAnalyticsCards({
   totalStudents,
@@ -19,6 +20,8 @@ export function GradeAnalyticsCards({
   passingStudents,
   passingRate,
 }: GradeAnalyticsCardsProps) {
+  const hasAverage = averageScore !== '—' && averageScore !== '-' && averageScore !== '0.00';
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {/* 1. Sĩ số */}
@@ -50,7 +53,8 @@ export function GradeAnalyticsCards({
               Điểm trung bình lớp
             </p>
             <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-              {averageScore} <span className="text-xs font-normal text-muted-foreground">/ 10</span>
+              {averageScore}{' '}
+              {hasAverage && <span className="text-xs font-normal text-muted-foreground">/ 10</span>}
             </p>
           </div>
         </CardContent>

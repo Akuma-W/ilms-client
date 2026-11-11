@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Download, Edit3, RotateCcw, Search, Sliders } from 'lucide-react';
+import { AlertTriangle, Check, Download, Edit3, RotateCcw, Search, Sliders } from 'lucide-react';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ interface TeacherGradesToolbarProps {
   categoryCount: number;
   isSaving: boolean;
   hasCategoriesHandler: boolean;
+  hasInvalidScore?: boolean;
   onSearchChange: (term: string) => void;
   onOpenCategories: () => void;
   onExportCsv: () => void;
@@ -21,7 +22,7 @@ interface TeacherGradesToolbarProps {
 
 /**
  * Top control toolbar for teacher grade matrix with search, category modal trigger,
- * CSV export, and stabilized edit/save button group.
+ * CSV export, invalid score guard, and stabilized edit/save button group.
  */
 export function TeacherGradesToolbar({
   isEditing,
@@ -29,6 +30,7 @@ export function TeacherGradesToolbar({
   categoryCount,
   isSaving,
   hasCategoriesHandler,
+  hasInvalidScore = false,
   onSearchChange,
   onOpenCategories,
   onExportCsv,
@@ -39,9 +41,16 @@ export function TeacherGradesToolbar({
   return (
     <CardHeader className="p-4 sm:p-5 border-b border-border/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
       <div className="space-y-1">
-        <CardTitle className="text-base sm:text-lg font-bold text-foreground">
-          Bảng tổng hợp điểm lớp học
-        </CardTitle>
+        <div className="flex items-center gap-2.5">
+          <CardTitle className="text-base sm:text-lg font-bold text-foreground">
+            Bảng tổng hợp điểm lớp học
+          </CardTitle>
+          {isEditing && hasInvalidScore && (
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-md animate-pulse">
+              <AlertTriangle className="size-3.5" /> Điểm phải từ 0 đến 10
+            </span>
+          )}
+        </div>
         <CardDescription className="text-xs">
           {isEditing
             ? 'Đang ở chế độ chỉnh sửa điểm trực tiếp. Cột Tổng kết tự động tính toán lại theo thời gian thực.'
@@ -113,8 +122,8 @@ export function TeacherGradesToolbar({
                 variant="default"
                 size="sm"
                 onClick={onSaveGrades}
-                disabled={isSaving}
-                className="h-9 text-xs rounded-xl gap-1.5 font-medium shadow-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                disabled={isSaving || hasInvalidScore}
+                className="h-9 text-xs rounded-xl gap-1.5 font-medium shadow-xs bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white"
               >
                 <Check className="size-3.5" />
                 <span>{isSaving ? 'Đang lưu...' : 'Lưu bảng điểm'}</span>

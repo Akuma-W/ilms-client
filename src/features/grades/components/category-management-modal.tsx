@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Loader2, Plus, Sliders, Trash2 } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Loader2, Plus, Sliders, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,13 @@ interface CategoryManagementModalProps {
   onOpenChange: (open: boolean) => void;
   categories: GradeCategory[];
   onSaveCategories: (
-    updated: { id?: string; name: string; weightPercent: number; isDeleted?: boolean }[],
+    updated: {
+      id?: string;
+      name: string;
+      weightPercent: number;
+      orderIndex?: number;
+      isDeleted?: boolean;
+    }[],
   ) => Promise<void>;
 }
 
@@ -29,38 +35,36 @@ interface LocalCategoryItem {
   id: string;
   name: string;
   weightPercent: number;
+  orderIndex?: number;
   isNew?: boolean;
   isDeleted?: boolean;
 }
 
-/**
- * Dialog for managing classroom grade categories (adding, renaming, adjusting weights, deleting).
- */
+// Maps and sorts category array by orderIndex ascending
+const mapCategories = (cats: GradeCategory[]): LocalCategoryItem[] =>
+  [...cats]
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+    .map((c, idx) => ({
+      id: c.id,
+      name: c.name,
+      weightPercent: Math.round(c.weight > 1 ? c.weight : c.weight * 100),
+      orderIndex: c.orderIndex ?? idx + 1,
+    }));
+
+// Dialog for managing classroom grade categories, weights, and chronological order
 export function CategoryManagementModal({
   isOpen,
   onOpenChange,
   categories,
   onSaveCategories,
 }: CategoryManagementModalProps) {
-  const [items, setItems] = useState<LocalCategoryItem[]>(() =>
-    categories.map((c) => ({
-      id: c.id,
-      name: c.name,
-      weightPercent: Math.round(c.weight > 1 ? c.weight : c.weight * 100),
-    })),
-  );
+  const [items, setItems] = useState<LocalCategoryItem[]>(() => mapCategories(categories));
   const [isSaving, setIsSaving] = useState(false);
 
   // Sync when dialog opens
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      setItems(
-        categories.map((c) => ({
-          id: c.id,
-          name: c.name,
-          weightPercent: Math.round(c.weight > 1 ? c.weight : c.weight * 100),
-        })),
-      );
+      setItems(mapCategories(categories));
     }
     onOpenChange(open);
   };
@@ -77,6 +81,7 @@ export function CategoryManagementModal({
         id: `temp-${Date.now()}`,
         name: 'Cột điểm mới',
         weightPercent: remaining,
+        orderIndex: activeItems.length + 1,
         isNew: true,
       },
     ]);
@@ -94,6 +99,27 @@ export function CategoryManagementModal({
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, [field]: val } : i)));
   };
 
+  // Move category position up or down in the display sequence
+  const handleMove = (activeIdx: number, direction: -1 | 1) => {
+    const targetIdx = activeIdx + direction;
+    if (targetIdx < 0 || targetIdx >= activeItems.length) return;
+
+    const currentItem = activeItems[activeIdx];
+    const targetItem = activeItems[targetIdx];
+
+    setItems((prev) => {
+      const next = [...prev];
+      const curPos = next.findIndex((i) => i.id === currentItem.id);
+      const tarPos = next.findIndex((i) => i.id === targetItem.id);
+      if (curPos !== -1 && tarPos !== -1) {
+        const temp = next[curPos];
+        next[curPos] = next[tarPos];
+        next[tarPos] = temp;
+      }
+      return next;
+    });
+  };
+
   const handleSave = async () => {
     if (!isBalanced) {
       toast.warning(`Tổng trọng số hiện tại là ${totalWeight}%. Vui lòng điều chỉnh về đúng 100%!`);
@@ -108,12 +134,18 @@ export function CategoryManagementModal({
 
     setIsSaving(true);
     try {
-      const payload = items.map((i) => ({
-        id: i.isNew ? undefined : i.id,
-        name: i.name.trim(),
-        weightPercent: Number(i.weightPercent),
-        isDeleted: i.isDeleted,
-      }));
+      let activeOrder = 1;
+      const payload = items.map((i) => {
+        const orderIndex = i.isDeleted ? undefined : activeOrder++;
+        return {
+          id: i.isNew ? undefined : i.id,
+          name: i.name.trim(),
+          weightPercent: Number(i.weightPercent),
+          orderIndex,
+          isDeleted: i.isDeleted,
+        };
+      });
+
       await onSaveCategories(payload);
       toast.success('Cập nhật cấu hình loại điểm thành công!');
       onOpenChange(false);
@@ -133,7 +165,7 @@ export function CategoryManagementModal({
             <span>Quản lý loại điểm & Trọng số</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Thiết lập các cột điểm thành phần. Tổng trọng số bắt buộc phải bằng đúng 100%.
+            Thiết lập thứ tự hiển thị và trọng số các cột điểm. Tổng trọng số bắt buộc phải bằng đúng 100%.
           </DialogDescription>
         </DialogHeader>
 
@@ -142,8 +174,35 @@ export function CategoryManagementModal({
           {activeItems.map((item, idx) => (
             <div
               key={item.id}
-              className="flex items-center gap-2.5 p-3 rounded-xl border border-border/80 bg-muted/20"
+              className="flex items-center gap-2 p-3 rounded-xl border border-border/80 bg-muted/20"
             >
+              {/* Reorder Buttons */}
+              <div className="flex flex-col items-center justify-center shrink-0 -space-y-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={idx === 0}
+                  onClick={() => handleMove(idx, -1)}
+                  title="Di chuyển lên trên"
+                  className="h-5 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:pointer-events-none rounded"
+                >
+                  <ChevronUp className="size-3.5" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={idx === activeItems.length - 1}
+                  onClick={() => handleMove(idx, 1)}
+                  title="Di chuyển xuống dưới"
+                  className="h-5 w-6 p-0 text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:pointer-events-none rounded"
+                >
+                  <ChevronDown className="size-3.5" />
+                </Button>
+              </div>
+
+              {/* Order index badge */}
               <div className="size-7 rounded-lg bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
                 {idx + 1}
               </div>

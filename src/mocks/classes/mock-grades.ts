@@ -7,25 +7,32 @@ import type {
   StudentGradeSummary,
 } from '@/types/grade';
 import { MOCK_STUDENTS } from './mock-users';
-import { calculateFinalScore, getLetterGrade } from '@/features/grades/utils/grade.utils';
+import {
+  calculateFinalScore,
+  getGpa4,
+  getLetterGrade,
+} from '@/features/grades/utils/grade.utils';
 
 export let MOCK_GRADE_CATEGORIES: GradeCategory[] = [
   {
     id: 'cat-attendance',
     name: 'Chuyên cần',
     weight: 0.2, // 20%
+    orderIndex: 1,
     classId: 'class-standard',
   },
   {
     id: 'cat-practical',
-    name: 'Thực hành',
+    name: 'Giữa kì',
     weight: 0.3, // 30%
+    orderIndex: 2,
     classId: 'class-standard',
   },
   {
     id: 'cat-final',
     name: 'Cuối kì',
     weight: 0.5, // 50%
+    orderIndex: 3,
     classId: 'class-standard',
   },
 ];
@@ -109,13 +116,19 @@ MOCK_STUDENTS.forEach((student, idx) => {
   }
 });
 
-export const getMockCategories = (): GradeCategory[] => [...MOCK_GRADE_CATEGORIES];
+export const getMockCategories = (): GradeCategory[] =>
+  [...MOCK_GRADE_CATEGORIES].sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
 
-export const addMockCategory = (name: string, weightPercent: number): GradeCategory => {
+export const addMockCategory = (
+  name: string,
+  weightPercent: number,
+  orderIndex?: number,
+): GradeCategory => {
   const newCat: GradeCategory = {
     id: `cat-${Date.now()}`,
     name,
     weight: weightPercent > 1 ? weightPercent / 100 : weightPercent,
+    orderIndex: orderIndex ?? MOCK_GRADE_CATEGORIES.length + 1,
     classId: 'class-standard',
   };
   MOCK_GRADE_CATEGORIES.push(newCat);
@@ -126,11 +139,15 @@ export const updateMockCategory = (
   id: string,
   name: string,
   weightPercent: number,
+  orderIndex?: number,
 ): GradeCategory | null => {
   const cat = MOCK_GRADE_CATEGORIES.find((c) => c.id === id);
   if (cat) {
     cat.name = name;
     cat.weight = weightPercent > 1 ? weightPercent / 100 : weightPercent;
+    if (orderIndex !== undefined) {
+      cat.orderIndex = orderIndex;
+    }
     return { ...cat };
   }
   return null;
@@ -173,7 +190,8 @@ export const getMockStudentRecord = (studentId?: string): StudentGradeRecord => 
     detailedItems: MOCK_DETAILED_ITEMS,
     finalScore,
     letterGrade: getLetterGrade(finalScore),
-    isPassed: finalScore >= 5.0,
+    gpa4: getGpa4(finalScore),
+    isPassed: finalScore !== null ? finalScore >= 5.0 : null,
     completionRate: 85,
   };
 };

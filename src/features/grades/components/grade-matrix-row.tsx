@@ -13,12 +13,12 @@ interface GradeMatrixRowProps {
   isEditing: boolean;
   draftScores?: Record<string, number | null>;
   onScoreChange?: (studentId: string, categoryId: string, val: number | null) => void;
-  computedFinalScore?: number;
+  computedFinalScore?: number | null;
 }
 
 /**
  * Single table row rendering in the teacher grade matrix using shadcn TableCell.
- * Supports read-only presentation and interactive live recalculation in edit mode.
+ * Supports read-only presentation, visual validation on bounds [0, 10], and real-time recalculation.
  */
 export function GradeMatrixRow({
   row,
@@ -66,6 +66,10 @@ export function GradeMatrixRow({
       {/* Category Scores */}
       {categories.map((cat) => {
         const currentScore = draftScores ? draftScores[cat.id] : row.scores[cat.id];
+        const isInvalid =
+          currentScore !== null &&
+          currentScore !== undefined &&
+          (currentScore < 0 || currentScore > 10);
 
         if (isEditing) {
           return (
@@ -80,8 +84,14 @@ export function GradeMatrixRow({
                   const val = e.target.value === '' ? null : parseFloat(e.target.value);
                   onScoreChange?.(row.studentId, cat.id, isNaN(val as number) ? null : val);
                 }}
-                className="w-20 mx-auto text-center h-8.5 text-sm font-medium rounded-lg border-primary/40 focus-visible:ring-primary"
+                className={cn(
+                  'w-20 mx-auto text-center h-8.5 text-sm font-medium rounded-lg transition-colors',
+                  isInvalid
+                    ? 'border-rose-500 bg-rose-500/10 text-rose-600 focus-visible:ring-rose-500 font-bold dark:border-rose-500 dark:bg-rose-950/30 dark:text-rose-400'
+                    : 'border-primary/40 focus-visible:ring-primary',
+                )}
                 placeholder="—"
+                title={isInvalid ? 'Điểm số phải từ 0 đến 10' : undefined}
               />
             </TableCell>
           );

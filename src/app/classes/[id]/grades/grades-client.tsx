@@ -5,6 +5,7 @@ import { Award, GraduationCap, Loader2 } from 'lucide-react';
 import { TeacherGradesView } from '@/features/grades/components/teacher-grades-view';
 import { StudentGradesView } from '@/features/grades/components/student-grades-view';
 import { gradesService } from '@/features/grades/services/grades.service';
+import { gradeCategoriesService } from '@/features/grades/services/grade-categories.service';
 import type { ClassGradeMatrixRow, GradeCategory, StudentGradeRecord } from '@/types/grade';
 import type { User } from '@/types/user';
 
@@ -68,15 +69,32 @@ export function GradesClient({ classId, isTeacher, currentUser }: GradesClientPr
   };
 
   const handleSaveCategories = async (
-    updated: { id?: string; name: string; weightPercent: number; isDeleted?: boolean }[],
+    updated: {
+      id?: string;
+      name: string;
+      weightPercent: number;
+      orderIndex?: number;
+      isDeleted?: boolean;
+    }[],
   ) => {
     for (const item of updated) {
       if (item.isDeleted && item.id) {
-        await gradesService.deleteCategory(classId, item.id);
+        await gradeCategoriesService.deleteCategory(classId, item.id);
       } else if (!item.id && !item.isDeleted) {
-        await gradesService.createCategory(classId, item.name, item.weightPercent);
+        await gradeCategoriesService.createCategory(
+          classId,
+          item.name,
+          item.weightPercent,
+          item.orderIndex,
+        );
       } else if (item.id && !item.isDeleted) {
-        await gradesService.updateCategory(classId, item.id, item.name, item.weightPercent);
+        await gradeCategoriesService.updateCategory(
+          classId,
+          item.id,
+          item.name,
+          item.weightPercent,
+          item.orderIndex,
+        );
       }
     }
     const res = await gradesService.getClassGradeMatrix(classId);

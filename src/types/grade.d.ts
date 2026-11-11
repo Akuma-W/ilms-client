@@ -4,6 +4,7 @@ export interface GradeCategory {
   id: string;
   name: string;
   weight: number; // e.g. 0.2 (20%), 0.3 (30%), 0.5 (50%)
+  orderIndex?: number;
   classId: string;
 }
 
@@ -43,9 +44,10 @@ export interface StudentGradeRecord {
   avatarUrl?: string | null;
   categoryGrades: StudentCategoryGrade[];
   detailedItems: DetailedGradeItem[];
-  finalScore: number;
-  letterGrade: string;
-  isPassed: boolean;
+  finalScore: number | null;
+  letterGrade: string | null;
+  gpa4: number | null;
+  isPassed: boolean | null;
   completionRate: number; // percentage
 }
 
@@ -56,8 +58,9 @@ export interface ClassGradeMatrixRow {
   studentCode: string;
   avatarUrl?: string | null;
   scores: Record<string, number | null>; // categoryId -> score
-  finalScore: number;
-  letterGrade: string;
+  finalScore: number | null;
+  letterGrade: string | null;
+  gpa4?: number | null;
 }
 
 export interface StudentGradeSummary {

@@ -1,9 +1,7 @@
 import { toast } from 'sonner';
 import type { ClassGradeMatrixRow, GradeCategory } from '@/types/grade';
 
-/**
- * Exports gradebook matrix rows and categories to a UTF-8 BOM CSV file for Microsoft Excel.
- */
+// Exports gradebook matrix rows and categories to a UTF-8 BOM CSV file for Microsoft Excel
 export function exportGradesToCsv(
   categories: GradeCategory[],
   rows: ClassGradeMatrixRow[],
