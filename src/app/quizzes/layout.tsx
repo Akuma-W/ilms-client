@@ -1,4 +1,3 @@
-import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/header/header';
 import { Navbar } from '@/components/layout/navbar';
 import { userServerService } from '@/features/user/services/user.server.service';
@@ -13,7 +12,6 @@ export default async function QuizLayout({ children }: { children: React.ReactNo
         <Navbar />
       </div>
       <main className="flex-1">{children}</main>
-      <Footer />
     </div>
   );
 }

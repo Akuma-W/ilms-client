@@ -1,26 +1,32 @@
 import { serverApiClient } from '@/lib/api/server-api-client';
-import { getMockClassQuizzes } from '@/mocks/classes/mock-quizzes';
-import type { QuizClassItem } from '@/types/quiz';
+import type { PaginatedQuizzesResult, QueryQuizInput, Quiz } from '@/types/quiz';
 
-/**
- * Server-side service for Class Quizzes SSR.
- * Encapsulates serverApiClient and fallback to mock data when API errors or fails.
- */
 export const quizzesServerService = {
-  /**
-   * SSR fetcher for quizzes published to a class.
-   */
-  async getClassQuizzes(classId: string): Promise<QuizClassItem[]> {
+  // Loads an initial page of quizzes for server-rendered repository content
+  async getQuizzes(query: QueryQuizInput): Promise<PaginatedQuizzesResult<Quiz> | null> {
+    const params = new URLSearchParams();
+    if (query.scope) params.set('scope', query.scope);
+    if (query.search) params.set('search', query.search);
+    if (query.page) params.set('page', String(query.page));
+    if (query.limit) params.set('limit', String(query.limit));
+
     try {
-      const res = await serverApiClient<QuizClassItem[]>(`/classes/${classId}/quizzes`, {
-        ignoreAuthError: true,
-      });
-      if (res && res.success !== false && Array.isArray(res.data)) {
-        return res.data;
-      }
-      return getMockClassQuizzes(classId);
+      const res = await serverApiClient<PaginatedQuizzesResult<Quiz>>(
+        `/quizzes?${params.toString()}`,
+      );
+      return res && res.success !== false ? res.data : null;
     } catch {
-      return getMockClassQuizzes(classId);
+      return null;
+    }
+  },
+
+  // Loads a quiz blueprint for detail and edit routes
+  async getQuizById(id: string): Promise<Quiz | null> {
+    try {
+      const res = await serverApiClient<Quiz>(`/quizzes/${id}`);
+      return res && res.success !== false ? res.data : null;
+    } catch {
+      return null;
     }
   },
 };

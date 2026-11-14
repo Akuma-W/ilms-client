@@ -70,10 +70,7 @@ export function getMaterialBadgeConfig(type: FileType): MaterialBadgeConfig {
   }
 }
 
-export function resourceToPreviewItem(
-  resource: UnifiedResource,
-  topicTitle?: string,
-): PreviewItem {
+export function resourceToPreviewItem(resource: UnifiedResource, topicTitle?: string): PreviewItem {
   if (resource.kind === 'material') {
     const badge = getMaterialBadgeConfig(resource.data.materialType);
     const hasExternal = Boolean(resource.data.externalUrl);

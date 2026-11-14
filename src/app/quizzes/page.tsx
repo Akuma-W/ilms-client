@@ -1,13 +1,24 @@
 import { Metadata } from 'next';
+import { Footer } from '@/components/layout/footer';
+import { userServerService } from '@/features/user/services/user.server.service';
+import { quizzesServerService } from '@/features/quizzes/services/quizzes.server.service';
+import { QuizzesClient } from './quizzes-client';
 
 export const metadata: Metadata = {
-  title: 'Bài trắc nghiệm',
+  title: 'Kho bài trắc nghiệm & đề thi | Interactive LMS',
+  description: 'Khám phá và biên soạn ngân hàng đề thi trắc nghiệm trực tuyến',
 };
 
-export default function QuizzesPage() {
+export default async function QuizzesPage() {
+  const [user, initialData] = await Promise.all([
+    userServerService.getMe(),
+    quizzesServerService.getQuizzes({ scope: 'all', page: 1, limit: 12 }),
+  ]);
+
   return (
-    <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-      Danh sách bài trắc nghiệm đang được cập nhật.
-    </div>
+    <>
+      <QuizzesClient currentUser={user} initialData={initialData} />
+      <Footer />
+    </>
   );
 }

@@ -54,7 +54,9 @@ export function GradeAnalyticsCards({
             </p>
             <p className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
               {averageScore}{' '}
-              {hasAverage && <span className="text-xs font-normal text-muted-foreground">/ 10</span>}
+              {hasAverage && (
+                <span className="text-xs font-normal text-muted-foreground">/ 10</span>
+              )}
             </p>
           </div>
         </CardContent>

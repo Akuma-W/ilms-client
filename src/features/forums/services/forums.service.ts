@@ -1,9 +1,5 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import type {
-  CreateForumInput,
-  Forum,
-  UpdateForumInput,
-} from '@/types/forum';
+import type { CreateForumInput, Forum, UpdateForumInput } from '@/types/forum';
 
 /**
  * Client-side forums service for Browser Components (CSR, SWR, Mutations).

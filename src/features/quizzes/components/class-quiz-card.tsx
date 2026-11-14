@@ -59,7 +59,9 @@ export function ClassQuizCard({
         return (
           <Badge className="text-xs px-2.5 py-0.5 bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 gap-1 font-semibold">
             <CheckCircle2 className="size-3.5" />
-            <span>Đã làm: {scoreAchieved !== null ? `${scoreAchieved}/10` : 'Đã nộp'}</span>
+            <span>
+              Đã làm: {scoreAchieved !== null ? `${scoreAchieved}/${quiz.totalPoints ?? 10}` : 'Đã nộp'}
+            </span>
           </Badge>
         );
 
@@ -95,18 +97,18 @@ export function ClassQuizCard({
   };
 
   return (
-    <Card className="rounded-2xl border border-rose-200/80 dark:border-rose-900/50 bg-linear-to-br from-card via-card to-rose-50/70 dark:to-rose-950/30 hover:border-rose-400/80 dark:hover:border-rose-500/60 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between relative group">
+    <Card className="rounded-xl border border-rose-200/80 dark:border-rose-900/50 bg-linear-to-br from-card via-card to-rose-50/70 dark:to-rose-950/30 hover:border-rose-400/80 dark:hover:border-rose-500/60 shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between relative group">
       {/* Top Gradient Accent Bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-rose-500 via-pink-500 to-amber-500 opacity-85" />
 
-      <CardContent className="p-4 sm:p-4.5 pt-4.5 sm:pt-5 space-y-3">
+      <CardContent className="p-3 sm:p-3.5 pt-3.5 sm:pt-4 space-y-2.5">
         {/* Top Meta: Topic Badge + Status Badge */}
-        <div className="flex items-start justify-between gap-2.5">
+        <div className="flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5 min-w-0">
             {quiz.topicName && (
               <Badge
                 variant="outline"
-                className="text-xs px-2.5 py-0.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/25 font-medium max-w-55 sm:max-w-70 justify-start inline-flex items-center"
+                className="text-[11px] px-2 py-0.5 bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/25 font-medium max-w-48 sm:max-w-60 justify-start inline-flex items-center"
                 title={quiz.topicName}
               >
                 <span className="truncate text-left block w-full">{quiz.topicName}</span>
@@ -122,7 +124,7 @@ export function ClassQuizCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 rounded-lg text-muted-foreground hover:text-foreground shrink-0"
+                  className="size-7 rounded-md text-muted-foreground hover:text-foreground shrink-0"
                 >
                   <MoreVertical className="size-4" />
                 </Button>
@@ -145,7 +147,7 @@ export function ClassQuizCard({
                 </DropdownMenuItem>
                 {onUnpublish && (
                   <DropdownMenuItem
-                    onClick={() => onUnpublish(quiz.id)}
+                    onClick={() => onUnpublish(quiz.publicationId)}
                     className="text-rose-600 focus:text-rose-600 gap-2 cursor-pointer font-medium"
                   >
                     <Trash2 className="size-3.5" />
@@ -157,65 +159,68 @@ export function ClassQuizCard({
           )}
         </div>
 
-        {/* Quiz Title & Description (+1 font typography) */}
-        <div className="space-y-1.5">
-          <h3 className="text-base sm:text-lg font-bold text-foreground leading-snug line-clamp-2">
+        {/* Quiz Title & Description */}
+        <div className="space-y-1">
+          <h3 className="text-sm sm:text-base font-bold text-foreground leading-snug line-clamp-2">
             {quiz.title}
           </h3>
           {quiz.description && (
-            <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed line-clamp-2">
+            <p className="text-xs text-foreground/80 leading-relaxed line-clamp-2">
               {quiz.description}
             </p>
           )}
         </div>
 
-        {/* Core Parameters Row (+1 font) */}
-        <div className="flex flex-wrap items-center gap-y-1.5 gap-x-4 pt-1 text-xs sm:text-sm text-muted-foreground font-medium">
-          <div className="flex items-center gap-1.5">
-            <Clock className="size-4 text-primary shrink-0" />
+        {/* Core Parameters Row */}
+        <div className="flex flex-wrap items-center gap-y-1 gap-x-3 pt-0.5 text-xs text-muted-foreground font-medium">
+          <div className="flex items-center gap-1">
+            <Clock className="size-3.5 text-primary shrink-0" />
             <span>{quiz.timeLimit} phút</span>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <HelpCircle className="size-4 text-primary shrink-0" />
-            <span>{quiz.questionCount || 15} câu hỏi</span>
+          <div className="flex items-center gap-1">
+            <HelpCircle className="size-3.5 text-primary shrink-0" />
+            <span>{quiz.questionCount ?? quiz.totalQuestions ?? '—'} câu</span>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <Award className="size-4 text-amber-500 shrink-0" />
-            <span>Thang 10 điểm</span>
+          <div className="flex items-center gap-1">
+            <Award className="size-3.5 text-amber-500 shrink-0" />
+            <span>Thang {quiz.totalPoints ? quiz.totalPoints : 10} điểm</span>
           </div>
         </div>
 
         {/* Participant Count: Visible for BOTH Students and Teachers */}
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium pt-0.5">
-          <Users className="size-3.5 text-primary/80 shrink-0" />
-          <span>
-            <strong className="text-foreground">{quiz.submittedCount}</strong>/{quiz.totalStudents}{' '}
-            bạn đã tham gia làm bài
-          </span>
-        </div>
+        {quiz.submittedCount !== undefined && quiz.totalStudents !== undefined && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium pt-0.5">
+            <Users className="size-3.5 text-primary/80 shrink-0" />
+            <span>
+              <strong className="text-foreground">{quiz.submittedCount}</strong>/
+              {quiz.totalStudents} bạn đã nộp
+            </span>
+          </div>
+        )}
 
         {/* Standardized 4-State Time Row */}
-        <div className="p-2.5 rounded-xl bg-card/85 dark:bg-card/50 border border-rose-200/60 dark:border-rose-900/40 flex items-center gap-2 text-xs font-medium text-foreground/90 shadow-2xs">
+        <div className="p-2 rounded-lg bg-card/85 dark:bg-card/50 border border-rose-200/60 dark:border-rose-900/40 flex items-center gap-2 text-xs font-medium text-foreground/90 shadow-2xs">
           <Calendar className="size-3.5 text-rose-500 shrink-0" />
           <span className="truncate">{timeRowText}</span>
         </div>
       </CardContent>
 
-      {/* Card Footer Actions (text-sm button requirement) */}
-      <div className="px-4 pb-4 sm:px-4.5 sm:pb-4.5 pt-2.5 border-t border-rose-100/80 dark:border-rose-950/50 bg-rose-500/2 dark:bg-rose-500/3 flex items-center justify-between gap-3">
+      {/* Card Footer Actions */}
+      <div className="px-3 pb-3 pt-2 border-t border-rose-100/80 dark:border-rose-950/50 bg-rose-500/2 dark:bg-rose-500/3 flex items-center justify-between gap-2">
         {isTeacher ? (
           <div className="flex items-center justify-between w-full gap-2">
             <Button
-              type="button"
+              asChild
               variant="outline"
               size="sm"
-              onClick={() => onViewStats?.(quiz)}
               className="h-9 px-3.5 text-sm font-semibold rounded-xl gap-1.5 w-full sm:w-auto"
             >
-              <BarChart3 className="size-4 text-primary" />
-              <span>Xem thống kê lớp</span>
+              <Link href={`/classes/${classId}/quizzes/${quiz.publicationId}`}>
+                <BarChart3 className="size-4 text-primary" />
+                <span>Xem thống kê lớp</span>
+              </Link>
             </Button>
 
             <Button
@@ -235,32 +240,29 @@ export function ClassQuizCard({
           <div className="w-full">
             {displayStatus === 'submitted_open' || displayStatus === 'submitted_closed' ? (
               <Button
-                type="button"
                 variant="outline"
                 size="sm"
                 asChild
                 className="w-full h-9 text-sm font-semibold rounded-xl gap-1.5"
               >
-                <Link href={`/quizzes/${quiz.id}?classId=${classId}&view=result`}>
+                <Link href={`/classes/${classId}/quizzes/${quiz.publicationId}`}>
                   <CheckCircle2 className="size-4 text-violet-500" />
-                  <span>Xem lại kết quả làm bài</span>
+                  <span>Xem chi tiết & kết quả</span>
                 </Link>
               </Button>
             ) : displayStatus === 'not_submitted_open' ? (
               <Button
-                type="button"
                 size="sm"
                 asChild
                 className="w-full h-9 text-sm font-semibold rounded-xl gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white"
               >
-                <Link href={`/quizzes/${quiz.id}?classId=${classId}`}>
+                <Link href={`/classes/${classId}/quizzes/${quiz.publicationId}`}>
                   <Play className="size-4 fill-white" />
                   <span>Vào làm bài kiểm tra</span>
                 </Link>
               </Button>
             ) : displayStatus === 'upcoming' ? (
               <Button
-                type="button"
                 variant="outline"
                 size="sm"
                 disabled
@@ -270,7 +272,6 @@ export function ClassQuizCard({
               </Button>
             ) : (
               <Button
-                type="button"
                 variant="outline"
                 size="sm"
                 disabled

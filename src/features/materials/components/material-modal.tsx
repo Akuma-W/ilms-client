@@ -3,12 +3,27 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { FolderOpen, Edit, FileText } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
-  ResourceDropzone, ResourceLinkInput, ResourceBatchToolbar, ResourceQueueRow, ResourceTopicSelect,
+  ResourceDropzone,
+  ResourceLinkInput,
+  ResourceBatchToolbar,
+  ResourceQueueRow,
+  ResourceTopicSelect,
 } from '@/components/resources';
-import { formatFileSize, inferMaterialTypeFromFileName, getBaseFileName } from '@/features/upload/utils/file.utils';
+import {
+  formatFileSize,
+  inferMaterialTypeFromFileName,
+  getBaseFileName,
+} from '@/features/upload/utils/file.utils';
 import { uploadService } from '@/features/upload/services/upload.service';
 import { materialsService } from '../services/materials.service';
 import type { Topic } from '@/types/topic';
@@ -101,7 +116,8 @@ export function MaterialModal({
   const handleLinkAdded = (url: string, customTitle?: string) => {
     const materialType = inferMaterialTypeFromFileName(url);
     const domain = new URL(url).hostname;
-    const title = customTitle || (materialType === 'video' ? 'Video bài giảng' : `Tài liệu web (${domain})`);
+    const title =
+      customTitle || (materialType === 'video' ? 'Video bài giảng' : `Tài liệu web (${domain})`);
     const newItem: StagedMaterialItem = {
       id: initialData?.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       title: stagedItems[0]?.title || title,
@@ -119,7 +135,12 @@ export function MaterialModal({
   };
 
   const handleApplyBatchTitle = (commonTitle: string, numbered: boolean) => {
-    setStagedItems((prev) => prev.map((item, idx) => ({ ...item, title: numbered ? `${commonTitle} (Phần ${idx + 1})` : commonTitle })));
+    setStagedItems((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        title: numbered ? `${commonTitle} (Phần ${idx + 1})` : commonTitle,
+      })),
+    );
   };
 
   const handleClose = () => {
@@ -144,7 +165,11 @@ export function MaterialModal({
       return;
     }
     if (stagedItems.length === 0) {
-      toast.error(isEdit ? 'Vui lòng chọn hoặc tải lên tệp/link cho bài giảng' : 'Vui lòng thêm ít nhất một tệp hoặc liên kết');
+      toast.error(
+        isEdit
+          ? 'Vui lòng chọn hoặc tải lên tệp/link cho bài giảng'
+          : 'Vui lòng thêm ít nhất một tệp hoặc liên kết',
+      );
       return;
     }
 
@@ -161,7 +186,7 @@ export function MaterialModal({
         await materialsService.updateMaterial(initialData.id, {
           title: item.title,
           materialType: item.materialType,
-          fileUrl: isLink ? null : (item.file ? uploadedUrl : (item.fileUrl || uploadedUrl || null)),
+          fileUrl: isLink ? null : item.file ? uploadedUrl : item.fileUrl || uploadedUrl || null,
           externalUrl: isLink ? item.externalUrl : null,
         });
 
@@ -170,7 +195,11 @@ export function MaterialModal({
         handleClose();
       } catch (err) {
         setStagedItems((prev) =>
-          prev.map((i) => ({ ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi cập nhật' })),
+          prev.map((i) => ({
+            ...i,
+            status: 'error',
+            error: err instanceof Error ? err.message : 'Lỗi khi cập nhật',
+          })),
         );
         toast.error('Cập nhật bài giảng thất bại');
       } finally {
@@ -182,7 +211,9 @@ export function MaterialModal({
     let successCount = 0;
     for (const item of stagedItems) {
       try {
-        setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: 'uploading', progress: 30 } : i)));
+        setStagedItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, status: 'uploading', progress: 30 } : i)),
+        );
         const uploadedUrl = await uploadItemFile(item);
         setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, progress: 80 } : i)));
 
@@ -190,22 +221,30 @@ export function MaterialModal({
         await materialsService.createMaterial(targetTopicId, {
           title: item.title,
           materialType: item.materialType,
-          fileUrl: isLink ? null : (uploadedUrl || null),
+          fileUrl: isLink ? null : uploadedUrl || null,
           externalUrl: isLink ? item.externalUrl : null,
         });
 
-        setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: 'success', progress: 100 } : i)));
+        setStagedItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, status: 'success', progress: 100 } : i)),
+        );
         successCount++;
       } catch (err) {
         setStagedItems((prev) =>
-          prev.map((i) => (i.id === item.id ? { ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi lưu' } : i)),
+          prev.map((i) =>
+            i.id === item.id
+              ? { ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi lưu' }
+              : i,
+          ),
         );
       }
     }
 
     setIsSubmitting(false);
     if (successCount > 0) {
-      toast.success(`Đã lưu thành công ${successCount}/${stagedItems.length} bài giảng vào chủ đề!`);
+      toast.success(
+        `Đã lưu thành công ${successCount}/${stagedItems.length} bài giảng vào chủ đề!`,
+      );
       onSuccess();
       handleClose();
     } else {
@@ -255,12 +294,20 @@ export function MaterialModal({
                 onFilesSelected={handleFilesAdded}
                 disabled={isSubmitting}
                 multiple={!isEdit}
-                hintText={isEdit ? 'Kéo thả hoặc bấm để chọn tệp mới thay thế (PDF, Slide, Video, Word...)' : undefined}
+                hintText={
+                  isEdit
+                    ? 'Kéo thả hoặc bấm để chọn tệp mới thay thế (PDF, Slide, Video, Word...)'
+                    : undefined
+                }
               />
               <ResourceLinkInput
                 onAddLink={handleLinkAdded}
                 disabled={isSubmitting}
-                placeholder={isEdit ? 'Dán liên kết YouTube hoặc web mới để thay thế...' : 'https://youtube.com/watch?v=... hoặc dán liên kết web'}
+                placeholder={
+                  isEdit
+                    ? 'Dán liên kết YouTube hoặc web mới để thay thế...'
+                    : 'https://youtube.com/watch?v=... hoặc dán liên kết web'
+                }
               />
             </div>
           )}
@@ -316,7 +363,9 @@ export function MaterialModal({
                     error={item.error}
                     disabled={isSubmitting}
                     onTitleChange={(newTitle) =>
-                      setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, title: newTitle } : i)))
+                      setStagedItems((prev) =>
+                        prev.map((i) => (i.id === item.id ? { ...i, title: newTitle } : i)),
+                      )
                     }
                     onRemove={() => setStagedItems((prev) => prev.filter((i) => i.id !== item.id))}
                   />
@@ -328,7 +377,13 @@ export function MaterialModal({
 
         {/* Dialog Footer */}
         <DialogFooter className="gap-2 pt-3 border-t border-border/50 shrink-0">
-          <Button variant="outline" size="sm" className="rounded-lg text-xs h-8.5" onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg text-xs h-8.5"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Hủy
           </Button>
           <Button
@@ -337,7 +392,11 @@ export function MaterialModal({
             onClick={handleSubmit}
             disabled={isSubmitting || stagedItems.length === 0}
           >
-            {isSubmitting ? 'Đang tải lên...' : isEdit ? 'Lưu thay đổi' : `Lưu ${stagedItems.length} bài giảng`}
+            {isSubmitting
+              ? 'Đang tải lên...'
+              : isEdit
+                ? 'Lưu thay đổi'
+                : `Lưu ${stagedItems.length} bài giảng`}
           </Button>
         </DialogFooter>
       </DialogContent>

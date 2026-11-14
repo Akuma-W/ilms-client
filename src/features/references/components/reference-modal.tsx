@@ -3,12 +3,28 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Bookmark, Edit, FileText } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
-  ResourceDropzone, ResourceLinkInput, ResourceBatchToolbar, ResourceQueueRow, ResourceTopicSelect,
+  ResourceDropzone,
+  ResourceLinkInput,
+  ResourceBatchToolbar,
+  ResourceQueueRow,
+  ResourceTopicSelect,
 } from '@/components/resources';
-import { formatFileSize, inferMaterialTypeFromFileName, getBaseFileName, isDirectFileUrl } from '@/features/upload/utils/file.utils';
+import {
+  formatFileSize,
+  inferMaterialTypeFromFileName,
+  getBaseFileName,
+  isDirectFileUrl,
+} from '@/features/upload/utils/file.utils';
 import { uploadService } from '@/features/upload/services/upload.service';
 import { referencesService } from '../services/references.service';
 import type { Topic } from '@/types/topic';
@@ -71,17 +87,19 @@ export function ReferenceModal({
     if (files.length === 0) return;
     if (isEdit) {
       const file = files[0];
-      setStagedItems([{
-        id: initialData?.id || `${Date.now()}`,
-        file,
-        title: stagedItems[0]?.title || getBaseFileName(file.name),
-        url: '',
-        isFile: true,
-        fileSizeFormatted: formatFileSize(file.size),
-        subtitle: `Tệp mới: ${file.name} (${formatFileSize(file.size)})`,
-        progress: 0,
-        status: 'idle',
-      }]);
+      setStagedItems([
+        {
+          id: initialData?.id || `${Date.now()}`,
+          file,
+          title: stagedItems[0]?.title || getBaseFileName(file.name),
+          url: '',
+          isFile: true,
+          fileSizeFormatted: formatFileSize(file.size),
+          subtitle: `Tệp mới: ${file.name} (${formatFileSize(file.size)})`,
+          progress: 0,
+          status: 'idle',
+        },
+      ]);
       return;
     }
     const newItems: StagedReferenceItem[] = files.map((file) => ({
@@ -119,7 +137,12 @@ export function ReferenceModal({
   };
 
   const handleApplyBatchTitle = (commonTitle: string, numbered: boolean) => {
-    setStagedItems((prev) => prev.map((item, idx) => ({ ...item, title: numbered ? `${commonTitle} (Phần ${idx + 1})` : commonTitle })));
+    setStagedItems((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        title: numbered ? `${commonTitle} (Phần ${idx + 1})` : commonTitle,
+      })),
+    );
   };
 
   const handleClose = () => {
@@ -146,7 +169,11 @@ export function ReferenceModal({
       return;
     }
     if (stagedItems.length === 0) {
-      toast.error(isEdit ? 'Vui lòng chọn hoặc tải lên tệp/link tham khảo' : 'Vui lòng thêm ít nhất một tệp hoặc liên kết tham khảo');
+      toast.error(
+        isEdit
+          ? 'Vui lòng chọn hoặc tải lên tệp/link tham khảo'
+          : 'Vui lòng thêm ít nhất một tệp hoặc liên kết tham khảo',
+      );
       return;
     }
 
@@ -170,7 +197,11 @@ export function ReferenceModal({
         handleClose();
       } catch (err) {
         setStagedItems((prev) =>
-          prev.map((i) => ({ ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi cập nhật' })),
+          prev.map((i) => ({
+            ...i,
+            status: 'error',
+            error: err instanceof Error ? err.message : 'Lỗi khi cập nhật',
+          })),
         );
         toast.error('Cập nhật tài liệu tham khảo thất bại');
       } finally {
@@ -182,7 +213,9 @@ export function ReferenceModal({
     let successCount = 0;
     for (const item of stagedItems) {
       try {
-        setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: 'uploading', progress: 30 } : i)));
+        setStagedItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, status: 'uploading', progress: 30 } : i)),
+        );
         const finalUrl = await uploadItemFile(item);
         setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, progress: 80 } : i)));
 
@@ -192,11 +225,17 @@ export function ReferenceModal({
           description: item.description,
         });
 
-        setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: 'success', progress: 100 } : i)));
+        setStagedItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, status: 'success', progress: 100 } : i)),
+        );
         successCount++;
       } catch (err) {
         setStagedItems((prev) =>
-          prev.map((i) => (i.id === item.id ? { ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi lưu' } : i)),
+          prev.map((i) =>
+            i.id === item.id
+              ? { ...i, status: 'error', error: err instanceof Error ? err.message : 'Lỗi khi lưu' }
+              : i,
+          ),
         );
       }
     }
@@ -253,13 +292,21 @@ export function ReferenceModal({
                 onFilesSelected={handleFilesAdded}
                 disabled={isSubmitting}
                 multiple={!isEdit}
-                hintText={isEdit ? 'Kéo thả hoặc bấm để chọn tệp tài liệu tham khảo mới (PDF, Word, Slide...)' : 'Tải lên tài liệu tham khảo PDF, EPUB, Word, Slide... (tối đa 50MB)'}
+                hintText={
+                  isEdit
+                    ? 'Kéo thả hoặc bấm để chọn tệp tài liệu tham khảo mới (PDF, Word, Slide...)'
+                    : 'Tải lên tài liệu tham khảo PDF, EPUB, Word, Slide... (tối đa 50MB)'
+                }
               />
               <ResourceLinkInput
                 onAddLink={handleLinkAdded}
                 disabled={isSubmitting}
                 showDescription={true}
-                placeholder={isEdit ? 'Dán liên kết tài liệu đọc thêm mới...' : 'https://wikipedia.org/... hoặc liên kết tài liệu đọc thêm'}
+                placeholder={
+                  isEdit
+                    ? 'Dán liên kết tài liệu đọc thêm mới...'
+                    : 'https://wikipedia.org/... hoặc liên kết tài liệu đọc thêm'
+                }
               />
             </div>
           )}
@@ -270,7 +317,9 @@ export function ReferenceModal({
               <div className="flex items-center gap-1.5">
                 <FileText className="size-3.5 text-muted-foreground" />
                 <span className="text-xs font-semibold text-foreground">
-                  {isEdit ? 'Tài liệu tham khảo' : `Danh sách tài liệu tham khảo (${stagedItems.length})`}
+                  {isEdit
+                    ? 'Tài liệu tham khảo'
+                    : `Danh sách tài liệu tham khảo (${stagedItems.length})`}
                 </span>
               </div>
               {isEdit && stagedItems.length > 0 && (
@@ -308,14 +357,18 @@ export function ReferenceModal({
                     key={item.id}
                     id={item.id}
                     title={item.title}
-                    materialType={item.isFile ? inferMaterialTypeFromFileName(item.title) : undefined}
+                    materialType={
+                      item.isFile ? inferMaterialTypeFromFileName(item.title) : undefined
+                    }
                     subtitle={item.subtitle}
                     progress={item.progress}
                     status={item.status}
                     error={item.error}
                     disabled={isSubmitting}
                     onTitleChange={(newTitle) =>
-                      setStagedItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, title: newTitle } : i)))
+                      setStagedItems((prev) =>
+                        prev.map((i) => (i.id === item.id ? { ...i, title: newTitle } : i)),
+                      )
                     }
                     onRemove={() => setStagedItems((prev) => prev.filter((i) => i.id !== item.id))}
                   />
@@ -327,7 +380,13 @@ export function ReferenceModal({
 
         {/* Dialog Footer */}
         <DialogFooter className="gap-2 pt-3 border-t border-border/50 shrink-0">
-          <Button variant="outline" size="sm" className="rounded-lg text-xs h-8.5" onClick={handleClose} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg text-xs h-8.5"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Hủy
           </Button>
           <Button
@@ -336,7 +395,11 @@ export function ReferenceModal({
             onClick={handleSubmit}
             disabled={isSubmitting || stagedItems.length === 0}
           >
-            {isSubmitting ? 'Đang tải lên...' : isEdit ? 'Lưu thay đổi' : `Lưu ${stagedItems.length} tài liệu`}
+            {isSubmitting
+              ? 'Đang tải lên...'
+              : isEdit
+                ? 'Lưu thay đổi'
+                : `Lưu ${stagedItems.length} tài liệu`}
           </Button>
         </DialogFooter>
       </DialogContent>

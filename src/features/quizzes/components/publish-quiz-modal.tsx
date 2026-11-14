@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Calendar, CheckCircle2, Clock, HelpCircle, Loader2 } from 'lucide-react';
+import { Loader2, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -15,246 +13,207 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { getAllMockQuizzes } from '@/mocks/classes/mock-quizzes';
-import { publishQuizSchema, type PublishQuizFormData } from '../schemas/quiz.schema';
+import { useClasses } from '@/features/classes/hooks/use-classes';
+import { topicsService } from '@/features/topics/services/topics.service';
 import { quizzesService } from '../services/quizzes.service';
+import { quizPublicationsService } from '../services/quiz-publications.service';
+import { formatDateTimeLocal } from '../utils/quiz.utils';
+import { PublishQuizFormFields } from './publish-quiz-form-fields';
+import { ClassTabs } from '@/types/enum';
 import type { Quiz } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
 
 interface PublishQuizModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  preselectedQuiz?: Quiz;
+  preselectedClassId?: string;
+  preselectedClassName?: string;
   topics?: Topic[];
-  onSubmit: (data: PublishQuizFormData, topicName?: string) => Promise<void>;
+  onSuccess?: () => void;
 }
 
-/**
- * Formats a Date object to local YYYY-MM-DDTHH:mm string for datetime-local input.
- */
-function formatForDateTimeInput(d: Date): string {
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  const year = d.getFullYear();
-  const month = pad(d.getMonth() + 1);
-  const day = pad(d.getDate());
-  const hours = pad(d.getHours());
-  const minutes = pad(d.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-/**
- * Modal for teachers to publish an existing quiz into the classroom workspace.
- * Allows choosing quiz from repository, associating with topic, and setting active window.
- */
 export function PublishQuizModal({
   isOpen,
   onOpenChange,
-  topics = [],
-  onSubmit,
+  preselectedQuiz,
+  preselectedClassId,
+  preselectedClassName,
+  topics: initialTopics = [],
+  onSuccess,
 }: PublishQuizModalProps) {
-  const safeTopics = useMemo(() => (Array.isArray(topics) ? topics : []), [topics]);
-  const fallbackQuizzes = useMemo(() => getAllMockQuizzes(), []);
+  const [selectedQuizId, setSelectedQuizId] = useState(preselectedQuiz?.id || '');
+  const [selectedClassId, setSelectedClassId] = useState(preselectedClassId || '');
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ quiz?: boolean; class?: boolean; topic?: boolean }>({});
 
-  const { data: availableQuizzes = fallbackQuizzes, isLoading: isLoadingQuizzes } = useSWR<Quiz[]>(
-    isOpen ? 'available-quizzes' : null,
+  const [openAt, setOpenAt] = useState(() => formatDateTimeLocal(new Date()));
+  const [closeAt, setCloseAt] = useState(() =>
+    formatDateTimeLocal(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+  );
+
+  // Fetch teacher quizzes if not preselected
+  const { data: availableQuizzes = [], isLoading: isLoadingQuizzes } = useSWR<Quiz[]>(
+    isOpen && !preselectedQuiz ? 'teacher-available-quizzes' : null,
     () => quizzesService.getAvailableQuizzes(),
+  );
+
+  // Fetch teacher created classes if not preselected
+  const { classes: teacherClasses = [], isLoading: isLoadingClasses } = useClasses({
+    tab: ClassTabs.CREATED,
+    page: 1,
+    limit: 50,
+  });
+
+  const effectiveQuizId = preselectedQuiz?.id || selectedQuizId;
+  const effectiveClassId = preselectedClassId || selectedClassId;
+
+  // Dynamically fetch topics for chosen class
+  const { data: classTopics = [], isLoading: isLoadingTopics } = useSWR<Topic[]>(
+    isOpen && effectiveClassId && effectiveClassId !== 'unselected'
+      ? ['class-topics-for-publish', effectiveClassId]
+      : null,
+    () => topicsService.getTopics(effectiveClassId),
     {
-      fallbackData: fallbackQuizzes,
+      fallbackData: preselectedClassId && initialTopics.length > 0 ? initialTopics : undefined,
     },
   );
 
-  const initialQuizzes = availableQuizzes.length > 0 ? availableQuizzes : fallbackQuizzes;
-
-  const defaultDates = useMemo(() => {
-    const open = new Date();
-    const close = new Date(open.getTime() + 7 * 24 * 60 * 60 * 1000);
-    return {
-      openAt: formatForDateTimeInput(open),
-      closeAt: formatForDateTimeInput(close),
-    };
-  }, []);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<PublishQuizFormData>({
-    resolver: zodResolver(publishQuizSchema),
-    defaultValues: {
-      quizId: initialQuizzes[0]?.id || '',
-      topicId: safeTopics[0]?.id || '',
-      openAt: defaultDates.openAt,
-      closeAt: defaultDates.closeAt,
-    },
-  });
-
+  // Resets state only when modal opens
   useEffect(() => {
     if (isOpen) {
-      const activeList = availableQuizzes.length > 0 ? availableQuizzes : fallbackQuizzes;
-      const open = new Date();
-      const close = new Date(open.getTime() + 7 * 24 * 60 * 60 * 1000);
-      reset({
-        quizId: activeList[0]?.id || '',
-        topicId: safeTopics[0]?.id || '',
-        openAt: formatForDateTimeInput(open),
-        closeAt: formatForDateTimeInput(close),
-      });
+      setSelectedQuizId(preselectedQuiz?.id || '');
+      setSelectedClassId(preselectedClassId || '');
+      setSelectedTopicId('');
+      setErrors({});
+      setIsPublic(false);
+      setOpenAt(formatDateTimeLocal(new Date()));
+      setCloseAt(formatDateTimeLocal(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)));
     }
-  }, [isOpen, reset, safeTopics, availableQuizzes, fallbackQuizzes]);
+  }, [isOpen, preselectedQuiz?.id, preselectedClassId]);
 
-  const handleFormSubmit = async (values: PublishQuizFormData) => {
+  const handlePublish = async () => {
+    const newErrors: { quiz?: boolean; class?: boolean; topic?: boolean } = {};
+    if (!effectiveQuizId || effectiveQuizId === 'unselected') newErrors.quiz = true;
+    if (!effectiveClassId || effectiveClassId === 'unselected') newErrors.class = true;
+    if (!selectedTopicId || selectedTopicId === 'unselected') newErrors.topic = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      if (newErrors.quiz) toast.error('Vui lòng chọn đề thi trắc nghiệm');
+      else if (newErrors.class) toast.error('Vui lòng chọn lớp học nhận bài thi');
+      else if (newErrors.topic) toast.error('Vui lòng chọn chủ đề bài học (Topic)');
+      return;
+    }
+
+    const openingTime = new Date(openAt);
+    const closingTime = new Date(closeAt);
+    if (
+      Number.isNaN(openingTime.getTime()) ||
+      Number.isNaN(closingTime.getTime()) ||
+      closingTime <= openingTime
+    ) {
+      toast.error('Thời gian đóng bài phải sau thời gian mở bài');
+      return;
+    }
+
     try {
-      const selectedTopic = safeTopics.find((t) => t.id === values.topicId);
-      await onSubmit(values, selectedTopic?.title);
+      setIsSubmitting(true);
+      const res = await quizPublicationsService.publishQuiz(effectiveClassId, {
+        quizId: effectiveQuizId,
+        topicId: selectedTopicId === 'none' ? null : selectedTopicId,
+        openAt: openingTime.toISOString(),
+        closeAt: closingTime.toISOString(),
+        isPublic,
+      });
+
+      toast.success(res.message || 'Xuất bản bài thi vào lớp học thành công!');
       onOpenChange(false);
-    } catch {
-      toast.error('Có lỗi xảy ra khi xuất bản bài thi. Vui lòng thử lại!');
+      onSuccess?.();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể xuất bản bài thi');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl p-5 sm:p-6">
-        <DialogHeader className="space-y-1 text-left pb-2 border-b border-border/60">
-          <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
-            <CheckCircle2 className="size-5 text-rose-500" />
-            <span>Xuất bản bài trắc nghiệm vào lớp</span>
+      <DialogContent className="sm:max-w-xl rounded-md border border-slate-200 dark:border-slate-800 p-6">
+        <DialogHeader>
+          <DialogTitle className="text-base font-bold flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-indigo-600" />
+            Xuất bản bài thi vào lớp học
           </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
-            Chọn đề thi có sẵn từ kho bài thi cá nhân và thiết lập thời hạn làm bài cho lớp.
+          <DialogDescription className="text-xs text-slate-500">
+            Ấn định lịch mở, hạn nộp và chủ đề bài học để sinh viên trong lớp tham gia làm bài.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 pt-2">
-          {/* Quiz Selection */}
-          <div className="space-y-1.5">
-            <Label htmlFor="quiz-select" className="text-xs font-bold text-foreground">
-              Đề thi trắc nghiệm <span className="text-rose-500">*</span>
-            </Label>
-            {isLoadingQuizzes ? (
-              <div className="h-10 rounded-xl bg-muted/50 animate-pulse flex items-center px-3 text-xs text-muted-foreground">
-                Đang tải danh sách bài thi...
-              </div>
-            ) : availableQuizzes.length === 0 ? (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300">
-                Kho bài thi cá nhân chưa có đề nào. Bạn có thể soạn đề mới tại phân hệ Quiz.
-              </div>
+        <PublishQuizFormFields
+          preselectedQuiz={preselectedQuiz}
+          selectedQuizId={selectedQuizId}
+          onSelectQuizId={(id) => {
+            setSelectedQuizId(id);
+            setErrors((prev) => ({ ...prev, quiz: false }));
+          }}
+          availableQuizzes={availableQuizzes}
+          isLoadingQuizzes={isLoadingQuizzes}
+          preselectedClassId={preselectedClassId}
+          preselectedClassName={preselectedClassName}
+          selectedClassId={selectedClassId}
+          onSelectClassId={(id) => {
+            setSelectedClassId(id);
+            setSelectedTopicId('');
+            setErrors((prev) => ({ ...prev, class: false }));
+          }}
+          teacherClasses={teacherClasses}
+          isLoadingClasses={isLoadingClasses}
+          selectedTopicId={selectedTopicId}
+          onSelectTopicId={(id) => {
+            setSelectedTopicId(id);
+            setErrors((prev) => ({ ...prev, topic: false }));
+          }}
+          classTopics={classTopics}
+          isLoadingTopics={isLoadingTopics}
+          openAt={openAt}
+          onOpenAtChange={setOpenAt}
+          closeAt={closeAt}
+          onCloseAtChange={setCloseAt}
+          isPublic={isPublic}
+          onIsPublicChange={setIsPublic}
+          errors={errors}
+        />
+
+        <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            className="text-xs rounded-md"
+          >
+            Hủy bỏ
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handlePublish}
+            disabled={isSubmitting}
+            className="text-xs rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Đang xuất bản...
+              </>
             ) : (
-              <select
-                id="quiz-select"
-                {...register('quizId')}
-                className="w-full h-10 px-3 text-sm rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary cursor-pointer"
-              >
-                {availableQuizzes.map((q) => (
-                  <option key={q.id} value={q.id}>
-                    {q.title} ({q.timeLimit} phút - {q.questionCount || 15} câu)
-                  </option>
-                ))}
-              </select>
+              'Xuất bản bài thi'
             )}
-            {errors.quizId && (
-              <p className="text-xs text-rose-500 font-medium">{errors.quizId.message}</p>
-            )}
-          </div>
-
-          {/* Topic Association */}
-          <div className="space-y-1.5">
-            <Label htmlFor="topic-select" className="text-xs font-bold text-foreground">
-              Chủ đề bài học (Topic)
-            </Label>
-            <select
-              id="topic-select"
-              {...register('topicId')}
-              className="w-full h-10 px-3 text-sm rounded-xl border border-border bg-background focus:ring-1 focus:ring-primary cursor-pointer"
-            >
-              <option value="">-- Không gắn chủ đề (Bài thi chung) --</option>
-              {topics.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Timeline Row (openAt & closeAt) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="open-at-input"
-                className="text-xs font-bold text-foreground flex items-center gap-1.5"
-              >
-                <Calendar className="size-3.5 text-primary" />
-                <span>Thời gian mở bài</span> <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                type="datetime-local"
-                id="open-at-input"
-                {...register('openAt')}
-                className="text-sm rounded-xl"
-              />
-              {errors.openAt && (
-                <p className="text-xs text-rose-500 font-medium">{errors.openAt.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label
-                htmlFor="close-at-input"
-                className="text-xs font-bold text-foreground flex items-center gap-1.5"
-              >
-                <Clock className="size-3.5 text-rose-500" />
-                <span>Hạn chót đóng bài</span> <span className="text-rose-500">*</span>
-              </Label>
-              <Input
-                type="datetime-local"
-                id="close-at-input"
-                {...register('closeAt')}
-                className="text-sm rounded-xl"
-              />
-              {errors.closeAt && (
-                <p className="text-xs text-rose-500 font-medium">{errors.closeAt.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-muted-foreground flex items-start gap-2">
-            <HelpCircle className="size-4 text-primary shrink-0 mt-0.5" />
-            <span>
-              Bài trắc nghiệm sau khi xuất bản sẽ hiển thị ngay trong danh sách của lớp. Sinh viên
-              sẽ chỉ được làm bài trong khoảng thời gian mở và đóng đã cấu hình.
-            </span>
-          </div>
-
-          <DialogFooter className="pt-3 border-t border-border/50 flex flex-col sm:flex-row items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-              className="w-full sm:w-auto h-9 text-sm rounded-xl"
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={isSubmitting || availableQuizzes.length === 0}
-              className="w-full sm:w-auto h-9 text-sm font-semibold rounded-xl gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="size-3.5 animate-spin" />
-                  <span>Đang xuất bản...</span>
-                </>
-              ) : (
-                <span>Xuất bản vào lớp</span>
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

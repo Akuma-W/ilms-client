@@ -1,6 +1,6 @@
 'use client';
 
-import { Award, CheckCircle2, Clock, HelpCircle, TrendingUp, Users } from 'lucide-react';
+import { Award, CheckCircle2, Clock, HelpCircle, TrendingUp } from 'lucide-react';
 
 interface QuizKpiStripProps {
   isTeacher: boolean;
@@ -22,7 +22,7 @@ export function QuizKpiStrip({
   studentAvgScore,
 }: QuizKpiStripProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${isTeacher ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
       {isTeacher ? (
         <>
           <div className="p-3.5 rounded-2xl border border-border/80 bg-card shadow-2xs space-y-1">
@@ -41,14 +41,6 @@ export function QuizKpiStrip({
             <p className="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400">
               {openCount} bài
             </p>
-          </div>
-
-          <div className="p-3.5 rounded-2xl border border-border/80 bg-card shadow-2xs space-y-1 col-span-2 sm:col-span-1">
-            <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-              <Users className="size-4 text-primary" />
-              <span>Tỉ lệ hoàn thành lớp</span>
-            </span>
-            <p className="text-lg sm:text-xl font-bold text-primary">~88.5%</p>
           </div>
         </>
       ) : (

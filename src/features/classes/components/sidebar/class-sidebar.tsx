@@ -13,13 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import {
   ArrowLeft,
-  BookOpen,
-  CheckSquare,
   ChevronLeft,
   ChevronRight,
-  ClipboardList,
-  FileText,
-  MessagesSquare,
   Star,
 } from 'lucide-react';
 import { DeadlineWidget } from './deadline-widget';
@@ -44,17 +39,6 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
 
   const classId = params?.id as string | undefined;
 
-  // Classroom-specific navigation items when viewing a specific class
-  const classroomNavItems = classId
-    ? [
-        { label: 'Tổng quan', href: `/classes/${classId}/overview`, icon: BookOpen },
-        { label: 'Tài liệu', href: `/classes/${classId}/materials`, icon: FileText },
-        { label: 'Bài tập', href: `/classes/${classId}/assignments`, icon: ClipboardList },
-        { label: 'Trắc nghiệm', href: `/classes/${classId}/quizzes`, icon: CheckSquare },
-        { label: 'Thảo luận', href: `/classes/${classId}/forum`, icon: MessagesSquare },
-      ]
-    : [];
-
   const isGlobalNavActive = (itemHref: string) => {
     const url = new URL(itemHref, 'http://localhost');
     const itemPath = url.pathname;
@@ -70,7 +54,7 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
     <motion.div
       initial={false}
       animate={{ width: isCollapsed ? 76 : 272 }}
-      className="h-full flex flex-col z-40 bg-gradient-to-b from-indigo-50/90 via-purple-50/75 to-slate-50/90 dark:from-slate-900/95 dark:via-purple-950/20 dark:to-slate-900/95 border-r border-indigo-200/70 text-slate-900 dark:text-slate-100 shadow-xs transition-all duration-200 select-none shrink-0"
+      className="h-full flex flex-col z-40 bg-linear-to-b from-indigo-50/90 via-purple-50/75 to-slate-50/90 dark:from-slate-900/95 dark:via-purple-950/20 dark:to-slate-900/95 border-r border-indigo-200/70 text-slate-900 dark:text-slate-100 shadow-xs transition-all duration-200 select-none shrink-0"
     >
       {/* Top Action Row: Header label & collapse toggle */}
       <div
@@ -98,118 +82,75 @@ export function ClassSidebar({ initialStarredClasses }: ClassSidebarProps) {
       {/* Main Independent Scrolling Navigation */}
       <ScrollArea className="flex-1 py-3 px-2.5">
         <div className="space-y-4">
-          {/* Active Class Context: Back button & classroom jump tabs */}
-          {classId ? (
-            <div className="space-y-1">
-              {/* Back to class list button */}
+          {/* Active Class Context Banner */}
+          {classId && (
+            <div className="px-1 mb-2">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
                     href="/classes?tab=joined"
                     className={cn(
-                      'flex items-center gap-2.5 rounded-xl text-xs font-bold text-slate-800 hover:text-indigo-950 hover:bg-white/80 border border-indigo-200/60 shadow-2xs transition-all mb-2 group',
+                      'flex items-center gap-2.5 rounded-xl text-xs font-bold text-indigo-950 bg-indigo-100/70 dark:bg-indigo-950/40 hover:bg-white border border-indigo-200/80 shadow-2xs transition-all group',
                       isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2',
                     )}
                   >
-                    <ArrowLeft className="w-4 h-4 shrink-0 group-hover:-translate-x-0.5 transition-transform" />
-                    {!isCollapsed && <span className="truncate">Danh sách lớp</span>}
+                    <ArrowLeft className="w-4 h-4 shrink-0 group-hover:-translate-x-0.5 transition-transform text-indigo-600" />
+                    {!isCollapsed && <span className="truncate">Đổi / Xem lớp khác</span>}
                   </Link>
                 </TooltipTrigger>
                 {isCollapsed && (
                   <TooltipContent side="right" className="bg-slate-900 text-white border-slate-800">
-                    Danh sách lớp
+                    Đổi / Xem lớp khác
                   </TooltipContent>
                 )}
               </Tooltip>
-
-              {!isCollapsed && (
-                <h3 className="px-3 mb-2 text-[11px] font-black uppercase tracking-wider text-indigo-950/80">
-                  Nội dung lớp học
-                </h3>
-              )}
-
-              {classroomNavItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
-                return (
-                  <Tooltip key={item.label}>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          'flex items-center gap-3 rounded-xl transition-all relative group',
-                          isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
-                          isActive
-                            ? 'bg-galaxy text-white shadow-md shadow-indigo-900/20 font-bold'
-                            : 'text-slate-800 font-semibold hover:text-indigo-950 hover:bg-white/75 hover:shadow-2xs',
-                        )}
-                      >
-                        <item.icon
-                          className={cn(
-                            'w-4.5 h-4.5 shrink-0',
-                            isActive ? 'text-white' : 'group-hover:scale-105 transition-transform',
-                          )}
-                        />
-                        {!isCollapsed && <span className="text-sm font-bold">{item.label}</span>}
-                      </Link>
-                    </TooltipTrigger>
-                    {isCollapsed && (
-                      <TooltipContent
-                        side="right"
-                        className="bg-slate-900 text-white border-slate-800"
-                      >
-                        {item.label}
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                );
-              })}
-            </div>
-          ) : (
-            /* Global Class Navigation */
-            <div className="space-y-1">
-              {!isCollapsed && (
-                <h3 className="px-3 mb-2 text-[11px] font-black uppercase tracking-wider text-indigo-950/80">
-                  Menu chính
-                </h3>
-              )}
-
-              {CLASS_SIDEBAR_NAV.map((item) => {
-                const active = isGlobalNavActive(item.href);
-                return (
-                  <Tooltip key={item.label}>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          'flex items-center gap-3 rounded-xl transition-all relative group',
-                          isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
-                          active
-                            ? 'bg-galaxy text-white shadow-md shadow-indigo-900/20 font-bold'
-                            : 'text-slate-800 font-semibold hover:text-indigo-950 hover:bg-white/75 hover:shadow-2xs',
-                        )}
-                      >
-                        <item.icon
-                          className={cn(
-                            'w-4.5 h-4.5 shrink-0',
-                            active ? 'text-white' : 'group-hover:scale-105 transition-transform',
-                          )}
-                        />
-                        {!isCollapsed && <span className="text-sm font-bold">{item.label}</span>}
-                      </Link>
-                    </TooltipTrigger>
-                    {isCollapsed && (
-                      <TooltipContent
-                        side="right"
-                        className="bg-slate-900 text-white border-slate-800"
-                      >
-                        {item.label}
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                );
-              })}
             </div>
           )}
+
+          {/* Global Main Menu (Always accessible whether inside or outside a class) */}
+          <div className="space-y-1">
+            {!isCollapsed && (
+              <h3 className="px-3 mb-2 text-[11px] font-black uppercase tracking-wider text-indigo-950/80">
+                Menu chính
+              </h3>
+            )}
+
+            {CLASS_SIDEBAR_NAV.map((item) => {
+              const active = isGlobalNavActive(item.href);
+              return (
+                <Tooltip key={item.label}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        'flex items-center gap-3 rounded-xl transition-all relative group',
+                        isCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
+                        active
+                          ? 'bg-galaxy text-white shadow-md shadow-indigo-900/20 font-bold'
+                          : 'text-slate-800 font-semibold hover:text-indigo-950 hover:bg-white/75 hover:shadow-2xs',
+                      )}
+                    >
+                      <item.icon
+                        className={cn(
+                          'w-4.5 h-4.5 shrink-0',
+                          active ? 'text-white' : 'group-hover:scale-105 transition-transform',
+                        )}
+                      />
+                      {!isCollapsed && <span className="text-sm font-bold">{item.label}</span>}
+                    </Link>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent
+                      side="right"
+                      className="bg-slate-900 text-white border-slate-800"
+                    >
+                      {item.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              );
+            })}
+          </div>
 
           <Separator className="bg-indigo-200/70" />
 

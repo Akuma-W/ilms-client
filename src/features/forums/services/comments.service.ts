@@ -1,9 +1,5 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import type {
-  Comment,
-  CreateCommentInput,
-  UpdateCommentInput,
-} from '@/types/forum';
+import type { Comment, CreateCommentInput, UpdateCommentInput } from '@/types/forum';
 
 /**
  * Client-side comments service for Browser Components (CSR, Mutations).
@@ -59,13 +55,10 @@ export const commentsService = {
     input: UpdateCommentInput,
   ): Promise<{ success: boolean; data?: Comment; message: string }> {
     try {
-      const res = await clientApiClient<Comment>(
-        `/forums/${forumId}/comments/${commentId}`,
-        {
-          method: 'PATCH',
-          body: JSON.stringify(input),
-        },
-      );
+      const res = await clientApiClient<Comment>(`/forums/${forumId}/comments/${commentId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(input),
+      });
       if (res && res.success !== false && res.data) {
         return { success: true, data: res.data, message: 'Đã cập nhật bình luận!' };
       }
@@ -90,12 +83,9 @@ export const commentsService = {
     commentId: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const res = await clientApiClient<unknown>(
-        `/forums/${forumId}/comments/${commentId}`,
-        {
-          method: 'DELETE',
-        },
-      );
+      const res = await clientApiClient<unknown>(`/forums/${forumId}/comments/${commentId}`, {
+        method: 'DELETE',
+      });
       if (res && res.success !== false) {
         return { success: true, message: 'Đã xóa bình luận thành công.' };
       }

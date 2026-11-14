@@ -185,11 +185,17 @@ export function FilePreviewModal({ item, isOpen, onOpenChange }: FilePreviewModa
               <div className="size-12 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center mx-auto">
                 <LinkIcon className="size-6" />
               </div>
-              <h4 className="text-base font-semibold text-foreground">Liên kết tài nguyên bên ngoài</h4>
+              <h4 className="text-base font-semibold text-foreground">
+                Liên kết tài nguyên bên ngoài
+              </h4>
               {current.description && (
-                <p className="text-sm text-muted-foreground leading-relaxed">{current.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {current.description}
+                </p>
               )}
-              <p className="text-xs text-muted-foreground truncate font-mono">{current.externalUrl}</p>
+              <p className="text-xs text-muted-foreground truncate font-mono">
+                {current.externalUrl}
+              </p>
             </div>
           ) : hasAssignmentMaterials ? (
             <div className="space-y-4 my-auto">
@@ -228,7 +234,12 @@ export function FilePreviewModal({ item, isOpen, onOpenChange }: FilePreviewModa
                           <Eye className="size-3.5" />
                           Xem trước
                         </Button>
-                        <Button size="sm" variant="default" asChild className="h-8 px-2.5 text-xs gap-1.5 bg-cyan-600 hover:bg-cyan-700 text-white">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          asChild
+                          className="h-8 px-2.5 text-xs gap-1.5 bg-cyan-600 hover:bg-cyan-700 text-white"
+                        >
                           <a
                             href={resolveStorageUrl(mat.fileUrl)}
                             download={mat.title}
@@ -261,13 +272,22 @@ export function FilePreviewModal({ item, isOpen, onOpenChange }: FilePreviewModa
 
         {/* Footer */}
         <DialogFooter className="flex flex-row items-center justify-between sm:justify-between pt-3 border-t border-border/50 shrink-0">
-          <Button variant="outline" size="sm" onClick={() => handleOpenChange(false)} className="text-xs rounded-xl">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenChange(false)}
+            className="text-xs rounded-xl"
+          >
             Đóng
           </Button>
 
           <div className="flex items-center gap-2">
             {ytEmbed && current.externalUrl && (
-              <Button size="sm" asChild className="bg-red-600 hover:bg-red-700 text-white text-xs rounded-xl gap-1.5">
+              <Button
+                size="sm"
+                asChild
+                className="bg-red-600 hover:bg-red-700 text-white text-xs rounded-xl gap-1.5"
+              >
                 <a href={current.externalUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="size-3.5" />
                   Mở trên YouTube
@@ -283,8 +303,17 @@ export function FilePreviewModal({ item, isOpen, onOpenChange }: FilePreviewModa
                     Mở tab mới
                   </a>
                 </Button>
-                <Button size="sm" asChild className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-xl gap-1.5">
-                  <a href={resolvedUrl} download={displayName} target="_blank" rel="noopener noreferrer">
+                <Button
+                  size="sm"
+                  asChild
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs rounded-xl gap-1.5"
+                >
+                  <a
+                    href={resolvedUrl}
+                    download={displayName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Download className="size-3.5" />
                     Tải tệp tin
                   </a>
@@ -293,7 +322,11 @@ export function FilePreviewModal({ item, isOpen, onOpenChange }: FilePreviewModa
             )}
 
             {isLinkOnly && current.externalUrl && (
-              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-xl gap-1.5">
+              <Button
+                size="sm"
+                asChild
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-xl gap-1.5"
+              >
                 <a href={current.externalUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="size-3.5" />
                   Mở liên kết

@@ -229,11 +229,7 @@ export function ResourceCard({
         {item.kind === 'material' && (
           <>
             {item.data.externalUrl ? (
-              <ActionBtn
-                icon={ExternalLink}
-                tooltip="Mở liên kết"
-                href={item.data.externalUrl}
-              />
+              <ActionBtn icon={ExternalLink} tooltip="Mở liên kết" href={item.data.externalUrl} />
             ) : (
               <ActionBtn
                 icon={Download}

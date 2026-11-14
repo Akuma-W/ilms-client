@@ -5,19 +5,12 @@ import {
   getMockStudentRecord,
   updateMockBatchScores,
 } from '@/mocks/classes/mock-grades';
-import type {
-  ClassGradeMatrixRow,
-  GradeCategory,
-  StudentGradeRecord,
-} from '@/types/grade';
+import type { ClassGradeMatrixRow, GradeCategory, StudentGradeRecord } from '@/types/grade';
 
 // Service managing student gradebooks and classroom grade matrix
 export const gradesService = {
   // Retrieves personal grade record for a student (Categories breakdown + detailed items)
-  async getStudentGradeRecord(
-    classId: string,
-    studentId?: string,
-  ): Promise<StudentGradeRecord> {
+  async getStudentGradeRecord(classId: string, studentId?: string): Promise<StudentGradeRecord> {
     try {
       const endpoint = studentId
         ? `/classes/${classId}/grades/my-record?studentId=${studentId}`
@@ -47,9 +40,7 @@ export const gradesService = {
           categories: Array.isArray(res.data.categories)
             ? res.data.categories
             : Object.values(res.data.categories || {}),
-          rows: Array.isArray(res.data.rows)
-            ? res.data.rows
-            : Object.values(res.data.rows || {}),
+          rows: Array.isArray(res.data.rows) ? res.data.rows : Object.values(res.data.rows || {}),
         };
       }
     } catch {

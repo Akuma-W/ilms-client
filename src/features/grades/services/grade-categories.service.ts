@@ -12,9 +12,7 @@ export const gradeCategoriesService = {
   // Retrieves all grade categories and weights for a class
   async getCategories(classId: string): Promise<GradeCategory[]> {
     try {
-      const res = await clientApiClient<GradeCategory[]>(
-        `/classes/${classId}/grade-categories`,
-      );
+      const res = await clientApiClient<GradeCategory[]>(`/classes/${classId}/grade-categories`);
       if (res.success !== false && res.data !== null && res.data !== undefined) {
         return Array.isArray(res.data) ? res.data : Object.values(res.data);
       }
@@ -33,17 +31,14 @@ export const gradeCategoriesService = {
     orderIndex?: number,
   ): Promise<{ success: boolean; data: GradeCategory; message: string }> {
     try {
-      const res = await clientApiClient<GradeCategory>(
-        `/classes/${classId}/grade-categories`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            name,
-            weight: weightPercent / 100,
-            ...(orderIndex !== undefined && { orderIndex }),
-          }),
-        },
-      );
+      const res = await clientApiClient<GradeCategory>(`/classes/${classId}/grade-categories`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          weight: weightPercent / 100,
+          ...(orderIndex !== undefined && { orderIndex }),
+        }),
+      });
       if (res.success !== false && res.data) {
         return {
           success: true,
@@ -72,17 +67,14 @@ export const gradeCategoriesService = {
     orderIndex?: number,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await clientApiClient(
-        `/classes/${classId}/grade-categories/${categoryId}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({
-            name,
-            weight: weightPercent / 100,
-            ...(orderIndex !== undefined && { orderIndex }),
-          }),
-        },
-      );
+      await clientApiClient(`/classes/${classId}/grade-categories/${categoryId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          name,
+          weight: weightPercent / 100,
+          ...(orderIndex !== undefined && { orderIndex }),
+        }),
+      });
       return { success: true, message: 'Cập nhật loại điểm thành công!' };
     } catch {
       // Fallback
@@ -98,12 +90,9 @@ export const gradeCategoriesService = {
     categoryId: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await clientApiClient(
-        `/classes/${classId}/grade-categories/${categoryId}`,
-        {
-          method: 'DELETE',
-        },
-      );
+      await clientApiClient(`/classes/${classId}/grade-categories/${categoryId}`, {
+        method: 'DELETE',
+      });
       return { success: true, message: 'Đã xóa loại điểm khỏi bảng điểm!' };
     } catch {
       // Fallback

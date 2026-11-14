@@ -108,12 +108,12 @@ export const MOCK_QUIZZES: Quiz[] = MOCK_CLASS_QUIZZES.map((cq) => ({
   title: cq.title,
   description: cq.description,
   timeLimit: cq.timeLimit,
-  visibility: cq.visibility,
-  status: cq.status,
+  visibility: cq.visibility ?? Visibility.private,
+  status: cq.status ?? QuizStatus.draft,
   openAt: cq.openAt,
   closeAt: cq.closeAt,
-  createdAt: cq.createdAt,
-  createdBy: cq.createdBy,
+  createdAt: cq.createdAt ?? '',
+  createdBy: cq.createdBy ?? '',
   questionCount: cq.questionCount,
   publications: [
     {
@@ -132,7 +132,7 @@ export const MOCK_QUIZZES: Quiz[] = MOCK_CLASS_QUIZZES.map((cq) => ({
         {
           id: cq.currentUserAttempt.id,
           quizId: cq.id,
-          studentId: cq.currentUserAttempt.studentId,
+          studentId: cq.currentUserAttempt.studentId ?? '',
           score: cq.currentUserAttempt.score,
           startedAt: cq.currentUserAttempt.startedAt,
           submittedAt: cq.currentUserAttempt.submittedAt,
@@ -145,22 +145,6 @@ let localClassQuizzes: QuizClassItem[] = [...MOCK_CLASS_QUIZZES];
 
 export function getMockClassQuizzes(classId: string): QuizClassItem[] {
   return localClassQuizzes.filter((q) => !classId || q.classId === classId);
-}
-
-export function getAllMockQuizzes(): Quiz[] {
-  return localClassQuizzes.map((cq) => ({
-    id: cq.id,
-    title: cq.title,
-    description: cq.description,
-    timeLimit: cq.timeLimit,
-    visibility: cq.visibility,
-    status: cq.status,
-    openAt: cq.openAt,
-    closeAt: cq.closeAt,
-    createdAt: cq.createdAt,
-    createdBy: cq.createdBy,
-    questionCount: cq.questionCount,
-  }));
 }
 
 export function publishMockQuizToClass(
@@ -185,8 +169,8 @@ export function publishMockQuizToClass(
     timeLimit: existing?.timeLimit || 20,
     visibility: Visibility.public,
     status: QuizStatus.published,
-    openAt: input.openAt,
-    closeAt: input.closeAt,
+    openAt: input.openAt || new Date().toISOString(),
+    closeAt: input.closeAt || new Date(Date.now() + 7 * 86400000).toISOString(),
     createdAt: new Date().toISOString(),
     createdBy: '11111111-1111-4111-8111-111111111111',
     questionCount: existing?.questionCount || 15,
@@ -214,10 +198,9 @@ export function unpublishMockQuizFromClass(classId: string, quizId: string): boo
  */
 export function getMockQuizClassStats(quizId: string): QuizClassStats {
   const quiz = localClassQuizzes.find((q) => q.id === quizId);
-  const quizTitle = quiz?.title || 'Bài trắc nghiệm lớp học';
   const totalStudents = 40;
-  const submittedCount = quiz?.submittedCount || 28;
-  const unsubmittedCount = Math.max(0, totalStudents - submittedCount);
+  const submittedCount = quiz?.submittedCount ?? 28;
+  const notSubmittedCount = Math.max(0, totalStudents - submittedCount);
 
   // Generate mock student submission records
   const sampleScores = [9.5, 9.0, 8.5, 8.0, 7.5, 10.0, 6.5, 7.0, 8.5, 9.0];
@@ -225,23 +208,31 @@ export function getMockQuizClassStats(quizId: string): QuizClassStats {
     const isSubmitted = idx < submittedCount;
     return {
       studentId: st.id,
-      fullName: st.fullName,
+      name: st.fullName,
       email: st.email,
-      avatarUrl: st.avatarUrl,
+      avatar: st.avatarUrl ?? null,
       isSubmitted,
       score: isSubmitted ? sampleScores[idx % sampleScores.length] : null,
+      startedAt: isSubmitted ? '2026-11-06T15:00:00Z' : null,
       submittedAt: isSubmitted ? '2026-11-06T15:30:00Z' : null,
+      attemptId: isSubmitted ? `attempt-${st.id}` : null,
     };
   });
 
   return {
-    quizId,
-    quizTitle,
+    publicationId: quiz?.publicationId ?? quizId,
     submittedCount,
-    unsubmittedCount,
+    notSubmittedCount,
     totalStudents,
     averageScore: 8.35,
-    passRatePercent: 92.5,
+    highestScore: 10,
+    lowestScore: 6.5,
+    distribution: {
+      under5: 0,
+      from5To6_5: 0,
+      from6_5To8: 3,
+      from8To10: submittedCount - 3,
+    },
     students,
   };
 }

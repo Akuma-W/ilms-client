@@ -119,7 +119,7 @@ src/
 ├── stores/ # Zustand global client stores (sidebar-store.ts...)
 └── types/ # Shared TypeScript definitions (\*.d.ts, index.ts)
 
-````
+```
 
 ---
 
@@ -149,7 +149,7 @@ export default async function ClassesPage({ searchParams }: PageProps) {
   const initialClasses = await classServerService.getClasses(searchParams);
   return <ClassesClient initialData={initialClasses} />;
 }
-````
+```
 
 ```typescript
 // Example: src/app/classes/classes-client.tsx (Client Component)

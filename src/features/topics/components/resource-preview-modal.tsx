@@ -26,11 +26,5 @@ export function ResourcePreviewModal({
     return resourceToPreviewItem(resource, topicTitle);
   }, [resource, topicTitle]);
 
-  return (
-    <FilePreviewModal
-      item={previewItem}
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
-    />
-  );
+  return <FilePreviewModal item={previewItem} isOpen={isOpen} onOpenChange={onOpenChange} />;
 }

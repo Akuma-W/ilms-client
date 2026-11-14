@@ -1,120 +1,90 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import {
-  getAllMockQuizzes,
-  getMockClassQuizzes,
-  getMockQuizClassStats,
-  publishMockQuizToClass,
-  unpublishMockQuizFromClass,
-} from '@/mocks/classes/mock-quizzes';
-import type { PublishQuizInput, Quiz, QuizClassItem, QuizClassStats } from '@/types/quiz';
+import type {
+  CreateQuizInput,
+  PaginatedQuizzesResult,
+  QueryQuizInput,
+  Quiz,
+  UpdateQuizInput,
+} from '@/types/quiz';
 
-/**
- * Client-side quizzes service for Browser Components (CSR, SWR, Mutations).
- * Encapsulates clientApiClient and fallback to mock data when API errors or fails.
- */
 export const quizzesService = {
-  /**
-   * Retrieves list of quizzes published in the specified class.
-   */
-  async getClassQuizzes(classId: string): Promise<QuizClassItem[]> {
-    try {
-      const res = await clientApiClient<QuizClassItem[]>(`/classes/${classId}/quizzes`);
-      if (res && res.success !== false && Array.isArray(res.data)) {
-        return res.data;
-      }
-      return getMockClassQuizzes(classId);
-    } catch {
-      return getMockClassQuizzes(classId);
+  // Retrieves paginated list of quizzes (public community library or user own quizzes)
+  async getQuizzes(query?: QueryQuizInput): Promise<PaginatedQuizzesResult<Quiz>> {
+    const params = new URLSearchParams();
+    if (query?.scope) params.append('scope', query.scope);
+    if (query?.search) params.append('search', query.search);
+    if (query?.page) params.append('page', String(query.page));
+    if (query?.limit) params.append('limit', String(query.limit));
+
+    const endpoint = `/quizzes${params.toString() ? `?${params.toString()}` : ''}`;
+    const res = await clientApiClient<PaginatedQuizzesResult<Quiz>>(endpoint);
+    if (res?.success !== false && res?.data) {
+      return res.data;
     }
+    throw new Error(res?.message || 'Không thể tải danh sách đề thi');
   },
 
-  /**
-   * Retrieves teacher's personal quizzes repository to choose from for publishing.
-   */
-  async getAvailableQuizzes(): Promise<Quiz[]> {
-    try {
-      const res = await clientApiClient<Quiz[]>('/quizzes', { ignoreAuthError: true });
-      if (res && res.success !== false && Array.isArray(res.data) && res.data.length > 0) {
-        return res.data;
-      }
-      return getAllMockQuizzes();
-    } catch {
-      return getAllMockQuizzes();
+  // Retrieves single quiz details along with its questions and options
+  async getQuizById(id: string): Promise<Quiz | null> {
+    const res = await clientApiClient<Quiz>(`/quizzes/${id}`);
+    if (res && res.success !== false && res.data) {
+      return res.data;
     }
+    return null;
   },
 
-  /**
-   * Publishes an existing quiz from teacher's repository into the class.
-   */
-  async publishQuiz(
-    classId: string,
-    input: PublishQuizInput,
-    topicName?: string,
-  ): Promise<{ success: boolean; data: QuizClassItem; message: string }> {
-    try {
-      const res = await clientApiClient<QuizClassItem>(`/classes/${classId}/quizzes/publish`, {
-        method: 'POST',
-        body: JSON.stringify(input),
-        ignoreAuthError: true,
-      });
-      if (res && res.success !== false && res.data) {
-        return {
-          success: true,
-          data: res.data,
-          message: 'Xuất bản bài trắc nghiệm vào lớp thành công!',
-        };
-      }
-    } catch {
-      // Fallback to in-memory mock
+  // Creates a new quiz draft in user repository
+  async createQuiz(input: CreateQuizInput): Promise<Quiz> {
+    const res = await clientApiClient<Quiz>('/quizzes', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    if (!res || res.success === false || !res.data) {
+      throw new Error(res?.message || 'Không thể tạo đề thi mới');
     }
+    return res.data;
+  },
 
-    const mockItem = publishMockQuizToClass(classId, input, topicName);
+  // Updates quiz metadata such as title, timeLimit, visibility, status
+  async updateQuiz(id: string, input: UpdateQuizInput): Promise<Quiz> {
+    const res = await clientApiClient<Quiz>(`/quizzes/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+    if (!res || res.success === false || !res.data) {
+      throw new Error(res?.message || 'Không thể cập nhật đề thi');
+    }
+    return res.data;
+  },
+
+  // Deletes a quiz from user repository
+  async deleteQuiz(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await clientApiClient<unknown>(`/quizzes/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res || res.success === false) {
+      throw new Error(res?.message || 'Không thể xóa đề thi');
+    }
     return {
       success: true,
-      data: mockItem,
-      message: 'Xuất bản bài trắc nghiệm vào lớp thành công!',
+      message: res.message || 'Xóa đề thi thành công',
     };
   },
 
-  /**
-   * Unpublishes (removes) a quiz from the class without deleting the original quiz.
-   */
-  async unpublishQuiz(
-    classId: string,
-    quizId: string,
-  ): Promise<{ success: boolean; message: string }> {
-    try {
-      const res = await clientApiClient<unknown>(
-        `/classes/${classId}/quizzes/${quizId}/unpublish`,
-        {
-          method: 'DELETE',
-        },
-      );
-      if (res && res.success !== false) {
-        return { success: true, message: 'Đã gỡ bài trắc nghiệm khỏi lớp học.' };
-      }
-    } catch {
-      // Fallback to mock
+  // Clones a public quiz into personal library
+  async cloneQuiz(id: string): Promise<Quiz> {
+    const res = await clientApiClient<Quiz>(`/quizzes/${id}/clone`, {
+      method: 'POST',
+    });
+    if (!res || res.success === false || !res.data) {
+      throw new Error(res?.message || 'Không thể sao chép đề thi');
     }
-
-    unpublishMockQuizFromClass(classId, quizId);
-    return { success: true, message: 'Đã gỡ bài trắc nghiệm khỏi lớp học.' };
+    return res.data;
   },
 
-  /**
-   * Retrieves class evaluation statistics for a specific quiz (submitted vs unsubmitted, class average).
-   */
-  async getClassQuizStats(classId: string, quizId: string): Promise<QuizClassStats> {
-    try {
-      const res = await clientApiClient<QuizClassStats>(
-        `/classes/${classId}/quizzes/${quizId}/stats`,
-      );
-      if (res && res.success !== false && res.data) {
-        return res.data;
-      }
-      return getMockQuizClassStats(quizId);
-    } catch {
-      return getMockQuizClassStats(quizId);
-    }
+  // Retrieves available quizzes for teacher to publish into a class
+  async getAvailableQuizzes(): Promise<Quiz[]> {
+    const res = await this.getQuizzes({ scope: 'my', limit: 50 });
+    return res.items || [];
   },
 };

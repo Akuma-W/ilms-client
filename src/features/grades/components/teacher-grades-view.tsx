@@ -125,9 +125,7 @@ export function TeacherGradesView({
   ).length;
   const averageClassScore =
     gradedRows.length > 0
-      ? (
-          gradedRows.reduce((sum, r) => sum + (r.finalScore ?? 0), 0) / gradedRows.length
-        ).toFixed(2)
+      ? (gradedRows.reduce((sum, r) => sum + (r.finalScore ?? 0), 0) / gradedRows.length).toFixed(2)
       : '—';
   const passingRate =
     gradedRows.length > 0 ? Math.round((passingStudents / gradedRows.length) * 100) : 0;

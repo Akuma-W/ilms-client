@@ -165,7 +165,8 @@ export function CategoryManagementModal({
             <span>Quản lý loại điểm & Trọng số</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Thiết lập thứ tự hiển thị và trọng số các cột điểm. Tổng trọng số bắt buộc phải bằng đúng 100%.
+            Thiết lập thứ tự hiển thị và trọng số các cột điểm. Tổng trọng số bắt buộc phải bằng
+            đúng 100%.
           </DialogDescription>
         </DialogHeader>
 

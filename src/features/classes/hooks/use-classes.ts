@@ -20,7 +20,7 @@ export function useClasses({ tab, search, page, limit, initialData }: UseClasses
     },
     {
       fallbackData: initialData,
-      revalidateOnMount: false,
+      revalidateOnMount: !initialData,
     },
   );
 

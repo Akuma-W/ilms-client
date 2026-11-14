@@ -58,6 +58,7 @@ export const TOPIC_RESOURCE_MENU_ITEMS = [
 export const CLASS_SIDEBAR_NAV = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/classes?tab=discovery' },
   { icon: BookOpen, label: 'Lớp của tôi', href: '/classes?tab=joined' },
+  { icon: HelpCircle, label: 'Trắc nghiệm', href: '/quizzes' },
   { icon: Wrench, label: 'Công cụ', href: '/tools' },
   { icon: MessageSquare, label: 'Tin nhắn', href: '/chats' },
 ] as const;

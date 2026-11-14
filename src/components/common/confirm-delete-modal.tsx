@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import { Loader2, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 
 export interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -21,6 +20,7 @@ export interface ConfirmDeleteModalProps {
   itemName?: string;
   itemTypeLabel?: string;
   isDeleting?: boolean;
+  deleteLabel?: string;
   onConfirm: () => void | Promise<void>;
 }
 
@@ -36,6 +36,7 @@ export function ConfirmDeleteModal({
   itemName,
   itemTypeLabel = 'mục này',
   isDeleting = false,
+  deleteLabel = 'Xóa vĩnh viễn',
   onConfirm,
 }: ConfirmDeleteModalProps) {
   const defaultDescription = `Bạn có chắc chắn muốn xóa ${itemTypeLabel}? Hành động này không thể hoàn tác và dữ liệu sẽ bị xóa vĩnh viễn khỏi hệ thống.`;
@@ -60,37 +61,36 @@ export function ConfirmDeleteModal({
         {itemName && (
           <div className="my-2 p-3 rounded-lg bg-muted/60 border border-border/60 text-sm">
             <span className="text-xs text-muted-foreground block mb-0.5">Đối tượng sẽ bị xóa:</span>
-            <span className="font-semibold text-foreground break-words line-clamp-2">
+            <span className="font-semibold text-red-600 wrap-break-word line-clamp-2">
               {itemName}
             </span>
           </div>
         )}
 
-        <AlertDialogFooter className="mt-4 gap-2 sm:gap-0">
+        <AlertDialogFooter className="mt-4 gap-2">
           <AlertDialogCancel disabled={isDeleting} className="rounded-lg h-9 text-sm">
             Hủy bỏ
           </AlertDialogCancel>
-          <Button
-            variant="destructive"
-            disabled={isDeleting}
+          <AlertDialogAction
             onClick={async (e) => {
               e.preventDefault();
               await onConfirm();
             }}
-            className="rounded-lg h-9 text-sm font-medium gap-1.5 bg-red-600 hover:bg-red-700 text-white dark:bg-red-600 dark:hover:bg-red-700"
+            className="text-sm h-9 rounded-md bg-red-600 hover:bg-red-700 text-white"
           >
-            {isDeleting ? (
+            {isDeleting && (
               <>
                 <Loader2 className="size-4 animate-spin" />
                 <span>Đang xóa...</span>
               </>
-            ) : (
+            )}
+            {!isDeleting && (
               <>
                 <Trash2 className="size-4" />
-                <span>Xóa vĩnh viễn</span>
+                <span>{deleteLabel}</span>
               </>
             )}
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

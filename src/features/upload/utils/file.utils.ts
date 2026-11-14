@@ -110,11 +110,9 @@ export function resolveStorageUrl(urlOrPath?: string | null): string {
         parsed.hostname.includes('minio') ||
         parsed.hostname === 'files.localhost';
       const hasMinioSignature =
-        parsed.searchParams.has('X-Amz-Signature') ||
-        parsed.searchParams.has('X-Amz-Algorithm');
+        parsed.searchParams.has('X-Amz-Signature') || parsed.searchParams.has('X-Amz-Algorithm');
       const hasBucketPath =
-        parsed.pathname.includes('/keiverse/') ||
-        parsed.pathname.includes('/ilms-bucket/');
+        parsed.pathname.includes('/keiverse/') || parsed.pathname.includes('/ilms-bucket/');
 
       // If it's a legacy MinIO presigned or direct link saved in DB, extract object key
       if (isMinioHost || hasMinioSignature || hasBucketPath) {
@@ -123,9 +121,7 @@ export function resolveStorageUrl(urlOrPath?: string | null): string {
         let cleanObjectKey = rawPath;
         if (
           segments.length > 1 &&
-          (segments[0] === 'keiverse' ||
-            segments[0] === 'ilms-bucket' ||
-            isMinioHost)
+          (segments[0] === 'keiverse' || segments[0] === 'ilms-bucket' || isMinioHost)
         ) {
           cleanObjectKey = segments.slice(1).join('/');
         }

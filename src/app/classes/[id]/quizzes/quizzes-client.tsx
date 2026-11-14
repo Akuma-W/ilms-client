@@ -16,12 +16,10 @@ import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-toolbar';
 import { ClassQuizCard } from '@/features/quizzes/components/class-quiz-card';
 import { PublishQuizModal } from '@/features/quizzes/components/publish-quiz-modal';
-import { QuizClassStatsModal } from '@/features/quizzes/components/quiz-class-stats-modal';
 import { QuizKpiStrip } from '@/features/quizzes/components/quiz-kpi-strip';
 import { QuizFilterBar } from '@/features/quizzes/components/quiz-filter-bar';
-import { quizzesService } from '@/features/quizzes/services/quizzes.service';
+import { quizPublicationsService } from '@/features/quizzes/services/quiz-publications.service';
 import { getQuizDisplayStatus } from '@/features/quizzes/utils/quiz.utils';
-import type { PublishQuizFormData } from '@/features/quizzes/schemas/quiz.schema';
 import type { QuizClassItem, QuizFilterTab } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
 import type { User } from '@/types/user';
@@ -34,11 +32,7 @@ interface QuizzesClientProps {
   currentUser?: User | null;
 }
 
-/**
- * Main Client component for Classroom Quizzes tab.
- * Connects ClassTabToolbar, KPI summary strip, status/topic filters, responsive grid,
- * and teacher modals for publishing, unpublishing, and class evaluation stats.
- */
+// Manages classroom quiz filters and teacher publication actions.
 export function QuizzesClient({
   initialQuizzes,
   topics = [],
@@ -50,18 +44,16 @@ export function QuizzesClient({
   const [filterTab, setFilterTab] = useState<QuizFilterTab>('all');
   const [selectedTopicId, setSelectedTopicId] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 9;
 
-  // Modals state
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [selectedStatsQuiz, setSelectedStatsQuiz] = useState<QuizClassItem | null>(null);
   const [unpublishModal, setUnpublishModal] = useState<{
     isOpen: boolean;
-    quizId: string | null;
+    publicationId: string | null;
     isUnpublishing: boolean;
   }>({
     isOpen: false,
-    quizId: null,
+    publicationId: null,
     isUnpublishing: false,
   });
 
@@ -130,45 +122,17 @@ export function QuizzesClient({
     setCurrentPage(1);
   };
 
-  const handlePublishQuiz = async (data: PublishQuizFormData, topicName?: string) => {
-    try {
-      const openAt = data.openAt ? new Date(data.openAt).toISOString() : new Date().toISOString();
-      const closeAt = data.closeAt
-        ? new Date(data.closeAt).toISOString()
-        : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-
-      const res = await quizzesService.publishQuiz(
-        classId,
-        {
-          quizId: data.quizId,
-          topicId: data.topicId,
-          openAt,
-          closeAt,
-        },
-        topicName,
-      );
-
-      if (res.success && res.data) {
-        toast.success(res.message);
-        setQuizzes((prev) => [res.data, ...prev.filter((q) => q.id !== res.data.id)]);
-        setCurrentPage(1);
-      } else {
-        toast.error('Không thể xuất bản bài thi. Vui lòng thử lại!');
-      }
-    } catch {
-      toast.error('Có lỗi xảy ra khi xuất bản bài thi. Vui lòng thử lại!');
-    }
-  };
-
   const handleConfirmUnpublish = async () => {
-    if (!unpublishModal.quizId) return;
+    if (!unpublishModal.publicationId) return;
     setUnpublishModal((prev) => ({ ...prev, isUnpublishing: true }));
     try {
-      const res = await quizzesService.unpublishQuiz(classId, unpublishModal.quizId);
+      const res = await quizPublicationsService.unpublishQuiz(unpublishModal.publicationId);
       if (res.success) {
         toast.success(res.message);
-        setQuizzes((prev) => prev.filter((q) => q.id !== unpublishModal.quizId));
-        setUnpublishModal({ isOpen: false, quizId: null, isUnpublishing: false });
+        setQuizzes((prev) =>
+          prev.filter((quiz) => quiz.publicationId !== unpublishModal.publicationId),
+        );
+        setUnpublishModal({ isOpen: false, publicationId: null, isUnpublishing: false });
       }
     } catch {
       toast.error('Gỡ bài thi thất bại. Vui lòng thử lại!');
@@ -178,7 +142,7 @@ export function QuizzesClient({
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6">
-      {/* SECTION 1: Standardized ClassTabToolbar (Rose Crimson Token) */}
+      {/* SECTION 1: Standardized ClassTabToolbar */}
       <ClassTabToolbar
         title="Bài thi & Trắc nghiệm"
         description="Kiểm tra trắc nghiệm, đánh giá mức độ tiếp thu và ôn luyện kiến thức bài học."
@@ -188,16 +152,15 @@ export function QuizzesClient({
         onSearchChange={handleSearchChange}
         searchPlaceholder="Tìm kiếm đề thi, chủ đề bài học..."
         actions={
-          isTeacher ? (
+          isTeacher && (
             <Button
-              type="button"
               onClick={() => setIsPublishModalOpen(true)}
               className="h-9 px-3.5 text-sm font-semibold rounded-lg gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white shrink-0"
             >
               <Plus className="size-4" />
-              <span>Xuất bản bài mới</span>
+              Xuất bản bài mới
             </Button>
-          ) : undefined
+          )
         }
       />
 
@@ -255,16 +218,15 @@ export function QuizzesClient({
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {paginatedQuizzes.map((quiz) => (
               <ClassQuizCard
                 key={quiz.id}
                 quiz={quiz}
                 classId={classId}
                 isTeacher={isTeacher}
-                onViewStats={(selected) => setSelectedStatsQuiz(selected)}
-                onUnpublish={(quizId) =>
-                  setUnpublishModal({ isOpen: true, quizId, isUnpublishing: false })
+                onUnpublish={(publicationId) =>
+                  setUnpublishModal({ isOpen: true, publicationId, isUnpublishing: false })
                 }
               />
             ))}
@@ -315,16 +277,12 @@ export function QuizzesClient({
       <PublishQuizModal
         isOpen={isPublishModalOpen}
         onOpenChange={setIsPublishModalOpen}
+        preselectedClassId={classId}
         topics={topics}
-        onSubmit={handlePublishQuiz}
-      />
-
-      {/* Teacher Class Evaluation Stats Modal */}
-      <QuizClassStatsModal
-        isOpen={Boolean(selectedStatsQuiz)}
-        onOpenChange={(open) => !open && setSelectedStatsQuiz(null)}
-        quiz={selectedStatsQuiz}
-        classId={classId}
+        onSuccess={async () => {
+          const fresh = await quizPublicationsService.getClassPublications(classId);
+          setQuizzes(fresh);
+        }}
       />
 
       {/* Universal Unpublish Confirmation Modal */}

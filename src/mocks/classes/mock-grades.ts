@@ -7,11 +7,7 @@ import type {
   StudentGradeSummary,
 } from '@/types/grade';
 import { MOCK_STUDENTS } from './mock-users';
-import {
-  calculateFinalScore,
-  getGpa4,
-  getLetterGrade,
-} from '@/features/grades/utils/grade.utils';
+import { calculateFinalScore, getGpa4, getLetterGrade } from '@/features/grades/utils/grade.utils';
 
 export let MOCK_GRADE_CATEGORIES: GradeCategory[] = [
   {

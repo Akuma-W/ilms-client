@@ -2,12 +2,12 @@ import { Metadata } from 'next';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
 import { userServerService } from '@/features/user/services/user.server.service';
-import { quizzesServerService } from '@/features/quizzes/services/quizzes.server.service';
-import { topicsService } from '@/features/topics/services/topics.service';
+import { quizPublicationsServerService } from '@/features/quizzes/services/quiz-publications.server.service';
+import { topicsServerService } from '@/features/topics/services/topics.server.service';
 import { QuizzesClient } from './quizzes-client';
 
 export const metadata: Metadata = {
-  title: 'Bài trắc nghiệm lớp học',
+  title: 'Trắc nghiệm lớp học',
   description: 'Danh sách bài trắc nghiệm, kiểm tra định kỳ và đánh giá tiếp thu môn học.',
 };
 
@@ -24,8 +24,8 @@ export default async function ClassQuizzesPage({ params }: ClassQuizzesPageProps
     classServerService.getClassData(id).catch(() => null),
     userServerService.getMe().catch(() => null),
     enrollmentServerService.getMyRelationInClass(id).catch(() => null),
-    quizzesServerService.getClassQuizzes(id),
-    topicsService.getTopics(id).catch(() => []),
+    quizPublicationsServerService.getClassPublications(id),
+    topicsServerService.getTopics(id).catch(() => []),
   ]);
 
   const isTeacher = Boolean(
