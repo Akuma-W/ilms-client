@@ -32,19 +32,16 @@ interface ClassQuizCardProps {
   classId: string;
   isTeacher?: boolean;
   onViewStats?: (quiz: QuizClassItem) => void;
+  onEditPublication?: (quiz: QuizClassItem) => void;
   onUnpublish?: (quizId: string) => void;
 }
 
-/**
- * Modern Classroom Quiz card.
- * Features 4-state time row, participant counts for all users, +1 font typography,
- * text-sm buttons, and compact non-bloated padding.
- */
 export function ClassQuizCard({
   quiz,
   classId,
   isTeacher = false,
   onViewStats,
+  onEditPublication,
   onUnpublish,
 }: ClassQuizCardProps) {
   const displayStatus = getQuizDisplayStatus(quiz);
@@ -53,6 +50,36 @@ export function ClassQuizCard({
 
   // Determine badge styling based on status
   const getStatusBadge = () => {
+    if (isTeacher) {
+      if (displayStatus === 'upcoming') {
+        return (
+          <Badge
+            variant="outline"
+            className="text-xs px-2.5 py-0.5 bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/30 gap-1 font-semibold"
+          >
+            <Clock className="size-3" />
+            <span>Sắp mở</span>
+          </Badge>
+        );
+      }
+      if (displayStatus === 'not_submitted_closed' || displayStatus === 'submitted_closed') {
+        return (
+          <Badge
+            variant="outline"
+            className="text-xs px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-muted-foreground border-slate-300 dark:border-slate-700 font-semibold"
+          >
+            <span>Đã đóng</span>
+          </Badge>
+        );
+      }
+      return (
+        <Badge className="text-xs px-2.5 py-0.5 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 gap-1 font-semibold">
+          <Play className="size-3" />
+          <span>Đang mở</span>
+        </Badge>
+      );
+    }
+
     switch (displayStatus) {
       case 'submitted_open':
       case 'submitted_closed':
@@ -77,7 +104,7 @@ export function ClassQuizCard({
         return (
           <Badge
             variant="outline"
-            className="text-xs px-2.5 py-0.5 bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/30 gap-1 font-medium"
+            className="text-xs px-2.5 py-0.5 bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/30 gap-1 font-semibold"
           >
             <Clock className="size-3" />
             <span>Sắp mở</span>
@@ -137,6 +164,15 @@ export function ClassQuizCard({
                   >
                     <BarChart3 className="size-3.5 text-primary" />
                     <span>Thống kê kết quả lớp</span>
+                  </DropdownMenuItem>
+                )}
+                {onEditPublication && (
+                  <DropdownMenuItem
+                    onClick={() => onEditPublication(quiz)}
+                    className="gap-2 cursor-pointer font-medium"
+                  >
+                    <Calendar className="size-3.5 text-indigo-500" />
+                    <span>Chỉnh sửa đợt thi</span>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild className="gap-2 cursor-pointer font-medium">

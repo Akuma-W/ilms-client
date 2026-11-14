@@ -3,15 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Visibility } from '@/types/enum';
-import { ArrowLeft, Save, Download, Upload, Clock, Globe, Lock, Loader2, Calculator } from 'lucide-react';
+import { ArrowLeft, Save, Download, Upload, Clock, Loader2, Calculator } from 'lucide-react';
 
 interface QuizStudioHeaderProps {
   title: string;
@@ -20,8 +12,6 @@ interface QuizStudioHeaderProps {
   onDescriptionChange: (description: string) => void;
   timeLimit: number;
   onTimeLimitChange: (minutes: number) => void;
-  visibility: Visibility;
-  onVisibilityChange: (visibility: Visibility) => void;
   onSave: () => void;
   isSaving: boolean;
   onOpenWordModal: () => void;
@@ -30,6 +20,7 @@ interface QuizStudioHeaderProps {
   totalPoints?: number;
 }
 
+// Fixed top header for quiz studio creator
 export function QuizStudioHeader({
   title,
   onTitleChange,
@@ -37,8 +28,6 @@ export function QuizStudioHeader({
   onDescriptionChange,
   timeLimit,
   onTimeLimitChange,
-  visibility,
-  onVisibilityChange,
   onSave,
   isSaving,
   onOpenWordModal,
@@ -46,23 +35,8 @@ export function QuizStudioHeader({
   totalQuestions,
   totalPoints,
 }: QuizStudioHeaderProps) {
-  const visibilityValues = [
-    {
-      value: 'private',
-      icon: Lock,
-      color: 'text-red-600 dark:text-red-400',
-      label: 'Riêng tư',
-    },
-    {
-      value: 'public',
-      icon: Globe,
-      color: 'text-cyan-600 dark:text-cyan-400',
-      label: 'Công khai',
-    },
-  ];
-
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-2.5 px-4 sm:px-6">
+    <header className="shrink-0 z-30 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-2.5 px-4 sm:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Left: Back button & Title input */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -145,23 +119,6 @@ export function QuizStudioHeader({
             />
             <span className="text-slate-500">phút</span>
           </div>
-
-          {/* Visibility Selector */}
-          <Select value={visibility} onValueChange={(val) => onVisibilityChange(val as Visibility)}>
-            <SelectTrigger className="h-9 w-32 rounded-md text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="rounded-md border border-slate-200 dark:border-slate-800">
-              {visibilityValues.map((item, idx) => (
-                <SelectItem key={idx} value={item.value} className="text-sm">
-                  <span className={`flex items-center gap-1.5 ${item.color}`}>
-                    <item.icon className={`size-3.5 ${item.color}`} />
-                    {item.label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           {/* Download Template Button */}
           <Button

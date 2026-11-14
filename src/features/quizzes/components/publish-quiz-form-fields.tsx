@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Calendar, HelpCircle, Lock } from 'lucide-react';
+import { BookOpen, Calendar, Eye, HelpCircle, Lock } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import {
@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ReviewMode } from '@/types/enum';
 import type { Quiz } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
 import type { Class } from '@/types/class';
@@ -38,6 +39,9 @@ interface PublishQuizFormFieldsProps {
   closeAt: string;
   onCloseAtChange: (val: string) => void;
 
+  reviewMode: ReviewMode;
+  onReviewModeChange: (val: ReviewMode) => void;
+
   isPublic: boolean;
   onIsPublicChange: (val: boolean) => void;
 
@@ -64,6 +68,8 @@ export function PublishQuizFormFields({
   onOpenAtChange,
   closeAt,
   onCloseAtChange,
+  reviewMode,
+  onReviewModeChange,
   isPublic,
   onIsPublicChange,
   errors,
@@ -240,7 +246,34 @@ export function PublishQuizFormFields({
         </div>
       </div>
 
-      {/* Field 5: Public Outside Classroom Checkbox */}
+      {/* Field 5: Review Mode */}
+      <div className="space-y-1.5 pt-1">
+        <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+          <Eye className="w-3.5 h-3.5 text-slate-500" />
+          Chế độ xem đáp án & kết quả
+        </Label>
+        <Select value={reviewMode} onValueChange={(val) => onReviewModeChange(val as ReviewMode)}>
+          <SelectTrigger className="w-full text-xs h-9 rounded-md">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="rounded-md">
+            <SelectItem value={ReviewMode.after_submission} className="text-xs">
+              Xem đáp án sau khi nộp bài
+            </SelectItem>
+            <SelectItem value={ReviewMode.immediate} className="text-xs">
+              Xem đáp án sau mỗi câu trả lời
+            </SelectItem>
+            <SelectItem value={ReviewMode.after_closed} className="text-xs">
+              Chỉ xem đáp án sau khi hết hạn đợt thi
+            </SelectItem>
+            <SelectItem value={ReviewMode.never} className="text-xs">
+              Không cho xem đáp án
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Field 6: Public Outside Classroom Checkbox */}
       <div className="flex items-center gap-2 pt-1">
         <input
           type="checkbox"
@@ -253,7 +286,7 @@ export function PublishQuizFormFields({
           htmlFor="isPublicPublication"
           className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
         >
-          Cho phép toàn trường truy cập làm thử đề thi này
+          Công khai lên Thư viện chung (Học sinh ngoài lớp có thể làm thử)
         </label>
       </div>
     </div>

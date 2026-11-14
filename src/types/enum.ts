@@ -55,6 +55,15 @@ export const QuizStatus = {
 
 export type QuizStatus = (typeof QuizStatus)[keyof typeof QuizStatus];
 
+export const ReviewMode = {
+  immediate: 'immediate',
+  after_submission: 'after_submission',
+  after_closed: 'after_closed',
+  never: 'never',
+} as const;
+
+export type ReviewMode = (typeof ReviewMode)[keyof typeof ReviewMode];
+
 export const QuestionType = {
   multiple_choice: 'multiple_choice',
   multiple_select: 'multiple_select',

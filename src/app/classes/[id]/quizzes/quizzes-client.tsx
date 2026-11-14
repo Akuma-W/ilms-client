@@ -16,6 +16,7 @@ import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-toolbar';
 import { ClassQuizCard } from '@/features/quizzes/components/class-quiz-card';
 import { PublishQuizModal } from '@/features/quizzes/components/publish-quiz-modal';
+import { EditPublicationModal } from '@/features/quizzes/components/edit-publication-modal';
 import { QuizKpiStrip } from '@/features/quizzes/components/quiz-kpi-strip';
 import { QuizFilterBar } from '@/features/quizzes/components/quiz-filter-bar';
 import { quizPublicationsService } from '@/features/quizzes/services/quiz-publications.service';
@@ -47,6 +48,8 @@ export function QuizzesClient({
   const pageSize = 9;
 
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState<QuizClassItem | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [unpublishModal, setUnpublishModal] = useState<{
     isOpen: boolean;
     publicationId: string | null;
@@ -65,6 +68,10 @@ export function QuizzesClient({
       const status = getQuizDisplayStatus(q, now);
       return status === 'not_submitted_open' || status === 'submitted_open';
     }).length;
+  }, [quizzes, now]);
+
+  const upcomingCount = useMemo(() => {
+    return quizzes.filter((q) => getQuizDisplayStatus(q, now) === 'upcoming').length;
   }, [quizzes, now]);
 
   const completedCount = useMemo(() => {
@@ -98,6 +105,9 @@ export function QuizzesClient({
       const status = getQuizDisplayStatus(q, now);
       if (filterTab === 'open') {
         return status === 'not_submitted_open' || status === 'submitted_open';
+      }
+      if (filterTab === 'upcoming') {
+        return status === 'upcoming';
       }
       if (filterTab === 'completed') {
         return status === 'submitted_open' || status === 'submitted_closed';
@@ -182,6 +192,7 @@ export function QuizzesClient({
         }}
         totalQuizzesCount={quizzes.length}
         openCount={openCount}
+        upcomingCount={upcomingCount}
         completedCount={completedCount}
         topics={topics}
         selectedTopicId={selectedTopicId}
@@ -225,6 +236,10 @@ export function QuizzesClient({
                 quiz={quiz}
                 classId={classId}
                 isTeacher={isTeacher}
+                onEditPublication={(q) => {
+                  setEditingQuiz(q);
+                  setIsEditModalOpen(true);
+                }}
                 onUnpublish={(publicationId) =>
                   setUnpublishModal({ isOpen: true, publicationId, isUnpublishing: false })
                 }
@@ -278,6 +293,18 @@ export function QuizzesClient({
         isOpen={isPublishModalOpen}
         onOpenChange={setIsPublishModalOpen}
         preselectedClassId={classId}
+        topics={topics}
+        onSuccess={async () => {
+          const fresh = await quizPublicationsService.getClassPublications(classId);
+          setQuizzes(fresh);
+        }}
+      />
+
+      {/* Teacher Edit Publication Modal */}
+      <EditPublicationModal
+        isOpen={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        quizItem={editingQuiz}
         topics={topics}
         onSuccess={async () => {
           const fresh = await quizPublicationsService.getClassPublications(classId);

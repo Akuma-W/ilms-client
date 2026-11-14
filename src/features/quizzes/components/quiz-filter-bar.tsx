@@ -9,21 +9,20 @@ interface QuizFilterBarProps {
   onFilterTabChange: (tab: QuizFilterTab) => void;
   totalQuizzesCount: number;
   openCount: number;
+  upcomingCount?: number;
   completedCount: number;
   topics: Topic[];
   selectedTopicId: string;
   onTopicChange: (topicId: string) => void;
 }
 
-/**
- * Filter bar for Classroom Quizzes.
- * Provides tab-based status filters and a dropdown to filter by topic.
- */
+// Filter bar for Classroom Quizzes with status tabs and topic selector
 export function QuizFilterBar({
   filterTab,
   onFilterTabChange,
   totalQuizzesCount,
   openCount,
+  upcomingCount = 0,
   completedCount,
   topics = [],
   selectedTopicId,
@@ -50,6 +49,16 @@ export function QuizFilterBar({
           className="h-8.5 text-xs font-semibold rounded-xl"
         >
           Đang mở ({openCount})
+        </Button>
+
+        <Button
+          type="button"
+          variant={filterTab === 'upcoming' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => onFilterTabChange('upcoming')}
+          className="h-8.5 text-xs font-semibold rounded-xl"
+        >
+          Sắp mở ({upcomingCount})
         </Button>
 
         <Button

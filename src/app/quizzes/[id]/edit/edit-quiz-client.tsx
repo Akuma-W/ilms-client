@@ -7,11 +7,15 @@ import { QuizStudioSidebar } from '@/features/quizzes/components/studio/quiz-stu
 import { QuizQuestionEditor } from '@/features/quizzes/components/studio/quiz-question-editor';
 import { WordImportModal } from '@/features/quizzes/components/studio/word-import-modal';
 import { DistributePointsModal } from '@/features/quizzes/components/studio/distribute-points-modal';
+import {
+  QuizSaveSettingsModal,
+  type QuizSavePayload,
+} from '@/features/quizzes/components/studio/quiz-save-settings-modal';
 import { quizzesService } from '@/features/quizzes/services/quizzes.service';
 import { questionsService } from '@/features/quizzes/services/questions.service';
 import { getQuizQuestionValidationError } from '@/features/quizzes/utils/quiz.utils';
 import type { ParsedQuestion, ParsedQuizDocx, Quiz } from '@/types/quiz';
-import { QuestionType, Visibility, QuizStatus } from '@/types/enum';
+import { QuestionType, Visibility, QuizStatus, ReviewMode } from '@/types/enum';
 import { toast } from 'sonner';
 
 interface EditQuizClientProps {
@@ -25,10 +29,13 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
   const [title, setTitle] = useState(initialQuiz.title);
   const [description, setDescription] = useState(initialQuiz.description ?? '');
   const [timeLimit, setTimeLimit] = useState(initialQuiz.timeLimit || 15);
-  const [visibility, setVisibility] = useState<Visibility>(initialQuiz.visibility);
+  const [reviewMode] = useState<ReviewMode>(
+    initialQuiz.reviewMode || ReviewMode.after_submission
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   // Map existing questions to editor format
   const [questions, setQuestions] = useState<ParsedQuestion[]>(() => {
@@ -125,23 +132,27 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
     toast.success('Đã cập nhật thang điểm cho toàn bộ câu hỏi!');
   };
 
-  // Saves changes to quiz metadata and questions
-  const handleSaveQuiz = async () => {
+  // Validates basic prerequisites and opens configuration modal
+  const handleOpenSaveModal = () => {
     if (!title.trim()) {
       toast.error('Vui lòng nhập tiêu đề cho đề thi');
       return;
     }
-
     if (questions.length === 0) {
       toast.error('Đề thi phải có ít nhất 1 câu hỏi');
       return;
     }
+    setIsSaveModalOpen(true);
+  };
 
+  // Saves changes to quiz metadata and questions
+  const handleConfirmSave = async (payload: QuizSavePayload) => {
     for (let i = 0; i < questions.length; i++) {
       const validationError = getQuizQuestionValidationError(questions[i]);
       if (validationError) {
         toast.error(`Câu hỏi ${i + 1}: ${validationError}`);
         setSelectedIndex(i);
+        setIsSaveModalOpen(false);
         return;
       }
     }
@@ -149,28 +160,30 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
     try {
       setIsSaving(true);
       // Step 1: Update Quiz metadata
-      const targetStatus =
-        visibility === Visibility.public
-          ? QuizStatus.published
-          : initialQuiz.status === QuizStatus.published
-            ? QuizStatus.published
-            : QuizStatus.draft;
-
       await quizzesService.updateQuiz(initialQuiz.id, {
-        title: title.trim(),
-        description: description.trim(),
-        timeLimit,
-        visibility,
-        status: targetStatus,
+        title: payload.title,
+        description: payload.description,
+        timeLimit: payload.timeLimit,
+        reviewMode: payload.reviewMode,
+        visibility: payload.visibility,
+        status: payload.status,
       });
 
+      // Step 2: Sync questions
       await questionsService.syncQuizQuestions(
         initialQuiz.id,
         questions,
         (initialQuiz.questions ?? []).map((question) => question.id),
       );
 
-      toast.success('Cập nhật đề thi thành công!');
+      toast.success(
+        payload.visibility === Visibility.public
+          ? 'Đã cập nhật và công khai đề thi!'
+          : payload.status === QuizStatus.published
+            ? 'Đã cập nhật hoàn tất đề thi riêng tư!'
+            : 'Đã cập nhật bản nháp đề thi!'
+      );
+      setIsSaveModalOpen(false);
       router.push(`/quizzes/${initialQuiz.id}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi khi lưu đề thi';
@@ -181,7 +194,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-100/60 dark:bg-slate-950">
+    <div className="flex flex-col h-[calc(100vh-4rem)] sm:h-[calc(100vh-6.25rem)] overflow-hidden bg-slate-100/60 dark:bg-slate-950">
       {/* Sticky Header */}
       <QuizStudioHeader
         title={title}
@@ -190,9 +203,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
         onDescriptionChange={setDescription}
         timeLimit={timeLimit}
         onTimeLimitChange={setTimeLimit}
-        visibility={visibility}
-        onVisibilityChange={setVisibility}
-        onSave={handleSaveQuiz}
+        onSave={handleOpenSaveModal}
         isSaving={isSaving}
         onOpenWordModal={() => setIsWordModalOpen(true)}
         onOpenDistributeModal={() => setIsDistributeModalOpen(true)}
@@ -201,7 +212,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
       />
 
       {/* Main Studio Two-Column Workspace */}
-      <div className="flex flex-1 h-[calc(100vh-172px)] overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         {/* Left: Studio Question Navigator Sidebar */}
         <QuizStudioSidebar
           questions={questions}
@@ -215,7 +226,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
         />
 
         {/* Right: Main Editor Canvas */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 h-full p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-4xl mx-auto">
             {questions.length > 0 && questions[selectedIndex] ? (
               <QuizQuestionEditor
@@ -252,6 +263,21 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
         onOpenChange={setIsDistributeModalOpen}
         questions={questions}
         onApplyPoints={handleApplyDistributedPoints}
+      />
+
+      {/* Save & Publish Settings Modal */}
+      <QuizSaveSettingsModal
+        open={isSaveModalOpen}
+        onOpenChange={setIsSaveModalOpen}
+        initialValues={{
+          title,
+          description,
+          timeLimit,
+          reviewMode,
+        }}
+        questions={questions}
+        isSaving={isSaving}
+        onConfirmSave={handleConfirmSave}
       />
     </div>
   );

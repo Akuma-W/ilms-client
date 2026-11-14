@@ -1,4 +1,4 @@
-import { QuestionType, QuizStatus, Visibility } from './enum';
+import { QuestionType, QuizStatus, ReviewMode, Visibility } from './enum';
 import { User } from './user';
 
 export interface Option {
@@ -54,6 +54,14 @@ export interface QuizAttemptSession {
   questions: QuizTakeQuestion[];
 }
 
+export interface CheckedAnswerResult {
+  questionId: string;
+  isCorrect: boolean;
+  correctOptionIds: string[];
+  explanation?: string | null;
+  pointsEarned: number;
+}
+
 export interface QuizAttemptResult {
   attemptId: string;
   quizId: string;
@@ -61,10 +69,14 @@ export interface QuizAttemptResult {
   studentId?: string;
   publicationId?: string | null;
   score: number | null;
+  totalPoints?: number;
   startedAt?: string;
   submittedAt: string | null;
   totalQuestions: number;
   correctCount: number;
+  reviewMode?: ReviewMode;
+  canViewAnswers?: boolean;
+  message?: string;
   details: {
     questionId: string;
     isCorrect: boolean;
@@ -86,6 +98,7 @@ export interface QuizPublication {
   openAt?: string | null;
   closeAt?: string | null;
   isPublic: boolean;
+  reviewMode?: ReviewMode;
   publishedAt?: string;
   quizId: string;
   classId?: string | null;
@@ -109,6 +122,7 @@ export interface Quiz {
   timeLimit: number;
   visibility: Visibility;
   status: QuizStatus;
+  reviewMode?: ReviewMode;
   createdAt: string;
   updatedAt?: string;
   createdBy: string;
@@ -122,7 +136,7 @@ export interface Quiz {
   attempts?: QuizAttempt[];
 }
 
-export type QuizFilterTab = 'all' | 'open' | 'completed' | 'closed';
+export type QuizFilterTab = 'all' | 'open' | 'upcoming' | 'completed' | 'closed';
 
 export interface QuizClassItem extends Pick<Quiz, 'id' | 'title' | 'timeLimit'> {
   description?: string | null;
@@ -132,6 +146,7 @@ export interface QuizClassItem extends Pick<Quiz, 'id' | 'title' | 'timeLimit'> 
   topicName?: string | null;
   openAt?: string | null;
   closeAt?: string | null;
+  reviewMode?: ReviewMode;
   questionCount?: number;
   totalQuestions?: number;
   totalPoints?: number;
@@ -153,6 +168,7 @@ export interface PublishQuizInput {
   topicId?: string | null;
   openAt?: string | null;
   closeAt?: string | null;
+  reviewMode?: ReviewMode;
   isPublic?: boolean;
 }
 
@@ -160,6 +176,7 @@ export interface UpdatePublicationInput {
   topicId?: string | null;
   openAt?: string | null;
   closeAt?: string | null;
+  reviewMode?: ReviewMode;
   isPublic?: boolean;
 }
 
@@ -167,6 +184,7 @@ export interface QuizStudentStatItem {
   studentId: string;
   name: string;
   email: string;
+  identityCode?: string | null;
   avatar: string | null;
   isSubmitted: boolean;
   score: number | null;
@@ -223,6 +241,7 @@ export interface CreateQuizInput {
   timeLimit: number;
   visibility?: Visibility;
   status?: QuizStatus;
+  reviewMode?: ReviewMode;
 }
 
 export interface UpdateQuizInput {
@@ -231,6 +250,7 @@ export interface UpdateQuizInput {
   timeLimit?: number;
   visibility?: Visibility;
   status?: QuizStatus;
+  reviewMode?: ReviewMode;
 }
 
 export interface CreateQuestionInput {

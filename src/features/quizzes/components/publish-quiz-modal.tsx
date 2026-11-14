@@ -19,7 +19,7 @@ import { quizzesService } from '../services/quizzes.service';
 import { quizPublicationsService } from '../services/quiz-publications.service';
 import { formatDateTimeLocal } from '../utils/quiz.utils';
 import { PublishQuizFormFields } from './publish-quiz-form-fields';
-import { ClassTabs } from '@/types/enum';
+import { ClassTabs, ReviewMode } from '@/types/enum';
 import type { Quiz } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
 
@@ -45,6 +45,7 @@ export function PublishQuizModal({
   const [selectedQuizId, setSelectedQuizId] = useState(preselectedQuiz?.id || '');
   const [selectedClassId, setSelectedClassId] = useState(preselectedClassId || '');
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
+  const [reviewMode, setReviewMode] = useState<ReviewMode>(ReviewMode.after_submission);
   const [isPublic, setIsPublic] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ quiz?: boolean; class?: boolean; topic?: boolean }>({});
@@ -87,6 +88,7 @@ export function PublishQuizModal({
       setSelectedQuizId(preselectedQuiz?.id || '');
       setSelectedClassId(preselectedClassId || '');
       setSelectedTopicId('');
+      setReviewMode(ReviewMode.after_submission);
       setErrors({});
       setIsPublic(false);
       setOpenAt(formatDateTimeLocal(new Date()));
@@ -126,6 +128,7 @@ export function PublishQuizModal({
         topicId: selectedTopicId === 'none' ? null : selectedTopicId,
         openAt: openingTime.toISOString(),
         closeAt: closingTime.toISOString(),
+        reviewMode,
         isPublic,
       });
 
@@ -182,6 +185,8 @@ export function PublishQuizModal({
           onOpenAtChange={setOpenAt}
           closeAt={closeAt}
           onCloseAtChange={setCloseAt}
+          reviewMode={reviewMode}
+          onReviewModeChange={setReviewMode}
           isPublic={isPublic}
           onIsPublicChange={setIsPublic}
           errors={errors}

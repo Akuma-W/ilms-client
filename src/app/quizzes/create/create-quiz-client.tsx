@@ -7,11 +7,15 @@ import { QuizStudioSidebar } from '@/features/quizzes/components/studio/quiz-stu
 import { QuizQuestionEditor } from '@/features/quizzes/components/studio/quiz-question-editor';
 import { WordImportModal } from '@/features/quizzes/components/studio/word-import-modal';
 import { DistributePointsModal } from '@/features/quizzes/components/studio/distribute-points-modal';
+import {
+  QuizSaveSettingsModal,
+  type QuizSavePayload,
+} from '@/features/quizzes/components/studio/quiz-save-settings-modal';
 import { quizzesService } from '@/features/quizzes/services/quizzes.service';
 import { questionsService } from '@/features/quizzes/services/questions.service';
 import { getQuizQuestionValidationError } from '@/features/quizzes/utils/quiz.utils';
 import type { ParsedQuestion, ParsedQuizDocx } from '@/types/quiz';
-import { QuestionType, Visibility, QuizStatus } from '@/types/enum';
+import { QuestionType, Visibility, QuizStatus, ReviewMode } from '@/types/enum';
 import { toast } from 'sonner';
 
 export function CreateQuizClient() {
@@ -20,10 +24,11 @@ export function CreateQuizClient() {
   const [title, setTitle] = useState('Đề thi trắc nghiệm mới');
   const [description, setDescription] = useState('');
   const [timeLimit, setTimeLimit] = useState(15);
-  const [visibility, setVisibility] = useState<Visibility>(Visibility.private);
+  const [reviewMode] = useState<ReviewMode>(ReviewMode.after_submission);
   const [isSaving, setIsSaving] = useState(false);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   const [questions, setQuestions] = useState<ParsedQuestion[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -104,23 +109,27 @@ export function CreateQuizClient() {
     toast.success('Đã cập nhật thang điểm cho toàn bộ câu hỏi!');
   };
 
-  // Validates and saves quiz and batch questions to backend
-  const handleSaveQuiz = async () => {
+  // Validates basic prerequisites and opens configuration modal
+  const handleOpenSaveModal = () => {
     if (!title.trim()) {
       toast.error('Vui lòng nhập tiêu đề cho đề thi');
       return;
     }
-
     if (questions.length === 0) {
       toast.error('Đề thi phải có ít nhất 1 câu hỏi');
       return;
     }
+    setIsSaveModalOpen(true);
+  };
 
+  // Validates and saves quiz and batch questions to backend
+  const handleConfirmSave = async (payload: QuizSavePayload) => {
     for (let i = 0; i < questions.length; i++) {
       const validationError = getQuizQuestionValidationError(questions[i]);
       if (validationError) {
         toast.error(`Câu hỏi ${i + 1}: ${validationError}`);
         setSelectedIndex(i);
+        setIsSaveModalOpen(false);
         return;
       }
     }
@@ -129,11 +138,12 @@ export function CreateQuizClient() {
       setIsSaving(true);
       // Step 1: Create Quiz metadata
       const newQuiz = await quizzesService.createQuiz({
-        title: title.trim(),
-        description: description.trim() || undefined,
-        timeLimit,
-        visibility,
-        status: QuizStatus.draft,
+        title: payload.title,
+        description: payload.description || undefined,
+        timeLimit: payload.timeLimit,
+        reviewMode: payload.reviewMode,
+        visibility: payload.visibility,
+        status: payload.status,
       });
 
       // Step 2: Batch create questions
@@ -152,11 +162,14 @@ export function CreateQuizClient() {
         })),
       );
 
-      if (visibility === Visibility.public) {
-        await quizzesService.updateQuiz(newQuiz.id, { status: QuizStatus.published });
-      }
-
-      toast.success('Lưu đề thi và ngân hàng câu hỏi thành công!');
+      toast.success(
+        payload.visibility === Visibility.public
+          ? 'Đã công khai đề thi lên Thư viện chung!'
+          : payload.status === QuizStatus.published
+            ? 'Đã lưu hoàn tất đề thi riêng tư!'
+            : 'Đã lưu bản nháp đề thi!'
+      );
+      setIsSaveModalOpen(false);
       router.push(`/quizzes/${newQuiz.id}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Lỗi khi lưu đề thi';
@@ -167,7 +180,7 @@ export function CreateQuizClient() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-100/60 dark:bg-slate-950">
+    <div className="flex flex-col h-[calc(100vh-4rem)] sm:h-[calc(100vh-6.25rem)] overflow-hidden bg-slate-100/60 dark:bg-slate-950">
       {/* Sticky Header */}
       <QuizStudioHeader
         title={title}
@@ -176,9 +189,7 @@ export function CreateQuizClient() {
         onDescriptionChange={setDescription}
         timeLimit={timeLimit}
         onTimeLimitChange={setTimeLimit}
-        visibility={visibility}
-        onVisibilityChange={setVisibility}
-        onSave={handleSaveQuiz}
+        onSave={handleOpenSaveModal}
         isSaving={isSaving}
         onOpenWordModal={() => setIsWordModalOpen(true)}
         onOpenDistributeModal={() => setIsDistributeModalOpen(true)}
@@ -187,7 +198,7 @@ export function CreateQuizClient() {
       />
 
       {/* Main Studio Two-Column Workspace */}
-      <div className="flex flex-1 h-[calc(100vh-172px)] overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         {/* Left: Studio Question Navigator Sidebar */}
         <QuizStudioSidebar
           questions={questions}
@@ -201,7 +212,7 @@ export function CreateQuizClient() {
         />
 
         {/* Right: Main Editor Canvas */}
-        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 h-full p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-4xl mx-auto">
             {questions.length > 0 && questions[selectedIndex] ? (
               <QuizQuestionEditor
@@ -238,6 +249,21 @@ export function CreateQuizClient() {
         onOpenChange={setIsDistributeModalOpen}
         questions={questions}
         onApplyPoints={handleApplyDistributedPoints}
+      />
+
+      {/* Save & Publish Settings Modal */}
+      <QuizSaveSettingsModal
+        open={isSaveModalOpen}
+        onOpenChange={setIsSaveModalOpen}
+        initialValues={{
+          title,
+          description,
+          timeLimit,
+          reviewMode,
+        }}
+        questions={questions}
+        isSaving={isSaving}
+        onConfirmSave={handleConfirmSave}
       />
     </div>
   );
