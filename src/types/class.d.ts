@@ -23,6 +23,9 @@ export interface Class {
   teacher: User;
   enrollment: Enrollment | null;
   totalStudents?: number;
+  totalTopics?: number;
+  totalAssignments?: number;
+  totalQuizzes?: number;
 }
 
 export interface ClassClient extends Class {

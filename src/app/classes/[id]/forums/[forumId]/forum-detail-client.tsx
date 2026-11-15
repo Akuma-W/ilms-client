@@ -16,25 +16,20 @@ import type {
   CreateForumFormData,
 } from '@/features/forums/schemas/forum.schema';
 import type { Comment, Forum } from '@/types/forum';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface ForumDetailClientProps {
   initialForum: Forum;
   classId: string;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
-/**
- * Client component for Single Discussion Topic details.
- * Manages post view, comments list before input, unified replies, soft deletes, and topic editing.
- */
 export function ForumDetailClient({
   initialForum,
   classId,
   isTeacher,
-  currentUser,
 }: ForumDetailClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const router = useRouter();
   const [forum, setForum] = useState<Forum>(initialForum);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

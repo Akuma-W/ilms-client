@@ -6,25 +6,21 @@ import { StudentClassInfo } from '@/features/classes/components/info/student-cla
 import { TeacherClassInfo } from '@/features/classes/components/info/teacher-class-info';
 import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface InfoClientProps {
-  classData: Class | null;
-  userData: User | null;
+  initialClassData: Class | null;
   relation: Enrollment | null;
 }
 
-/**
- * Main Client component for Class Info tab.
- * Orchestrates role-based views across Guest, Enrolled Student, and Class Teacher.
- */
-export function InfoClient({ classData: initialClassData, userData, relation }: InfoClientProps) {
+export function InfoClient({ initialClassData, relation }: InfoClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const [classData, setClassData] = useState<Class | null>(initialClassData);
 
   if (!classData) return null;
 
   const isTeacher = Boolean(
-    (relation?.roleIn === 'teacher' || classData?.teacherId === userData?.id) && userData,
+    (relation?.roleIn === 'teacher' || classData?.teacherId === currentUser?.id) && currentUser,
   );
   const isJoined = Boolean(relation && relation.status === 'approved');
 
@@ -34,17 +30,17 @@ export function InfoClient({ classData: initialClassData, userData, relation }: 
       {!isJoined && !isTeacher && <GuestClassInfo classData={classData} relation={relation} />}
 
       {/* Case 2: Class Teacher */}
-      {isTeacher && userData && (
+      {isTeacher && currentUser && (
         <TeacherClassInfo
           classData={classData}
-          userData={userData}
+          userData={currentUser}
           onClassUpdated={(updated) => setClassData(updated)}
         />
       )}
 
       {/* Case 3: Enrolled Student */}
-      {isJoined && !isTeacher && userData && relation && (
-        <StudentClassInfo classData={classData} userData={userData} relation={relation} />
+      {isJoined && !isTeacher && currentUser && relation && (
+        <StudentClassInfo classData={classData} userData={currentUser} relation={relation} />
       )}
     </div>
   );

@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { forumsServerService } from '@/features/forums/services/forums.server.service';
 import { ForumsClient } from './forums-client';
 
@@ -19,15 +18,14 @@ interface ClassForumsPageProps {
 export default async function ClassForumsPage({ params }: ClassForumsPageProps) {
   const { id } = await params;
 
-  const [classData, user, relation, initialForums] = await Promise.all([
+  const [classData, relation, initialForums] = await Promise.all([
     classServerService.getClassData(id),
-    userServerService.getMe().catch(() => null),
     enrollmentServerService.getMyRelationInClass(id).catch(() => null),
     forumsServerService.getForums(id),
   ]);
 
   const isTeacher = Boolean(
-    (relation?.roleIn === 'teacher' || classData?.teacherId === user?.id) && user,
+    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
   return (
@@ -35,7 +33,6 @@ export default async function ClassForumsPage({ params }: ClassForumsPageProps) 
       initialForums={initialForums}
       classId={id}
       isTeacher={isTeacher}
-      currentUser={user}
     />
   );
 }

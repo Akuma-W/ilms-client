@@ -26,9 +26,6 @@ interface OverviewClientProps {
   isTeacher: boolean;
 }
 
-/**
- * Client Component for Class Overview tab in full-width Hub-and-Spoke layout.
- */
 export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');

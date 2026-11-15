@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { forumsServerService } from '@/features/forums/services/forums.server.service';
 import { ForumDetailClient } from './forum-detail-client';
 
@@ -26,9 +25,8 @@ export async function generateMetadata({ params }: ForumDetailPageProps): Promis
 export default async function ForumDetailPage({ params }: ForumDetailPageProps) {
   const { id, forumId } = await params;
 
-  const [classData, user, relation, forumDetail] = await Promise.all([
+  const [classData, relation, forumDetail] = await Promise.all([
     classServerService.getClassData(id),
-    userServerService.getMe().catch(() => null),
     enrollmentServerService.getMyRelationInClass(id).catch(() => null),
     forumsServerService.getForumDetail(forumId),
   ]);
@@ -38,7 +36,7 @@ export default async function ForumDetailPage({ params }: ForumDetailPageProps) 
   }
 
   const isTeacher = Boolean(
-    (relation?.roleIn === 'teacher' || classData?.teacherId === user?.id) && user,
+    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
   return (
@@ -46,7 +44,6 @@ export default async function ForumDetailPage({ params }: ForumDetailPageProps) 
       initialForum={forumDetail}
       classId={id}
       isTeacher={isTeacher}
-      currentUser={user}
     />
   );
 }

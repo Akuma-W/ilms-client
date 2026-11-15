@@ -104,9 +104,13 @@ export function ContactSection({ defaultType = 'contact' }: ContactSectionProps)
                 {(['contact', 'feedback'] as const).map((t) => (
                   <Button
                     key={t}
+                    type="button"
                     variant={type === t ? 'default' : 'ghost'}
-                    onClick={() => form.setValue('type', t)}
-                    className="cursor-pointer py-2 text-sm font-medium rounded-lg transition-all"
+                    onClick={() => {
+                      form.setValue('type', t);
+                      form.clearErrors();
+                    }}
+                    className="py-2 text-sm font-medium rounded-lg transition-all"
                   >
                     {t === 'contact' ? 'Liên hệ' : 'Góp ý'}
                   </Button>
@@ -173,7 +177,7 @@ export function ContactSection({ defaultType = 'contact' }: ContactSectionProps)
                 )}
               />
 
-              <Button type="submit" className="cursor-pointer w-full">
+              <Button type="submit" className="w-full">
                 {config.submitLabel}
                 <Send className="ml-2 h-4 w-4" />
               </Button>

@@ -61,7 +61,7 @@ export async function proxy(request: NextRequest) {
   let refreshedResponse: NextResponse | null = null;
 
   // Auto-refresh token at the Edge if access_token is expired but refresh_token exists
-  if ((!validToken || isTokenExpired) && refreshToken && (isProtectedRoute || isAdminRoute)) {
+  if ((!validToken || isTokenExpired) && refreshToken) {
     try {
       const serverApiUrl =
         process.env.INTERNAL_API_URL ||
@@ -92,10 +92,16 @@ export async function proxy(request: NextRequest) {
             payload = decodeJwt(validToken);
           }
 
+          const maxAge =
+            trimmedName === 'refresh_token'
+              ? 7 * 24 * 60 * 60
+              : 15 * 60;
+
           refreshedResponse.cookies.set(trimmedName, trimmedVal, {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
+            maxAge,
           });
           request.cookies.set(trimmedName, trimmedVal);
         }
@@ -118,7 +124,8 @@ export async function proxy(request: NextRequest) {
 
   // 2. Authenticated user trying to access auth pages (login/register)
   if (isLoggedIn && isAuthRoute) {
-    return NextResponse.redirect(new URL('/classes', request.url));
+    const target = payload?.role === 'admin' ? '/admin' : '/classes';
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
   // 3. RBAC: Restrict /admin route to users with 'admin' role

@@ -22,10 +22,6 @@ interface AssignmentsClientProps {
   topics?: Topic[];
 }
 
-/**
- * Client Component for Classroom Assignments tab.
- * Adheres to Amber Orange theme, Clean Architecture, and Single Responsibility Principle.
- */
 export function AssignmentsClient({
   classId,
   initialAssignments = [],

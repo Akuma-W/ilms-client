@@ -35,7 +35,7 @@ export function Logo({
   const textColor1 = variant === 'light' ? 'text-galaxy-blue' : 'text-blue-400';
   const textColor2 = variant === 'light' ? 'text-galaxy-purple' : 'text-purple-400';
 
-  const sloganColor = variant === 'light' ? 'text-gray-500' : 'text-slate-500';
+  const sloganColor = variant === 'light' ? 'text-slate-500' : 'text-slate-300';
 
   return (
     <Link href="/" className={cn('flex items-center gap-1 select-none cursor-pointer', className)}>

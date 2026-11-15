@@ -1,108 +1,141 @@
 'use client';
 
-import { Lock, LogIn, Mail } from 'lucide-react';
+import { LogIn, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { useActionState, useEffect } from 'react';
-import { LoginState, loginAction } from '@/features/auth/actions/login.action';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { LoginFormSchema, LoginFormValues } from '../schemas/auth.schema';
+import { loginAction } from '@/features/auth/actions/login.action';
 import { toast } from 'sonner';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-
-const initialState: LoginState = {
-  success: null,
-  message: '',
-  errors: {},
-  data: {},
-};
+import { PasswordInput } from '@/components/ui/password-input';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 export function LoginForm() {
   const router = useRouter();
-  const [state, action, pending] = useActionState(loginAction, initialState);
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect') || '/classes';
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (state.success === null) return;
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginFormSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-    if (state.success === false) {
-      toast.error(state.message, { duration: 1000 });
-    } else if (state.message) {
-      toast.success('Đăng nhập thành công', { duration: 3000 });
-      router.push('/classes');
-      router.refresh();
+  const onSubmit = async (values: LoginFormValues) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('email', values.email);
+      formData.append('password', values.password);
+
+      const state = await loginAction(
+        { success: null, message: '', errors: {}, data: {} },
+        formData,
+      );
+
+      if (state.success === false) {
+        toast.error(state.message || 'Đăng nhập thất bại');
+        if (state.errors?.email?.[0]) {
+          form.setError('email', { message: state.errors.email[0] });
+        }
+        if (state.errors?.password?.[0]) {
+          form.setError('password', { message: state.errors.password[0] });
+        }
+      } else if (state.message) {
+        toast.success('Đăng nhập thành công');
+        router.push(redirectTarget);
+        router.refresh();
+      }
+    } catch {
+      toast.error('Đã xảy ra lỗi trong quá trình đăng nhập');
+    } finally {
+      setLoading(false);
     }
-  }, [state, router]);
+  };
 
   return (
-    <form action={action} className="space-y-4">
-      {/* Email Field */}
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            defaultValue={state.data?.email}
-            autoComplete="email"
-            placeholder="Nhập email của bạn"
-            className="pl-10"
-            aria-describedby="email-error"
-          />
-        </div>
-        <div id="email-error" aria-live="polite" aria-atomic="true">
-          {state?.errors?.email &&
-            state.errors.email.map((error: string) => (
-              <p className="mt-2 text-sm text-red-500" key={error}>
-                {error}
-              </p>
-            ))}
-        </div>
-      </div>
-      {/* Password Field */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Mật khẩu</Label>
-          <Link href="#" className="text-xs text-galaxy-blue hover:underline">
-            Quên mật khẩu?
-          </Link>
-        </div>
-        <div className="relative">
-          <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            defaultValue={state.data?.password}
-            autoComplete="current-password"
-            placeholder="Nhập mật khẩu của bạn"
-            className="pl-10"
-            aria-describedby="password-error"
-          />
-        </div>
-        <div id="password-error" aria-live="polite" aria-atomic="true">
-          {state?.errors?.password && (
-            <div className="mt-2 text-sm text-red-500">
-              <p>Mật khẩu phải:</p>
-              <ul>
-                {state.errors.password.map((error) => (
-                  <li key={error}>- {error}</li>
-                ))}
-              </ul>
-            </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Email Field */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-1.5">
+              <FormLabel className="text-xs font-semibold text-slate-700">
+                Địa chỉ Email
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
+                  <Input
+                    {...field}
+                    type="email"
+                    autoComplete="email"
+                    placeholder="name@example.com"
+                    className="pl-10 h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </FormControl>
+              <FormMessage className="text-xs text-rose-500 font-medium" />
+            </FormItem>
           )}
-        </div>
-      </div>
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        disabled={pending}
-        className="cursor-pointer w-full bg-galaxy hover:opacity-90 text-white font-bold py-6 rounded-xl shadow-lg transition-all"
-      >
-        {pending ? 'Đang xử lý...' : 'Đăng nhập'}
-        {!pending && <LogIn className="ml-2 h-4 w-4" />}
-      </Button>
-    </form>
+        />
+
+        {/* Password Field */}
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-xs font-semibold text-slate-700">
+                  Mật khẩu
+                </FormLabel>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"
+                >
+                  Quên mật khẩu?
+                </Link>
+              </div>
+              <FormControl>
+                <PasswordInput
+                  {...field}
+                  autoComplete="current-password"
+                  placeholder="Password@123"
+                  className="h-11 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                />
+              </FormControl>
+              <FormMessage className="text-xs text-rose-500 font-medium" />
+            </FormItem>
+          )}
+        />
+
+        {/* Action Submit */}
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full h-11 text-sm font-bold rounded-xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:opacity-95 text-white shadow-md shadow-indigo-500/20 gap-2 mt-2"
+        >
+          <LogIn className="size-4" />
+          <span>{loading ? 'Đang xác thực...' : 'Đăng nhập'}</span>
+        </Button>
+      </form>
+    </Form>
   );
 }

@@ -7,19 +7,15 @@ import { StudentGradesView } from '@/features/grades/components/student-grades-v
 import { gradesService } from '@/features/grades/services/grades.service';
 import { gradeCategoriesService } from '@/features/grades/services/grade-categories.service';
 import type { ClassGradeMatrixRow, GradeCategory, StudentGradeRecord } from '@/types/grade';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface GradesClientProps {
   classId: string;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
-/**
- * Main Client orchestrator for the Grades tab.
- * Dynamically switches between student personal gradebook and teacher grading matrix.
- */
-export function GradesClient({ classId, isTeacher, currentUser }: GradesClientProps) {
+export function GradesClient({ classId, isTeacher }: GradesClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<GradeCategory[]>([]);
   const [matrixRows, setMatrixRows] = useState<ClassGradeMatrixRow[]>([]);

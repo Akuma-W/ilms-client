@@ -8,6 +8,7 @@ import { QuizGridSkeleton } from '@/features/quizzes/components/repository/quiz-
 import { QuizEmptyState } from '@/features/quizzes/components/repository/quiz-empty-state';
 import { QuizPagination } from '@/features/quizzes/components/repository/quiz-pagination';
 import { useQuizzes } from '@/features/quizzes/hooks/use-quizzes';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 import { quizzesService } from '@/features/quizzes/services/quizzes.service';
 import type { PaginatedQuizzesResult, Quiz } from '@/types/quiz';
 import type { User } from '@/types/user';
@@ -17,11 +18,12 @@ import { toast } from 'sonner';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 
 interface QuizzesClientProps {
-  currentUser: User | null;
+  currentUser?: User | null;
   initialData: PaginatedQuizzesResult<Quiz> | null;
 }
 
 export function QuizzesClient({ currentUser, initialData }: QuizzesClientProps) {
+  const { user } = useCurrentUser({ initialUser: currentUser });
   const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -152,7 +154,7 @@ export function QuizzesClient({ currentUser, initialData }: QuizzesClientProps) 
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.items.map((quiz) => {
-              const isOwner = currentUser?.id === quiz.createdBy;
+              const isOwner = user?.id === quiz.createdBy;
               return (
                 <QuizRepositoryCard
                   key={quiz.id}

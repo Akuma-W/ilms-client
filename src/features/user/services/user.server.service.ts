@@ -1,9 +1,6 @@
 import { serverApiClient } from '@/lib/api/server-api-client';
 import { User } from '@/types/user';
 
-/**
- * Server-side user service executing in Node.js runtime (SSR / Server Components).
- */
 export const userServerService = {
   async getMe(): Promise<User | null> {
     const result = await serverApiClient<User>('/users/me', {

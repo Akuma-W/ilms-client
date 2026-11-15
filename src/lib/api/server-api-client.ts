@@ -16,6 +16,10 @@ export async function serverApiClient<T>(
 
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
+  const serializedCookies = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join('; ');
 
   const targetUrl = endpoint.startsWith('http')
     ? endpoint
@@ -27,7 +31,7 @@ export async function serverApiClient<T>(
       headers: {
         'Content-Type': 'application/json',
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        Cookie: cookieStore.toString(),
+        Cookie: serializedCookies,
         ...options?.headers,
       },
     });
