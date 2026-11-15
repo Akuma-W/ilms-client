@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { assignmentsServerService } from '@/features/assignments/services/assignments.server.service';
 import { topicsServerService } from '@/features/topics/services/topics.server.service';
@@ -14,26 +13,20 @@ interface ClassAssignmentsProps {
   params: Promise<{ id: string }>;
 }
 
-/**
- * Server Component for the Class Assignments tab.
- * Pre-fetches initial assignments and user role to prevent waterfalls.
- */
 export default async function ClassAssignments({ params }: ClassAssignmentsProps) {
   const { id: classId } = await params;
 
-  // 1. Check user relation and role (Must be teacher of THIS class)
-  const [relation, currentUser, classData, initialAssignments, topics] = await Promise.all([
+  // Check user relation and role (Must be teacher of THIS class)
+  const [relation, classData, initialAssignments, topics] = await Promise.all([
     enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
-    userServerService.getMe().catch(() => null),
     classServerService.getClassData(classId).catch(() => null),
     assignmentsServerService.getAssignments(classId).catch(() => []),
     topicsServerService.getTopics(classId).catch(() => []),
   ]);
 
   const isTeacher =
-    currentUser?.role === 'admin' ||
     relation?.roleIn === 'teacher' ||
-    Boolean(classData && currentUser && classData.teacherId === currentUser.id);
+    Boolean(classData && relation?.userId && classData.teacherId === relation.userId);
 
   return (
     <AssignmentsClient
@@ -41,7 +34,7 @@ export default async function ClassAssignments({ params }: ClassAssignmentsProps
       initialAssignments={initialAssignments}
       topics={topics}
       isTeacher={isTeacher}
-      studentId={currentUser?.id}
+      studentId={relation?.userId}
     />
   );
 }

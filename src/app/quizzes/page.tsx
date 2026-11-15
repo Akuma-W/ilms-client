@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Footer } from '@/components/layout/footer';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { quizzesServerService } from '@/features/quizzes/services/quizzes.server.service';
 import { QuizzesClient } from './quizzes-client';
 
@@ -10,14 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function QuizzesPage() {
-  const [user, initialData] = await Promise.all([
-    userServerService.getMe(),
-    quizzesServerService.getQuizzes({ scope: 'all', page: 1, limit: 12 }),
-  ]);
+  const initialData = await quizzesServerService.getQuizzes({ scope: 'all', page: 1, limit: 12 });
 
   return (
     <>
-      <QuizzesClient currentUser={user} initialData={initialData} />
+      <QuizzesClient initialData={initialData} />
       <Footer />
     </>
   );

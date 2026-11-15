@@ -23,10 +23,15 @@ export const MAIN_NAV_ITEMS = [
 ] as const;
 
 export const QUICK_LINKS = [
-  { label: 'Tham gia ngay', href: '/login' },
-  { label: 'Lớp học', href: '/classes' },
-  { label: 'Trắc nghiệm ôn tập', href: '/quizzes' },
-  { label: 'Liên hệ', href: '/contact' },
+  { label: 'Trang chủ', href: '/' },
+  { label: 'Lớp học trực tuyến', href: '/classes' },
+  { label: 'Trắc nghiệm & Ôn tập', href: '/quizzes' },
+  { label: 'Liên hệ & Hỗ trợ', href: '/contact' },
+] as const;
+
+export const LEGAL_LINKS = [
+  { label: 'Điều khoản sử dụng', href: '/terms' },
+  { label: 'Chính sách bảo mật', href: '/privacy' },
 ] as const;
 
 export const FOOTER_CONTACTS = [

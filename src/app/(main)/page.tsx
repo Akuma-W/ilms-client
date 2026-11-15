@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ContactSection } from '@/components/common/contact-section';
 import { SITE_CONFIG } from '@/config';
 import { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight, BookOpen, Sparkles, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Welcome',
@@ -15,50 +17,64 @@ export default function Home() {
   const { slogan } = SITE_CONFIG;
 
   return (
-    <section className="flex flex-col w-full overflow-x-hidden">
+    <section className="flex flex-col w-full overflow-x-hidden bg-slate-50/50">
       {/* Banner */}
       <BannerCarousel banners={HOME_BANNERS} />
 
-      {/* Slogan Bar */}
-      <div className="w-full bg-galaxy py-8 text-center relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-purple-500/20 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+      {/* Slogan Bar with Galaxy Gradient */}
+      <div className="w-full bg-linear-to-r from-slate-950 via-indigo-950 to-slate-950 py-10 text-center relative overflow-hidden border-y border-indigo-900/30">
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <h3 className="text-2xl md:text-3xl font-bold text-white italic tracking-wide">
+        <div className="container mx-auto px-4 relative z-10 max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-semibold mb-3">
+            <Sparkles className="size-3.5 text-indigo-400" />
+            <span>Nền tảng giáo dục thông minh KEIVerse</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-wide leading-relaxed">
             &quot;{slogan}&quot;
           </h3>
         </div>
       </div>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Chức năng cốt lõi</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Chúng tôi cung cấp đầy đủ các công cụ cần thiết để bạn có một trải nghiệm học tập
-              tuyệt vời nhất.
+      <section id="features" className="py-16 sm:py-20 relative">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-14 max-w-2xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+              <span>Hệ sinh thái số</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Chức năng cốt lõi
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              Cung cấp trọn bộ công cụ học tập, bài giảng tương tác và trợ lý AI thông minh đồng hành
+              suốt quá trình rèn luyện.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {HOME_FEATURES.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1 group"
+                className="bg-white p-7 sm:p-8 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-indigo-300 transition-all hover:-translate-y-1 group flex flex-col justify-between"
               >
-                <div
-                  className={cn(
-                    'w-14 h-14 rounded-xl flex items-center justify-center mb-6 text-white transition-transform group-hover:scale-110',
-                    feature.color,
-                  )}
-                >
-                  <feature.icon className="w-7 h-7" />
+                <div>
+                  <div
+                    className={cn(
+                      'w-12 h-12 rounded-xl flex items-center justify-center mb-5 text-white transition-transform group-hover:scale-110 shadow-sm',
+                      feature.color,
+                    )}
+                  >
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                    {feature.title}
+                  </h4>
+                  <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">
+                    {feature.description}
+                  </p>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h4>
-                <p className="text-gray-600 leading-relaxed text-sm">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -66,94 +82,125 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section className="py-16 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="flex-1 relative">
-              <div className="hidden lg:block relative z-10 rounded-3xl overflow-hidden shadow-2xl h-100">
+      <section className="py-16 sm:py-20 bg-white border-y border-slate-200/70 relative overflow-hidden">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+            <div className="flex-1 relative w-full">
+              <div className="relative z-10 rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 h-72 sm:h-96 w-full">
                 <Image
-                  src="https://picsum.photos/seed/about-us/800/600"
-                  alt="About KEIVerse"
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
+                  alt="About KEIVerse Interactive Learning"
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
-                  referrerPolicy="no-referrer"
                 />
               </div>
 
-              <div className="block lg:hidden h-1 w-full bg-galaxy rounded-full" />
-
-              {/* Decorative blobs */}
-              <div className="hidden lg:block absolute -top-10 -left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
-              <div className="hidden lg:block absolute -bottom-10 -right-10 w-60 h-60 bg-purple-400/20 rounded-full blur-3xl"></div>
+              {/* Decorative cosmic glow */}
+              <div className="absolute -top-8 -left-8 w-44 h-44 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-8 -right-8 w-60 h-60 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
             </div>
 
-            <div className="flex-1 space-y-8">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">
-                Về chúng tôi
+            <div className="flex-1 space-y-6">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                <span>Về chúng tôi</span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">
                 Kiến tạo tương lai <br />
-                <span className="text-gradient">Học tập không giới hạn</span>
+                <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  Học tập tương tác không giới hạn
+                </span>
               </h2>
-              <p className="text-gray-600 leading-relaxed text-lg">
-                KEIVerse ra đời với sứ mệnh mang đến một môi trường học tập số hóa toàn diện, nơi
-                tri thức được kết nối và lan tỏa. Chúng tôi tin rằng mỗi sinh viên đều có một hành
-                trình học tập riêng biệt, và KEIVerse là người bạn đồng hành giúp bạn khám phá và
-                chinh phục những đỉnh cao mới.
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
+                KEIVerse ra đời với sứ mệnh mang đến một môi trường học tập số hóa tương tác toàn diện,
+                nơi tri thức được kết nối và lan tỏa. Chúng tôi tin rằng mỗi người học đều sở hữu tiềm
+                năng riêng, và KEIVerse là trợ thủ đắc lực giúp bạn tiếp cận nguồn tài nguyên phong phú
+                và bứt phá kết quả.
               </p>
-              <div className="grid grid-cols-2 gap-8 pt-4">
-                <div>
-                  <div className="text-3xl font-bold text-galaxy-blue mb-1">10k+</div>
-                  <div className="text-sm text-gray-500">Sinh viên tin dùng</div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center gap-2 text-indigo-600 mb-1">
+                    <Users className="size-4" />
+                    <span className="text-xl sm:text-2xl font-black text-slate-900">10k+</span>
+                  </div>
+                  <div className="text-xs text-slate-500 font-medium">Học sinh & Giảng viên tin dùng</div>
                 </div>
-                <div>
-                  <div className="text-3xl font-bold text-galaxy-purple mb-1">500+</div>
-                  <div className="text-sm text-gray-500">Khóa học đa dạng</div>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center gap-2 text-purple-600 mb-1">
+                    <BookOpen className="size-4" />
+                    <span className="text-xl sm:text-2xl font-black text-slate-900">500+</span>
+                  </div>
+                  <div className="text-xs text-slate-500 font-medium">Lớp học & Khóa học đa dạng</div>
                 </div>
               </div>
-              <Button size="lg" className="bg-galaxy text-white px-8">
-                Tìm hiểu thêm
-              </Button>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Button
+                  asChild
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-11 px-6 font-semibold shadow-xs gap-2"
+                >
+                  <Link href="/classes">
+                    <span>Khám phá lớp học</span>
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="rounded-xl h-11 px-6 font-semibold border-slate-200 text-slate-700 hover:bg-slate-50"
+                >
+                  <Link href="/contact">
+                    <span>Liên hệ hỗ trợ</span>
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 bg-galaxy-dark text-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Quy trình học tập</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Chỉ với vài bước đơn giản, bạn đã có thể bắt đầu trải nghiệm học tập hiện đại tại
-              KEIVerse.
+      <section className="py-16 sm:py-24 bg-slate-950 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="text-center mb-16 max-w-2xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-bold border border-white/10">
+              <span>Lộ trình tiếp cận</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+              Quy trình học tập hiện đại
+            </h2>
+            <p className="text-slate-400 text-sm sm:text-base">
+              Chỉ với vài thao tác trực quan, bạn đã sẵn sàng tham gia lớp học, làm bài tập và trao đổi
+              trực tiếp cùng giảng viên.
             </p>
           </div>
 
-          <div className="relative">
-            {/* Connector line */}
-            <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-linear-to-r from-blue-500 via-purple-500 to-blue-500 -translate-y-1/2 opacity-20"></div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12">
-              {HOME_STEPS.map((step, index) => (
-                <div key={index} className="relative flex flex-col items-center text-center group">
-                  <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-6 border border-white/20 transition-all group-hover:bg-galaxy group-hover:scale-110 relative z-10">
-                    <step.icon className="w-10 h-10 text-blue-400 group-hover:text-white" />
-                    <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-galaxy flex items-center justify-center text-xs font-bold border-2 border-white/20">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <h4 className="text-lg font-bold mb-3">{step.title}</h4>
-                  <p className="text-sm text-gray-400 leading-relaxed">{step.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
+            {HOME_STEPS.map((step, index) => (
+              <div
+                key={index}
+                className="relative flex flex-col items-center text-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-indigo-500/40 hover:bg-white/10 transition-all group"
+              >
+                <div className="w-14 h-14 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center mb-4 text-indigo-400 group-hover:scale-110 group-hover:text-white group-hover:bg-indigo-600 transition-all shadow-sm">
+                  <step.icon className="w-7 h-7" />
                 </div>
-              ))}
-            </div>
+                <span className="text-[11px] font-mono font-bold text-indigo-400 mb-1">
+                  Bước 0{index + 1}
+                </span>
+                <h4 className="text-base font-bold mb-2 text-white">{step.title}</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">{step.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Feedback Section */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-16 sm:py-20 border-t border-slate-200/70">
         <ContactSection defaultType="feedback" />
       </section>
     </section>

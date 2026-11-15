@@ -14,14 +14,16 @@ import { School } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { ClassList } from '@/features/classes/components/ui/class-list';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface ClassesClientProps {
-  user: User | null;
+  user?: User | null;
   initialData: QueryResponse<Class> | null;
   initialParams: ClassParams;
 }
 
-export default function ClassesClient({ user, initialData, initialParams }: ClassesClientProps) {
+export default function ClassesClient({ user: propUser, initialData, initialParams }: ClassesClientProps) {
+  const { user } = useCurrentUser({ initialUser: propUser });
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

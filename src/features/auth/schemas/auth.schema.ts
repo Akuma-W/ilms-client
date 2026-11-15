@@ -21,6 +21,8 @@ export const LoginFormSchema = z.object({
   password: PasswordSchema,
 });
 
+export type LoginFormValues = z.infer<typeof LoginFormSchema>;
+
 export const GoogleRegisterSchema = z
   .object({
     role: z.enum(Role),
@@ -45,6 +47,52 @@ export const GoogleRegisterSchema = z
   );
 
 export type GoogleProfileFormValues = z.infer<typeof GoogleRegisterSchema>;
+
+export const ForgotPasswordEmailSchema = z.object({
+  email: z
+    .string()
+    .email({
+      message: 'Vui lòng nhập email hợp lệ.',
+    })
+    .trim(),
+});
+
+export type ForgotPasswordEmailValues = z.infer<typeof ForgotPasswordEmailSchema>;
+
+export const ResetPasswordSchema = z
+  .object({
+    otp: z.string().length(6, { message: 'Vui lòng nhập đủ 6 chữ số mã OTP.' }),
+    newPassword: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Mật khẩu xác nhận không khớp.',
+        path: ['confirmPassword'],
+      });
+    }
+  });
+
+export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
+
+export const NewPasswordSchema = z
+  .object({
+    newPassword: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Mật khẩu xác nhận không khớp.',
+        path: ['confirmPassword'],
+      });
+    }
+  });
+
+export type NewPasswordValues = z.infer<typeof NewPasswordSchema>;
 
 export const RegisterSchema = z
   .object({

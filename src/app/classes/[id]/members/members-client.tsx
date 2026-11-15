@@ -11,19 +11,15 @@ import { MemberStudentTable } from '@/features/members/components/member-student
 import { EnrollmentStatus, Role } from '@/types/enum';
 import type { Class } from '@/types/class';
 import type { ClassMember, MemberFilterTab } from '@/types/member';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface MembersClientProps {
   classData: Class;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
-/**
- * Main Client component for Class Members tab.
- * Manages instructors section, student list, search filtering, and role modifications.
- */
-export function MembersClient({ classData, isTeacher, currentUser }: MembersClientProps) {
+export function MembersClient({ classData, isTeacher }: MembersClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const [members, setMembers] = useState<ClassMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTab, setFilterTab] = useState<MemberFilterTab>('all');

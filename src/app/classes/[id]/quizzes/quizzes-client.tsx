@@ -23,14 +23,12 @@ import { quizPublicationsService } from '@/features/quizzes/services/quiz-public
 import { getQuizDisplayStatus } from '@/features/quizzes/utils/quiz.utils';
 import type { QuizClassItem, QuizFilterTab } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
-import type { User } from '@/types/user';
 
 interface QuizzesClientProps {
   initialQuizzes: QuizClassItem[];
   topics: Topic[];
   classId: string;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
 // Manages classroom quiz filters and teacher publication actions.

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { assignmentsServerService } from '@/features/assignments/services/assignments.server.service';
 import { AssignmentDetailClient } from './assignment-detail-client';
@@ -20,18 +19,16 @@ export async function generateMetadata({ params }: AssignmentDetailPageProps): P
 export default async function AssignmentDetailPage({ params }: AssignmentDetailPageProps) {
   const { id: classId, itemId } = await params;
 
-  // 1. Fetch user enrollment, role in class, assignment, and class data
-  const [relation, currentUser, assignment, classData] = await Promise.all([
+  // Fetch user enrollment, role in class, assignment, and class data
+  const [relation, assignment, classData] = await Promise.all([
     enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
-    userServerService.getMe().catch(() => null),
     assignmentsServerService.getAssignmentById(itemId).catch(() => null),
     classServerService.getClassData(classId).catch(() => null),
   ]);
 
   const isTeacher =
-    currentUser?.role === 'admin' ||
     relation?.roleIn === 'teacher' ||
-    Boolean(classData && currentUser && classData.teacherId === currentUser.id);
+    Boolean(classData && relation?.userId && classData.teacherId === relation.userId);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -40,7 +37,6 @@ export default async function AssignmentDetailPage({ params }: AssignmentDetailP
         assignmentId={itemId}
         classId={classId}
         isTeacher={isTeacher}
-        currentUser={currentUser}
       />
     </div>
   );

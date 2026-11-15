@@ -20,25 +20,20 @@ import { CreateForumModal } from '@/features/forums/components/create-forum-moda
 import { forumsService } from '@/features/forums/services/forums.service';
 import type { CreateForumFormData } from '@/features/forums/schemas/forum.schema';
 import type { Forum, ForumFilterTab } from '@/types/forum';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface ForumsClientProps {
   initialForums: Forum[];
   classId: string;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
-/**
- * Main Client component for Class Forums tab.
- * Integrates ClassTabToolbar, Facebook-style quick composer, filter tabs, feed, and modals.
- */
 export function ForumsClient({
   initialForums,
   classId,
   isTeacher,
-  currentUser,
 }: ForumsClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const [forums, setForums] = useState<Forum[]>(initialForums);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTab, setFilterTab] = useState<ForumFilterTab>('all');

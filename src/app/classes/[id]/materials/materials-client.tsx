@@ -26,10 +26,6 @@ interface MaterialsClientProps {
   isTeacher: boolean;
 }
 
-/**
- * Client Component for Class Materials tab (Lectures & References Hub).
- * Adheres to Emerald Green theme and full-width layout.
- */
 export function MaterialsClient({
   classId,
   topics: initialTopics = [],

@@ -23,21 +23,22 @@ interface AvatarDropdownProps {
 
 export function AvatarDropdown({ user, onLogout: logout }: AvatarDropdownProps) {
   const roleConfig = ROLE_CONFIG[user.role];
+  const avatarSrc = user.avatar || user.avatarUrl || undefined;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* Avatar Menu Trigger */}
-        <div className="flex items-center gap-2 cursor-pointer hover:bg-white/80 p-1 pr-2 rounded-full transition-all border border-indigo-100 hover:border-indigo-200/80 shadow-2xs">
-          <Avatar className="h-9 w-9 border-2 border-white shadow-xs">
-            <AvatarImage src={user.avatar || undefined} alt={user.fullName} />
-            <AvatarFallback className="bg-galaxy text-white text-xs font-bold">
+        <div className="flex items-center gap-2 cursor-pointer hover:bg-white/80 p-1.5 pr-2.5 rounded-full transition-all border border-slate-200 hover:border-slate-300 bg-white/40">
+          <Avatar className="h-9 w-9 border border-indigo-200">
+            <AvatarImage src={avatarSrc} alt={user.fullName} />
+            <AvatarFallback className="bg-linear-to-br from-blue-600 to-indigo-600 text-white text-xs font-bold">
               {user.fullName.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="hidden lg:flex flex-col items-start text-left">
-            <span className="text-xs font-bold text-slate-900 leading-none">{user.fullName}</span>
-            <span className="text-[10px] text-indigo-700 capitalize mt-0.5 font-semibold">
+            <span className="text-xs font-bold text-slate-800 leading-none">{user.fullName}</span>
+            <span className="text-[10px] text-indigo-600 capitalize mt-0.5 font-semibold">
               {user.role}
             </span>
           </div>
@@ -47,15 +48,15 @@ export function AvatarDropdown({ user, onLogout: logout }: AvatarDropdownProps) 
 
       <DropdownMenuContent
         align="end"
-        className="w-64 mt-2 p-2 bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-950 text-slate-800 dark:text-slate-100 shadow-xl rounded-2xl"
+        className="w-64 mt-2 p-2 bg-white border border-slate-200 text-slate-800 shadow-xl rounded-2xl"
       >
         {/* Avatar Header */}
         <DropdownMenuLabel className="font-normal p-2">
           <div className="flex flex-col space-y-2">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 border border-indigo-100">
-                <AvatarImage src={user.avatar || undefined} alt={user.fullName} />
-                <AvatarFallback className="bg-galaxy text-white font-bold">
+                <AvatarImage src={avatarSrc} alt={user.fullName} />
+                <AvatarFallback className="bg-linear-to-br from-blue-600 to-indigo-600 text-white font-bold">
                   {user.fullName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -79,20 +80,20 @@ export function AvatarDropdown({ user, onLogout: logout }: AvatarDropdownProps) 
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator className="my-1.5 bg-indigo-50" />
+        <DropdownMenuSeparator className="my-1.5 bg-slate-100" />
 
         {/* Profile */}
-        <Link href={`/profile/${user.id}`}>
-          <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-800 font-medium hover:text-indigo-950 hover:bg-indigo-50/70 focus:bg-indigo-50/70 transition-colors">
+        <Link href="/profile">
+          <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-700 font-medium hover:text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 transition-colors">
             <User2 className="mr-2 h-4 w-4 text-indigo-600" />
-            <span className="font-semibold text-sm">Thông tin cá nhân</span>
+            <span className="font-semibold text-sm">Hồ sơ cá nhân</span>
           </DropdownMenuItem>
         </Link>
 
         {/* Teacher: Class Management */}
         {user.role === Role.teacher && (
-          <Link href={'/classes'}>
-            <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-800 font-medium hover:text-indigo-950 hover:bg-indigo-50/70 focus:bg-indigo-50/70 transition-colors">
+          <Link href="/classes">
+            <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-700 font-medium hover:text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 transition-colors">
               <BookOpen className="mr-2 h-4 w-4 text-indigo-600" />
               <span className="font-semibold text-sm">Quản lý lớp học</span>
             </DropdownMenuItem>
@@ -101,19 +102,19 @@ export function AvatarDropdown({ user, onLogout: logout }: AvatarDropdownProps) 
 
         {/* Admin: System Management */}
         {user.role === Role.admin && (
-          <Link href={'/admin'}>
-            <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-800 font-medium hover:text-indigo-950 hover:bg-indigo-50/70 focus:bg-indigo-50/70 transition-colors">
+          <Link href="/admin">
+            <DropdownMenuItem className="cursor-pointer rounded-xl p-2.5 text-slate-700 font-medium hover:text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 transition-colors">
               <Settings className="mr-2 h-4 w-4 text-indigo-600" />
-              <span className="font-semibold text-sm">Quản lý hệ thống</span>
+              <span className="font-semibold text-sm">Quản trị hệ thống</span>
             </DropdownMenuItem>
           </Link>
         )}
 
-        <DropdownMenuSeparator className="my-1.5 bg-indigo-50" />
+        <DropdownMenuSeparator className="my-1.5 bg-slate-100" />
 
         {/* Logout */}
         <DropdownMenuItem
-          className="cursor-pointer rounded-xl p-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 focus:text-red-700 transition-colors"
+          className="cursor-pointer rounded-xl p-2.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 focus:bg-rose-50 focus:text-rose-700 transition-colors"
           onClick={logout}
         >
           <LogOut className="mr-2 h-4 w-4" />

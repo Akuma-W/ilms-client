@@ -17,14 +17,13 @@ import {
   getStudentSubmission,
 } from '@/features/assignments/utils/assignment.utils';
 import type { Assignment, Submission } from '@/types/assignment';
-import type { User } from '@/types/user';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface AssignmentDetailClientProps {
   assignment?: Assignment | null;
   assignmentId?: string;
   classId: string;
   isTeacher: boolean;
-  currentUser?: User | null;
 }
 
 export function AssignmentDetailClient({
@@ -32,8 +31,8 @@ export function AssignmentDetailClient({
   assignmentId,
   classId,
   isTeacher,
-  currentUser,
 }: AssignmentDetailClientProps) {
+  const { user: currentUser } = useCurrentUser();
   const router = useRouter();
   const [assignment, setAssignment] = useState<Assignment | null>(initialAssignment || null);
   const [isLoading, setIsLoading] = useState(!initialAssignment && !!assignmentId);

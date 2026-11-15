@@ -27,14 +27,12 @@ import { EditPublicationModal } from '@/features/quizzes/components/edit-publica
 import { ClassStudentAttemptHistory } from '@/features/quizzes/components/class-student-attempt-history';
 import { ReviewMode } from '@/types/enum';
 import type { QuizAttempt, QuizClassStats, QuizPublication } from '@/types/quiz';
-import type { User } from '@/types/user';
 
 interface ClassQuizPublicationClientProps {
   classId: string;
   publicationId: string;
   publication: QuizPublication;
   isTeacher: boolean;
-  currentUser: User | null;
 }
 
 // Detailed class quiz publication dashboard with analytics and student history

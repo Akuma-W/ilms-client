@@ -2,7 +2,6 @@ import { ClassTabs } from '@/types/enum';
 import { Metadata } from 'next';
 import ClassesClient from './classes-client';
 import { fetchClassesServer } from '@/features/classes/utils/classes.server.utils';
-import { userServerService } from '@/features/user/services/user.server.service';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
@@ -35,11 +34,8 @@ export default async function Classes({ searchParams }: ClassesProps) {
 
   const initialData = await fetchClassesServer(tab, { search, page, limit });
 
-  const user = await userServerService.getMe();
-
   return (
     <ClassesClient
-      user={user}
       initialData={initialData}
       initialParams={{ tab, page, limit, search }}
     />

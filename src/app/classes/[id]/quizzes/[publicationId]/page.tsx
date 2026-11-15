@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { userServerService } from '@/features/user/services/user.server.service';
+import { enrollmentServerService } from '@/features/classes/services/enrollment.server.service';
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { quizPublicationsServerService } from '@/features/quizzes/services/quiz-publications.server.service';
 import { ClassQuizPublicationClient } from './class-quiz-publication-client';
@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ClassQuizPublicationPage({ params }: PageProps) {
   const { id: classId, publicationId } = await params;
 
-  const [user, publication, classData] = await Promise.all([
-    userServerService.getMe(),
+  const [relation, publication, classData] = await Promise.all([
+    enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
     quizPublicationsServerService.getPublicationById(publicationId),
     classServerService.getClassData(classId),
   ]);
@@ -32,7 +32,9 @@ export default async function ClassQuizPublicationPage({ params }: PageProps) {
     notFound();
   }
 
-  const isTeacher = user?.id === classData.teacherId || user?.role === 'teacher' || user?.role === 'admin';
+  const isTeacher =
+    relation?.roleIn === 'teacher' ||
+    Boolean(classData && relation?.userId && classData.teacherId === relation.userId);
 
   return (
     <ClassQuizPublicationClient
@@ -40,7 +42,6 @@ export default async function ClassQuizPublicationPage({ params }: PageProps) {
       publicationId={publicationId}
       publication={publication}
       isTeacher={isTeacher}
-      currentUser={user}
     />
   );
 }
