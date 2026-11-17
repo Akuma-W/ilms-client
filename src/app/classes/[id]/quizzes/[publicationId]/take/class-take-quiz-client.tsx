@@ -51,9 +51,7 @@ export function ClassTakeQuizClient({
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-3">
         <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-        <p className="text-sm text-muted-foreground font-medium">
-          Đang chuẩn bị đề thi lớp học...
-        </p>
+        <p className="text-sm text-muted-foreground font-medium">Đang chuẩn bị đề thi lớp học...</p>
       </div>
     );
   }
@@ -61,7 +59,9 @@ export function ClassTakeQuizClient({
   if (error || !session) {
     return (
       <div className="max-w-md mx-auto my-20 p-6 rounded-2xl border border-destructive/20 bg-destructive/5 text-center space-y-4">
-        <p className="text-sm font-semibold text-destructive">{error || 'Không tải được bài thi'}</p>
+        <p className="text-sm font-semibold text-destructive">
+          {error || 'Không tải được bài thi'}
+        </p>
         <div className="flex items-center justify-center gap-2">
           <Button
             type="button"

@@ -27,7 +27,8 @@ export default async function ClassQuizzesPage({ params }: ClassQuizzesPageProps
   ]);
 
   const isTeacher = Boolean(
-    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
+    relation?.roleIn === 'teacher' ||
+    (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
   return (

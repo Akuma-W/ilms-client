@@ -23,13 +23,9 @@ export default async function ClassMembersPage({ params }: ClassMembersProps) {
   ]);
 
   const isTeacher = Boolean(
-    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
+    relation?.roleIn === 'teacher' ||
+    (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
-  return (
-    <MembersClient
-      classData={classData as unknown as Class}
-      isTeacher={isTeacher}
-    />
-  );
+  return <MembersClient classData={classData as unknown as Class} isTeacher={isTeacher} />;
 }

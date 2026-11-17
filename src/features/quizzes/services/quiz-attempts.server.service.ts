@@ -24,7 +24,7 @@ export const quizAttemptsServerService = {
         `/quiz-publications/${publicationId}/stats`,
         {
           ignoreAuthError: true,
-        }
+        },
       );
       if (res && res.success !== false && res.data) {
         return res.data;

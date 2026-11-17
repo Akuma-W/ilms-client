@@ -56,7 +56,9 @@ export function TakeQuizClient({ quizId, initialQuiz }: TakeQuizClientProps) {
   if (error || !session) {
     return (
       <div className="max-w-md mx-auto my-20 p-6 rounded-2xl border border-destructive/20 bg-destructive/5 text-center space-y-4">
-        <p className="text-sm font-semibold text-destructive">{error || 'Không tải được bài thi'}</p>
+        <p className="text-sm font-semibold text-destructive">
+          {error || 'Không tải được bài thi'}
+        </p>
         <div className="flex items-center justify-center gap-2">
           <Button
             type="button"

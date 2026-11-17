@@ -19,7 +19,10 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { quizAttemptsService } from '@/features/quizzes/services/quiz-attempts.service';
-import { formatQuizDateTime, mapQuizPublicationToClassItem } from '@/features/quizzes/utils/quiz.utils';
+import {
+  formatQuizDateTime,
+  mapQuizPublicationToClassItem,
+} from '@/features/quizzes/utils/quiz.utils';
 import { ClassQuizStatsKpi } from '@/features/quizzes/components/stats/class-quiz-stats-kpi';
 import { ClassQuizScoreChart } from '@/features/quizzes/components/stats/class-quiz-score-chart';
 import { ClassQuizStudentsTable } from '@/features/quizzes/components/stats/class-quiz-students-table';
@@ -112,7 +115,12 @@ export function ClassQuizPublicationClient({
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12">
       {/* Top Navigation & Breadcrumbs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/50">
-        <Button asChild variant="ghost" size="sm" className="text-xs h-8 px-2 text-muted-foreground w-fit">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="text-xs h-8 px-2 text-muted-foreground w-fit"
+        >
           <Link href={`/classes/${classId}/quizzes`}>
             <ArrowLeft className="w-4 h-4 mr-1" />
             <span>Trở về danh sách bài thi lớp</span>
@@ -127,7 +135,10 @@ export function ClassQuizPublicationClient({
             </Badge>
           )}
           {isUpcoming && (
-            <Badge variant="outline" className="bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30 text-xs gap-1">
+            <Badge
+              variant="outline"
+              className="bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30 text-xs gap-1"
+            >
               <Clock className="w-3 h-3" />
               Sắp diễn ra
             </Badge>
@@ -196,17 +207,19 @@ export function ClassQuizPublicationClient({
 
           <div className="flex items-center gap-3 shrink-0">
             <div className="px-3 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-right">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Thời lượng</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                Thời lượng
+              </p>
               <p className="text-sm font-bold text-foreground flex items-center justify-end gap-1">
                 <Clock className="w-3.5 h-3.5 text-rose-500" />
                 {publication.quiz?.timeLimit || 15} phút
               </p>
             </div>
             <div className="px-3 py-1.5 rounded-lg border border-border/60 bg-muted/30 text-right">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Thang điểm</p>
-              <p className="text-sm font-bold text-emerald-500">
-                {totalPoints} đ
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                Thang điểm
               </p>
+              <p className="text-sm font-bold text-emerald-500">{totalPoints} đ</p>
             </div>
           </div>
         </div>
@@ -216,7 +229,8 @@ export function ClassQuizPublicationClient({
           <div className="flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5 text-rose-500 shrink-0" />
             <span>
-              Thời gian: <strong>{formatQuizDateTime(publication.openAt)}</strong> — <strong>{formatQuizDateTime(publication.closeAt)}</strong>
+              Thời gian: <strong>{formatQuizDateTime(publication.openAt)}</strong> —{' '}
+              <strong>{formatQuizDateTime(publication.closeAt)}</strong>
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-indigo-500 font-medium">
@@ -253,14 +267,22 @@ export function ClassQuizPublicationClient({
                   <p className="text-xs text-muted-foreground">
                     Điểm số đạt được:{' '}
                     <strong className="text-emerald-500 text-base">
-                      {latestAttempt?.score !== null ? `${latestAttempt?.score}/${totalPoints} đ` : 'Đang xử lý'}
+                      {latestAttempt?.score !== null
+                        ? `${latestAttempt?.score}/${totalPoints} đ`
+                        : 'Đang xử lý'}
                     </strong>
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                   {latestAttempt?.id && (
-                    <Button asChild size="default" className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5">
-                      <Link href={`/classes/${classId}/quizzes/${publicationId}/attempts/${latestAttempt.id}`}>
+                    <Button
+                      asChild
+                      size="default"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5"
+                    >
+                      <Link
+                        href={`/classes/${classId}/quizzes/${publicationId}/attempts/${latestAttempt.id}`}
+                      >
                         <ExternalLink className="w-4 h-4" />
                         <span>Xem lại bài làm chi tiết</span>
                       </Link>
@@ -284,8 +306,9 @@ export function ClassQuizPublicationClient({
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-foreground">Sẵn sàng làm bài kiểm tra</h3>
                   <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                    Đề thi gồm các câu hỏi trắc nghiệm khách quan với thời lượng {publication.quiz?.timeLimit || 15} phút.
-                    Hệ thống sẽ tự động tính giờ và thu bài khi hết thời gian.
+                    Đề thi gồm các câu hỏi trắc nghiệm khách quan với thời lượng{' '}
+                    {publication.quiz?.timeLimit || 15} phút. Hệ thống sẽ tự động tính giờ và thu
+                    bài khi hết thời gian.
                   </p>
                 </div>
                 {isOpen ? (
@@ -300,9 +323,13 @@ export function ClassQuizPublicationClient({
                     </Link>
                   </Button>
                 ) : isClosed ? (
-                  <p className="text-xs text-rose-500 font-semibold">Đợt thi này đã kết thúc, bạn không thể nộp bài.</p>
+                  <p className="text-xs text-rose-500 font-semibold">
+                    Đợt thi này đã kết thúc, bạn không thể nộp bài.
+                  </p>
                 ) : (
-                  <p className="text-xs text-sky-500 font-semibold">Đợt thi chưa mở, vui lòng quay lại sau.</p>
+                  <p className="text-xs text-sky-500 font-semibold">
+                    Đợt thi chưa mở, vui lòng quay lại sau.
+                  </p>
                 )}
               </>
             )}

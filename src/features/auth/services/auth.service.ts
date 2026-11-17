@@ -67,10 +67,7 @@ export const authService = {
   },
 
   // Verifies forgot password OTP code before setting new password
-  async verifyForgotPasswordOtp(data: {
-    email: string;
-    otp: string;
-  }): PromiseResponse<null> {
+  async verifyForgotPasswordOtp(data: { email: string; otp: string }): PromiseResponse<null> {
     const result = await clientApiClient<null>('/auth/forgot-password/verify-otp', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -109,10 +106,7 @@ export const authService = {
   },
 
   // Changes password for currently authenticated user
-  async changePassword(data: {
-    oldPassword: string;
-    newPassword: string;
-  }): PromiseResponse<null> {
+  async changePassword(data: { oldPassword: string; newPassword: string }): PromiseResponse<null> {
     const result = await clientApiClient<null>('/auth/change-password', {
       method: 'PATCH',
       body: JSON.stringify(data),

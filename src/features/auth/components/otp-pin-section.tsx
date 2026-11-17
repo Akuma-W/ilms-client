@@ -132,9 +132,7 @@ export function OtpPinSection({
       </div>
 
       <div className="space-y-1 text-center sm:text-left">
-        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-          {title}
-        </h3>
+        <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">{title}</h3>
         <p className="text-xs sm:text-sm text-slate-600">
           {description} <span className="font-semibold text-indigo-600">{email}</span>
         </p>
@@ -158,9 +156,7 @@ export function OtpPinSection({
             className={cn(
               'size-11 sm:size-13 text-center text-lg sm:text-xl font-bold rounded-xl border bg-white text-slate-900 transition-all shadow-xs',
               'focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
-              digit
-                ? 'border-indigo-500 bg-indigo-50/50'
-                : 'border-slate-200',
+              digit ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-200',
               countdown === 0 && 'opacity-50 cursor-not-allowed',
             )}
           />
@@ -172,7 +168,8 @@ export function OtpPinSection({
         <div className="text-slate-500">
           {countdown > 0 ? (
             <span>
-              Hết hạn sau: <strong className="text-amber-600 font-mono">{formatTime(countdown)}</strong>
+              Hết hạn sau:{' '}
+              <strong className="text-amber-600 font-mono">{formatTime(countdown)}</strong>
             </span>
           ) : (
             <span className="text-rose-600 font-semibold">Mã OTP đã hết hiệu lực</span>

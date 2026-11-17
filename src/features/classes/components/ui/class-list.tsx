@@ -19,6 +19,7 @@ interface ClassListProps {
     search?: string;
     page?: number;
     limit?: number;
+    subjectId?: string;
   };
   onPageChange: (page: number) => void;
 }

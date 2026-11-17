@@ -107,7 +107,8 @@ function DistributePointsDialogBody({
           Chia điểm cho toàn bộ câu hỏi
         </DialogTitle>
         <DialogDescription className="text-xs text-slate-500">
-          Phân bổ đều điểm số theo thang điểm mong muốn hoặc điều chỉnh điểm chi tiết cho từng câu hỏi.
+          Phân bổ đều điểm số theo thang điểm mong muốn hoặc điều chỉnh điểm chi tiết cho từng câu
+          hỏi.
         </DialogDescription>
       </DialogHeader>
 
@@ -211,10 +212,15 @@ function DistributePointsDialogBody({
           {/* Table Summary Footer */}
           <div className="bg-slate-50 dark:bg-slate-900 px-4 py-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 font-medium">
-              Tổng cộng: <strong className="text-slate-800 dark:text-slate-100">{questions.length} câu</strong>
+              Tổng cộng:{' '}
+              <strong className="text-slate-800 dark:text-slate-100">{questions.length} câu</strong>
             </span>
             <span className="font-semibold text-slate-700 dark:text-slate-300">
-              Tổng điểm: <strong className="text-rose-600 dark:text-rose-400 text-sm">{currentSum.toFixed(2)}</strong> / {targetTotal} điểm
+              Tổng điểm:{' '}
+              <strong className="text-rose-600 dark:text-rose-400 text-sm">
+                {currentSum.toFixed(2)}
+              </strong>{' '}
+              / {targetTotal} điểm
             </span>
           </div>
         </div>

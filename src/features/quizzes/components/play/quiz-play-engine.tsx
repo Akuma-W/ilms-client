@@ -56,7 +56,7 @@ export function QuizPlayEngine({
   const totalQuestions = session.questions.length;
   const currentQuestion = session.questions[currentIndex];
   const answeredCount = Object.keys(answers).filter(
-    (qId) => (answers[qId] || []).length > 0
+    (qId) => (answers[qId] || []).length > 0,
   ).length;
 
   // Restore draft from local storage on mount
@@ -140,7 +140,7 @@ export function QuizPlayEngine({
       const result = await quizAttemptsService.checkAnswer(
         session.attemptId,
         currentQuestion.id,
-        selected
+        selected,
       );
       setCheckedAnswers((prev) => ({ ...prev, [currentQuestion.id]: result }));
     } catch (err) {
@@ -181,7 +181,7 @@ export function QuizPlayEngine({
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const accumulatedPoints = Object.values(checkedAnswers).reduce(
     (sum, item) => sum + (item.pointsEarned || 0),
-    0
+    0,
   );
 
   return (
@@ -228,11 +228,7 @@ export function QuizPlayEngine({
         onPrev={handlePrev}
         onNext={handleNext}
         onCheckAnswer={handleCheckCurrentAnswer}
-        onSubmit={
-          isImmediate
-            ? handleFinalSubmit
-            : () => setIsConfirmModalOpen(true)
-        }
+        onSubmit={isImmediate ? handleFinalSubmit : () => setIsConfirmModalOpen(true)}
       />
 
       {/* Confirmation Dialog before submitting */}
@@ -251,7 +247,9 @@ export function QuizPlayEngine({
           <AlertDialogHeader>
             <AlertDialogTitle>Rời phòng thi?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tiến độ và các câu trả lời bạn đã chọn sẽ được lưu tạm thời. Bạn có thể quay lại tiếp tục làm bài bất cứ lúc nào trước khi thời gian kết thúc hoặc tiến hành nộp bài chính thức.
+              Tiến độ và các câu trả lời bạn đã chọn sẽ được lưu tạm thời. Bạn có thể quay lại tiếp
+              tục làm bài bất cứ lúc nào trước khi thời gian kết thúc hoặc tiến hành nộp bài chính
+              thức.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

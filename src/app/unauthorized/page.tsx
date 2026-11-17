@@ -41,7 +41,8 @@ export default function UnauthorizedPage() {
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed max-w-md mx-auto">
               Tài khoản hiện tại của bạn chưa được cấp đặc quyền truy cập vào phân khu này. Vui lòng
-              kiểm tra lại vai trò tài khoản (Học sinh, Giảng viên hoặc Quản trị viên) hoặc yêu cầu hỗ trợ.
+              kiểm tra lại vai trò tài khoản (Học sinh, Giảng viên hoặc Quản trị viên) hoặc yêu cầu
+              hỗ trợ.
             </p>
           </div>
 

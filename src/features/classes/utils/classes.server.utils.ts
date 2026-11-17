@@ -4,15 +4,13 @@ import type { Class } from '@/types/class';
 import { enrollmentServerService } from '../services/enrollment.server.service';
 import { classServerService } from '../services/class.server.service';
 
-/**
- * Server-side class fetcher for Server Components SSR.
- */
 export async function fetchClassesServer(
   tab: ClassTabs,
   params: {
     search?: string;
     page?: number;
     limit?: number;
+    subjectId?: string;
   },
 ): Promise<QueryResponse<Class> | null> {
   switch (tab) {

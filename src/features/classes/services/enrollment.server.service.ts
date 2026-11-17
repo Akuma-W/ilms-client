@@ -4,10 +4,6 @@ import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
 import type { EnrollmentStatus } from '@/types/enum';
 
-/**
- * Server-side enrollment service executing in Node.js runtime (SSR).
- * Encapsulates try/catch and fallback to mock data when API errors or fails.
- */
 export const enrollmentServerService = {
   async getMyRelationInClass(classId: string): Promise<Enrollment | null> {
     try {

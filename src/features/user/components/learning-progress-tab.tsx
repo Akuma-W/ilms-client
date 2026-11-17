@@ -73,7 +73,10 @@ export function LearningProgressTab({ user }: LearningProgressTabProps) {
             ? 'Bạn chưa tham gia lớp học nào. Hãy sử dụng mã khóa học để đăng ký và bắt đầu lộ trình học tập.'
             : 'Tạo lớp học mới trên hệ thống để phân quyền tài nguyên, bài tập và chấm điểm tương tác.'}
         </p>
-        <Button asChild className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold">
+        <Button
+          asChild
+          className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold"
+        >
           <Link href="/classes">
             <span>{isStudent ? 'Khám phá lớp học' : 'Tạo lớp học mới'}</span>
           </Link>
@@ -96,7 +99,12 @@ export function LearningProgressTab({ user }: LearningProgressTabProps) {
               : `Bạn đang quản lý ${classes.length} lớp học với vai trò giảng viên`}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm" className="rounded-xl border-slate-200 text-xs font-semibold gap-1.5">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="rounded-xl border-slate-200 text-xs font-semibold gap-1.5"
+        >
           <Link href="/classes">
             <span>Xem tất cả lớp</span>
             <ExternalLink className="size-3.5" />

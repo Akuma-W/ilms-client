@@ -92,10 +92,7 @@ export async function proxy(request: NextRequest) {
             payload = decodeJwt(validToken);
           }
 
-          const maxAge =
-            trimmedName === 'refresh_token'
-              ? 7 * 24 * 60 * 60
-              : 15 * 60;
+          const maxAge = trimmedName === 'refresh_token' ? 7 * 24 * 60 * 60 : 15 * 60;
 
           refreshedResponse.cookies.set(trimmedName, trimmedVal, {
             path: '/',

@@ -29,9 +29,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
   const [title, setTitle] = useState(initialQuiz.title);
   const [description, setDescription] = useState(initialQuiz.description ?? '');
   const [timeLimit, setTimeLimit] = useState(initialQuiz.timeLimit || 15);
-  const [reviewMode] = useState<ReviewMode>(
-    initialQuiz.reviewMode || ReviewMode.after_submission
-  );
+  const [reviewMode] = useState<ReviewMode>(initialQuiz.reviewMode || ReviewMode.after_submission);
   const [isSaving, setIsSaving] = useState(false);
   const [isWordModalOpen, setIsWordModalOpen] = useState(false);
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
@@ -181,7 +179,7 @@ export function EditQuizClient({ initialQuiz }: EditQuizClientProps) {
           ? 'Đã cập nhật và công khai đề thi!'
           : payload.status === QuizStatus.published
             ? 'Đã cập nhật hoàn tất đề thi riêng tư!'
-            : 'Đã cập nhật bản nháp đề thi!'
+            : 'Đã cập nhật bản nháp đề thi!',
       );
       setIsSaveModalOpen(false);
       router.push(`/quizzes/${initialQuiz.id}`);

@@ -85,7 +85,9 @@ export function ChangePasswordCard() {
           <KeyRound className="size-4.5" />
           <span className="text-xs font-bold uppercase tracking-wider">Cài đặt bảo mật</span>
         </div>
-        <CardTitle className="text-xl font-bold text-slate-900">Bảo mật tài khoản & Mật khẩu</CardTitle>
+        <CardTitle className="text-xl font-bold text-slate-900">
+          Bảo mật tài khoản & Mật khẩu
+        </CardTitle>
         <CardDescription className="text-xs sm:text-sm text-slate-500">
           Quản lý cơ chế xác thực và cập nhật mật khẩu để bảo vệ không gian học tập của bạn.
         </CardDescription>
@@ -170,7 +172,9 @@ export function ChangePasswordCard() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">Xác nhận mật khẩu mới</Label>
+                  <Label className="text-xs font-semibold text-slate-700">
+                    Xác nhận mật khẩu mới
+                  </Label>
                   <PasswordInput
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}

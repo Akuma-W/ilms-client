@@ -6,12 +6,17 @@ export const createClassSchema = z.object({
     .min(3, 'Tiêu đề lớp học ít nhất 3 ký tự')
     .max(100, 'Tiêu đề không được vượt quá 100 ký tự'),
 
-  subject: z
-    .string()
-    .min(3, 'Môn học ít nhất 3 ký tự')
-    .max(100, 'Tên môn học không được vượt quá 100 ký tự'),
+  subjectId: z.string().uuid('Vui lòng chọn môn học trực thuộc'),
 
   isPrivate: z.boolean(),
+
+  maxStudents: z
+    .number()
+    .int('Sĩ số phải là số nguyên')
+    .min(1, 'Sĩ số tối thiểu là 1 sinh viên')
+    .max(500, 'Sĩ số tối đa là 500 sinh viên'),
+
+  assistantIds: z.array(z.string().uuid()),
 
   description: z
     .string()

@@ -91,7 +91,8 @@ export function QuizDetailClient({ initialQuiz, currentUser }: QuizDetailClientP
         {validAttempts.length === 0 ? (
           <div className="py-8 text-center border border-dashed border-border/60 rounded-xl bg-muted/20">
             <p className="text-xs text-muted-foreground">
-              Bạn chưa có lượt luyện tập nào cho đề thi này. Hãy nhấn &quot;Luyện tập ngay&quot; phía trên để thử sức!
+              Bạn chưa có lượt luyện tập nào cho đề thi này. Hãy nhấn &quot;Luyện tập ngay&quot;
+              phía trên để thử sức!
             </p>
           </div>
         ) : (
@@ -123,12 +124,20 @@ export function QuizDetailClient({ initialQuiz, currentUser }: QuizDetailClientP
                       {formatQuizDateTime(att.submittedAt)}
                     </td>
                     <td className="py-2.5">
-                      <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                      >
                         Đã hoàn thành
                       </Badge>
                     </td>
                     <td className="py-2.5 text-right pr-2">
-                      <Button asChild variant="ghost" size="sm" className="h-7 text-xs text-indigo-600 dark:text-indigo-400 gap-1 hover:text-indigo-700">
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs text-indigo-600 dark:text-indigo-400 gap-1 hover:text-indigo-700"
+                      >
                         <Link href={`/quizzes/results/${att.id}`}>
                           <span>Xem lại</span>
                           <ExternalLink className="w-3 h-3" />

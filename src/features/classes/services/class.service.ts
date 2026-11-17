@@ -3,10 +3,6 @@ import { getMockClass } from '@/mocks/classes/class-data.mock';
 import type { QueryResponse } from '@/types/api';
 import type { Class, ClassClient, CreateClassPayload } from '@/types/class';
 
-/**
- * Client-side class service for Browser Components (CSR, SWR, Modals).
- * Encapsulates try/catch and fallback to mock data when API errors or fails.
- */
 export const classService = {
   async createClass(payload: CreateClassPayload) {
     try {
@@ -23,12 +19,13 @@ export const classService = {
     return null;
   },
 
-  async getClasses(params: { page?: number; limit?: number; search?: string }) {
+  async getClasses(params: { page?: number; limit?: number; search?: string; subjectId?: string }) {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);
+      if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
       const result = await clientApiClient<QueryResponse<Class>>(url);
@@ -41,12 +38,18 @@ export const classService = {
     return null;
   },
 
-  async getMyCreatedClasses(params: { page?: number; limit?: number; search?: string }) {
+  async getMyCreatedClasses(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    subjectId?: string;
+  }) {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);
+      if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString()
         ? `/classes/me/created?${query.toString()}`

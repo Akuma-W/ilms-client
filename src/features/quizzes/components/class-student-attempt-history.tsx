@@ -70,13 +70,23 @@ export function ClassStudentAttemptHistory({
                     {formatQuizDateTime(att.submittedAt)}
                   </td>
                   <td className="py-2.5">
-                    <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                    >
                       Đã nộp bài
                     </Badge>
                   </td>
                   <td className="py-2.5 text-right pr-2">
-                    <Button asChild variant="ghost" size="sm" className="h-7 text-xs text-indigo-600 dark:text-indigo-400 gap-1 hover:text-indigo-700">
-                      <Link href={`/classes/${classId}/quizzes/${publicationId}/attempts/${att.id}`}>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs text-indigo-600 dark:text-indigo-400 gap-1 hover:text-indigo-700"
+                    >
+                      <Link
+                        href={`/classes/${classId}/quizzes/${publicationId}/attempts/${att.id}`}
+                      >
                         <span>Xem lại</span>
                         <ExternalLink className="w-3 h-3" />
                       </Link>

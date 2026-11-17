@@ -17,7 +17,10 @@ export default function NotFound() {
         <div className="text-center space-y-6 max-w-lg mx-auto">
           {/* Cosmic Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-600 text-white dark:bg-white/10 border dark:border-white/15 dark:text-indigo-300 text-xs font-semibold backdrop-blur-md">
-            <Compass className="size-3.5 transition-colors animate-spin" style={{ animationDuration: '8s' }} />
+            <Compass
+              className="size-3.5 transition-colors animate-spin"
+              style={{ animationDuration: '8s' }}
+            />
             <span>Mất tín hiệu định vị tọa độ</span>
           </div>
 
@@ -34,8 +37,8 @@ export default function NotFound() {
               Lạc Vào Không Gian Vô Định
             </h2>
             <p className="text-indigo-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed max-w-md mx-auto">
-              Tọa độ trang bạn đang tìm kiếm dường như chưa từng tồn tại hoặc đã di chuyển sang một quỹ đạo
-              khác trong hệ thống KEIVerse.
+              Tọa độ trang bạn đang tìm kiếm dường như chưa từng tồn tại hoặc đã di chuyển sang một
+              quỹ đạo khác trong hệ thống KEIVerse.
             </p>
           </div>
 

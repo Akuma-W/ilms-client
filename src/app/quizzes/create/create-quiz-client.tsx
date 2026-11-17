@@ -167,7 +167,7 @@ export function CreateQuizClient() {
           ? 'Đã công khai đề thi lên Thư viện chung!'
           : payload.status === QuizStatus.published
             ? 'Đã lưu hoàn tất đề thi riêng tư!'
-            : 'Đã lưu bản nháp đề thi!'
+            : 'Đã lưu bản nháp đề thi!',
       );
       setIsSaveModalOpen(false);
       router.push(`/quizzes/${newQuiz.id}`);

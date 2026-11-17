@@ -5,7 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { ParsedQuestion } from '@/types/quiz';
 import { QuestionType } from '@/types/enum';
-import { Plus, Trash2, ArrowUp, ArrowDown, RotateCcw, GripVertical, Calculator } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  RotateCcw,
+  GripVertical,
+  Calculator,
+} from 'lucide-react';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 
 interface QuizStudioSidebarProps {
@@ -161,9 +169,7 @@ export function QuizStudioSidebar({
                 onClick={() => onSelectIndex(idx)}
                 className={`group p-2.5 rounded-md border text-xs cursor-pointer transition-all ${
                   isBeingDragged ? 'opacity-40' : ''
-                } ${
-                  isTargeted ? 'border-t-2 border-t-rose-500 scale-[1.01]' : ''
-                } ${
+                } ${isTargeted ? 'border-t-2 border-t-rose-500 scale-[1.01]' : ''} ${
                   isSelected
                     ? 'border-rose-500 bg-white dark:bg-slate-900 shadow-xs ring-1 ring-rose-500/20'
                     : 'border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 hover:border-slate-300'

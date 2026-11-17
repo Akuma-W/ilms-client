@@ -16,13 +16,8 @@ const DEFAULT_MOCK_PROGRESS: StudentClassProgress = {
   meetRate: 90,
 };
 
-/**
- * Service providing student learning progress and attendance stats.
- */
 export const studentProgressService = {
-  /**
-   * Retrieves student's current progress in a specific class.
-   */
+  // Retrieves student's current progress in a specific class.
   async getStudentProgress(classId: string, studentId?: string): Promise<StudentClassProgress> {
     try {
       const res = await clientApiClient<StudentClassProgress>(

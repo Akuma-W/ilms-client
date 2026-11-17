@@ -2,7 +2,16 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowDown, ArrowUp, ArrowUpDown, CheckCircle2, ExternalLink, Loader2, Search, XCircle } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  CheckCircle2,
+  ExternalLink,
+  Loader2,
+  Search,
+  XCircle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -280,7 +289,12 @@ export function ClassQuizStudentsTable({
                   </td>
                   <td className="py-3 px-3 text-right">
                     {st.isSubmitted && st.attemptId ? (
-                      <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1 text-indigo-500">
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs gap-1 text-indigo-500"
+                      >
                         <Link
                           href={`/classes/${classId}/quizzes/${publicationId}/attempts/${st.attemptId}`}
                         >

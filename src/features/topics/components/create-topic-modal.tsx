@@ -10,9 +10,6 @@ interface CreateTopicModalProps {
   onSuccess: () => void;
 }
 
-/**
- * Trigger button & dialog wrapper for teachers to create a new lecture topic.
- */
 export function CreateTopicModal({ classId, onSuccess }: CreateTopicModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 

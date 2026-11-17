@@ -87,7 +87,8 @@ export function ClassQuizCard({
           <Badge className="text-xs px-2.5 py-0.5 bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 gap-1 font-semibold">
             <CheckCircle2 className="size-3.5" />
             <span>
-              Đã làm: {scoreAchieved !== null ? `${scoreAchieved}/${quiz.totalPoints ?? 10}` : 'Đã nộp'}
+              Đã làm:{' '}
+              {scoreAchieved !== null ? `${scoreAchieved}/${quiz.totalPoints ?? 10}` : 'Đã nộp'}
             </span>
           </Badge>
         );

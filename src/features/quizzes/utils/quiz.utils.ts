@@ -111,9 +111,7 @@ export function changeParsedQuestionType(
   if (questionType === QuestionType.true_false) {
     // Stash choice options so user does not lose typed options when switching back
     const choiceOptions =
-      question.questionType !== QuestionType.true_false
-        ? question.options
-        : question.choiceOptions;
+      question.questionType !== QuestionType.true_false ? question.options : question.choiceOptions;
 
     return {
       ...question,

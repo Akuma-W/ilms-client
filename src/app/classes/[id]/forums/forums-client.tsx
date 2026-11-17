@@ -28,11 +28,7 @@ interface ForumsClientProps {
   isTeacher: boolean;
 }
 
-export function ForumsClient({
-  initialForums,
-  classId,
-  isTeacher,
-}: ForumsClientProps) {
+export function ForumsClient({ initialForums, classId, isTeacher }: ForumsClientProps) {
   const { user: currentUser } = useCurrentUser();
   const [forums, setForums] = useState<Forum[]>(initialForums);
   const [searchQuery, setSearchQuery] = useState('');

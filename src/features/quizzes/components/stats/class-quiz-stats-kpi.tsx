@@ -24,7 +24,9 @@ export function ClassQuizStatsKpi({ stats, totalPoints }: ClassQuizStatsKpiProps
 
       {/* 2: Đã nộp bài */}
       <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 shadow-2xs">
-        <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">Đã nộp bài</p>
+        <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+          Đã nộp bài
+        </p>
         <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
           {stats?.submittedCount ?? 0}{' '}
           <span className="text-xs font-normal text-muted-foreground">({completionRate}%)</span>
@@ -39,7 +41,9 @@ export function ClassQuizStatsKpi({ stats, totalPoints }: ClassQuizStatsKpiProps
 
       {/* 4: Điểm trung bình */}
       <div className="p-4 rounded-xl border border-indigo-500/30 bg-indigo-500/5 shadow-2xs">
-        <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">Điểm trung bình</p>
+        <p className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
+          Điểm trung bình
+        </p>
         <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
           {stats?.averageScore !== undefined && stats?.averageScore !== null
             ? `${stats.averageScore}/${safeTotal}`

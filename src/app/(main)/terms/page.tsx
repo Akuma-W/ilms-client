@@ -44,13 +44,16 @@ export default function TermsPage() {
               </div>
               <div className="text-slate-600 text-sm leading-relaxed space-y-2 pl-7.5">
                 <p>
-                  • Mỗi người dùng chỉ được sở hữu một tài khoản định danh duy nhất tương ứng với mã số sinh viên hoặc mã số giảng viên được cấp bởi nhà trường.
+                  • Mỗi người dùng chỉ được sở hữu một tài khoản định danh duy nhất tương ứng với mã
+                  số sinh viên hoặc mã số giảng viên được cấp bởi nhà trường.
                 </p>
                 <p>
-                  • Bạn có trách nhiệm bảo mật tuyệt đối thông tin đăng nhập, mã xác thực OTP và mật khẩu. Không chia sẻ phiên đăng nhập cho bên thứ ba.
+                  • Bạn có trách nhiệm bảo mật tuyệt đối thông tin đăng nhập, mã xác thực OTP và mật
+                  khẩu. Không chia sẻ phiên đăng nhập cho bên thứ ba.
                 </p>
                 <p>
-                  • Mọi hoạt động phát sinh từ tài khoản của bạn sẽ do bạn chịu trách nhiệm hoàn toàn trước quy chế nhà trường và pháp luật.
+                  • Mọi hoạt động phát sinh từ tài khoản của bạn sẽ do bạn chịu trách nhiệm hoàn
+                  toàn trước quy chế nhà trường và pháp luật.
                 </p>
               </div>
             </section>
@@ -63,13 +66,16 @@ export default function TermsPage() {
               </div>
               <div className="text-slate-600 text-sm leading-relaxed space-y-2 pl-7.5">
                 <p>
-                  • Người học cam kết thực hiện các bài thi trắc nghiệm, bài tập cá nhân và đồ án với tinh thần trung thực, liêm chính.
+                  • Người học cam kết thực hiện các bài thi trắc nghiệm, bài tập cá nhân và đồ án
+                  với tinh thần trung thực, liêm chính.
                 </p>
                 <p>
-                  • Nghiêm cấm mọi hành vi gian lận thi cử, sao chép mã nguồn trái phép, can thiệp vào mã client/API nhằm thao túng điểm số.
+                  • Nghiêm cấm mọi hành vi gian lận thi cử, sao chép mã nguồn trái phép, can thiệp
+                  vào mã client/API nhằm thao túng điểm số.
                 </p>
                 <p>
-                  • Dữ liệu bài nộp, thời gian hoàn thành và lịch sử tương tác được hệ thống ghi nhận tự động phục vụ công tác thanh tra và đánh giá học phần.
+                  • Dữ liệu bài nộp, thời gian hoàn thành và lịch sử tương tác được hệ thống ghi
+                  nhận tự động phục vụ công tác thanh tra và đánh giá học phần.
                 </p>
               </div>
             </section>
@@ -82,10 +88,13 @@ export default function TermsPage() {
               </div>
               <div className="text-slate-600 text-sm leading-relaxed space-y-2 pl-7.5">
                 <p>
-                  • Toàn bộ bài giảng, tài liệu tham khảo, ngân hàng câu hỏi và video được lưu trữ trên {SITE_CONFIG.name} thuộc quyền sở hữu trí tuệ của Giảng viên và Nhà trường.
+                  • Toàn bộ bài giảng, tài liệu tham khảo, ngân hàng câu hỏi và video được lưu trữ
+                  trên {SITE_CONFIG.name} thuộc quyền sở hữu trí tuệ của Giảng viên và Nhà trường.
                 </p>
                 <p>
-                  • Người học chỉ được sử dụng học liệu cho mục đích học tập cá nhân; nghiêm cấm sao chép, phân phối lại hoặc thương mại hóa dưới mọi hình thức mà không có sự cho phép bằng văn bản.
+                  • Người học chỉ được sử dụng học liệu cho mục đích học tập cá nhân; nghiêm cấm sao
+                  chép, phân phối lại hoặc thương mại hóa dưới mọi hình thức mà không có sự cho phép
+                  bằng văn bản.
                 </p>
               </div>
             </section>
@@ -98,10 +107,13 @@ export default function TermsPage() {
               </div>
               <div className="text-slate-600 text-sm leading-relaxed space-y-2 pl-7.5">
                 <p>
-                  • Hệ thống có quyền tạm khóa hoặc thu hồi vĩnh viễn quyền truy cập của bất kỳ tài khoản nào có dấu hiệu tấn công mạng, phá hoại dữ liệu hoặc vi phạm nghiêm trọng quy chế học tập.
+                  • Hệ thống có quyền tạm khóa hoặc thu hồi vĩnh viễn quyền truy cập của bất kỳ tài
+                  khoản nào có dấu hiệu tấn công mạng, phá hoại dữ liệu hoặc vi phạm nghiêm trọng
+                  quy chế học tập.
                 </p>
                 <p>
-                  • Các trường hợp vi phạm sẽ được chuyển báo cáo tới Hội đồng kỷ luật của Nhà trường để xử lý theo quy định hiện hành.
+                  • Các trường hợp vi phạm sẽ được chuyển báo cáo tới Hội đồng kỷ luật của Nhà
+                  trường để xử lý theo quy định hiện hành.
                 </p>
               </div>
             </section>

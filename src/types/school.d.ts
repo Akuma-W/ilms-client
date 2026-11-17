@@ -10,3 +10,10 @@ export interface School {
   createdAt?: Date | string;
   updatedAt?: Date | string | null;
 }
+
+export interface SchoolTeacherItem {
+  id: string;
+  fullName: string;
+  email: string;
+  avatarUrl: string | null;
+}

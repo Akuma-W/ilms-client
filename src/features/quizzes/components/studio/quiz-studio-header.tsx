@@ -54,11 +54,17 @@ export function QuizStudioHeader({
           </Button>
 
           <div className="hidden xl:flex items-center gap-1 text-xs text-slate-400 shrink-0 font-medium border-r border-slate-200 dark:border-slate-800 pr-3 mr-1">
-            <Link href="/classes" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+            <Link
+              href="/classes"
+              className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+            >
               Lớp học
             </Link>
             <span>/</span>
-            <Link href="/chats" className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+            <Link
+              href="/chats"
+              className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+            >
               Chat
             </Link>
             <span>/</span>
@@ -97,10 +103,14 @@ export function QuizStudioHeader({
               className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 rounded-md border border-slate-200 hover:border-rose-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
             >
               <Calculator className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
-              <span className="text-rose-600 dark:text-rose-400 font-bold">{totalQuestions} câu</span>
+              <span className="text-rose-600 dark:text-rose-400 font-bold">
+                {totalQuestions} câu
+              </span>
               <span>•</span>
               <span>{(totalPoints ?? 0).toFixed(1)} điểm</span>
-              <span className="text-[10px] text-slate-400 font-normal underline ml-0.5">Chia điểm</span>
+              <span className="text-[10px] text-slate-400 font-normal underline ml-0.5">
+                Chia điểm
+              </span>
             </button>
           )}
 

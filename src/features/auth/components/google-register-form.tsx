@@ -127,9 +127,7 @@ export function GoogleRegisterForm({ user }: GoogleRegisterFormProps) {
             name="fullName"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs font-semibold text-slate-700">
-                  Họ và tên
-                </FormLabel>
+                <FormLabel className="text-xs font-semibold text-slate-700">Họ và tên</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
@@ -174,7 +172,9 @@ export function GoogleRegisterForm({ user }: GoogleRegisterFormProps) {
             render={({ field }) => (
               <FormItem className="space-y-1">
                 <FormLabel className="text-xs font-semibold text-slate-700">
-                  {selectedRole === 'student' ? 'Mã số sinh viên (MSSV)' : 'Mã số giảng viên (MSGV)'}
+                  {selectedRole === 'student'
+                    ? 'Mã số sinh viên (MSSV)'
+                    : 'Mã số giảng viên (MSGV)'}
                 </FormLabel>
                 <FormControl>
                   <div className="relative">

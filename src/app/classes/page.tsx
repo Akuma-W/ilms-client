@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ClassTabs } from '@/types/enum';
 import { Metadata } from 'next';
 import ClassesClient from './classes-client';
@@ -14,6 +15,7 @@ interface ClassesProps {
     search?: string;
     page?: string;
     limit?: string;
+    subjectId?: string;
   }>;
 }
 
@@ -29,15 +31,18 @@ export default async function Classes({ searchParams }: ClassesProps) {
 
   const tab = params.tab;
   const search = params.search || '';
+  const subjectId = params.subjectId || undefined;
   const page = Number(params.page) || 1;
   const limit = Number(params.limit) || 10;
 
-  const initialData = await fetchClassesServer(tab, { search, page, limit });
+  const initialData = await fetchClassesServer(tab, { search, page, limit, subjectId });
 
   return (
-    <ClassesClient
-      initialData={initialData}
-      initialParams={{ tab, page, limit, search }}
-    />
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <ClassesClient
+        initialData={initialData}
+        initialParams={{ tab, page, limit, search, subjectId }}
+      />
+    </Suspense>
   );
 }

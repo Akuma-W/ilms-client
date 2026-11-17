@@ -2,13 +2,7 @@
 
 import { motion } from 'motion/react';
 import { Logo } from '@/components/common/logo';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { GoogleRegisterForm } from '@/features/auth/components/google-register-form';
 import { useGoogleUser } from '@/features/auth/hooks/use-google-user';
 import { useRouter } from 'next/navigation';
@@ -33,7 +27,9 @@ export default function GoogleRegisterClient() {
       <div className="w-full max-w-md mx-auto space-y-4">
         <Card className="w-full border border-rose-200 bg-rose-50/50 rounded-2xl overflow-hidden text-center shadow-xs">
           <CardHeader className="space-y-2 pt-6">
-            <CardTitle className="text-lg font-bold text-slate-900">Phiên đăng nhập đã hết hạn</CardTitle>
+            <CardTitle className="text-lg font-bold text-slate-900">
+              Phiên đăng nhập đã hết hạn
+            </CardTitle>
             <CardDescription className="text-xs text-slate-600">
               Vui lòng đăng nhập lại với Google để tiếp tục hoàn tất hồ sơ tài khoản.
             </CardDescription>
@@ -83,7 +79,8 @@ export default function GoogleRegisterClient() {
       <GoogleRegisterForm user={user} />
 
       <p className="text-[11px] text-center text-slate-500 px-4 pt-2">
-        Bằng cách nhấn hoàn tất, bạn đồng ý với các điều khoản dịch vụ và chính sách bảo mật của chúng tôi.
+        Bằng cách nhấn hoàn tất, bạn đồng ý với các điều khoản dịch vụ và chính sách bảo mật của
+        chúng tôi.
       </p>
     </motion.div>
   );

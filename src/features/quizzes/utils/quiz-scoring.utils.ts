@@ -13,7 +13,7 @@ interface ScoreBin {
 // Calculate dynamic 5 percentage bins adapting to any total points scale
 export function calcScoreBins(
   attempts: Array<{ score: number | null }>,
-  totalPoints: number
+  totalPoints: number,
 ): ScoreBin[] {
   const safeTotal = totalPoints > 0 ? totalPoints : 10;
   const submitted = attempts.filter((a) => a.score !== null && a.score !== undefined);
@@ -71,7 +71,10 @@ export function calcScoreBins(
       if (def.id === 'lt50') {
         return score < safeTotal * 0.5;
       }
-      return score >= safeTotal * def.minRatio && score < safeTotal * (def.minRatio + (def.id === '80to89' ? 0.1 : 0.15));
+      return (
+        score >= safeTotal * def.minRatio &&
+        score < safeTotal * (def.minRatio + (def.id === '80to89' ? 0.1 : 0.15))
+      );
     }).length;
 
     const percentage = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;

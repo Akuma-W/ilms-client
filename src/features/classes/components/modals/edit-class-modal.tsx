@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Globe, Loader2, Lock, Pencil } from 'lucide-react';
+import { Globe, Loader2, Lock, Pencil, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { classService } from '@/features/classes/services/class.service';
+import { useSubjects } from '@/features/subjects/hooks/use-subjects';
+import { SubjectSelectCombobox } from '@/features/subjects/components/subject-select-combobox';
 import type { Class } from '@/types/class';
 
 interface EditClassModalProps {
@@ -24,18 +26,18 @@ interface EditClassModalProps {
   onSuccess?: (updated: Class) => void;
 }
 
-/**
- * Modal dialog for teachers to update class details.
- */
 export function EditClassModal({
   isOpen,
   onOpenChange,
   classData,
   onSuccess,
 }: EditClassModalProps) {
+  const { subjects } = useSubjects();
+
   const [title, setTitle] = useState(classData.title);
-  const [subject, setSubject] = useState(classData.subject);
+  const [subjectId, setSubjectId] = useState(classData.subjectId || '');
   const [semester, setSemester] = useState(classData.semester || '');
+  const [maxStudents, setMaxStudents] = useState<number>(classData.maxStudents ?? 60);
   const [description, setDescription] = useState(classData.description || '');
   const [isPrivate, setIsPrivate] = useState<boolean>(classData.isPrivate ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,8 +45,9 @@ export function EditClassModal({
   useEffect(() => {
     if (isOpen) {
       setTitle(classData.title);
-      setSubject(classData.subject);
+      setSubjectId(classData.subjectId || '');
       setSemester(classData.semester || '');
+      setMaxStudents(classData.maxStudents ?? 60);
       setDescription(classData.description || '');
       setIsPrivate(classData.isPrivate ?? false);
     }
@@ -52,17 +55,23 @@ export function EditClassModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !subject.trim() || !semester.trim()) {
-      toast.error('Vui lòng điền đầy đủ các thông tin bắt buộc');
+    if (!title.trim() || !semester.trim()) {
+      toast.error('Vui lòng điền đầy đủ tiêu đề và học kỳ');
+      return;
+    }
+    if (!subjectId) {
+      toast.error('Vui lòng chọn môn học');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const selectedSubject = subjects.find((s) => s.id === subjectId);
       const res = await classService.updateClass(classData.id, {
         title: title.trim(),
-        subject: subject.trim(),
+        subjectId,
         semester: semester.trim(),
+        maxStudents: Number(maxStudents) || 60,
         description: description.trim() || undefined,
         isPrivate,
       });
@@ -74,8 +83,18 @@ export function EditClassModal({
       const updated: Class = {
         ...classData,
         title: title.trim(),
-        subject: subject.trim(),
+        subjectId,
+        subject: selectedSubject ? selectedSubject.name : classData.subject,
+        subjectRef: selectedSubject
+          ? {
+              id: selectedSubject.id,
+              code: selectedSubject.code,
+              name: selectedSubject.name,
+              credits: selectedSubject.credits,
+            }
+          : classData.subjectRef,
         semester: semester.trim(),
+        maxStudents: Number(maxStudents) || 60,
         description: description.trim() || null,
         isPrivate,
       };
@@ -94,7 +113,7 @@ export function EditClassModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <DialogHeader className="space-y-1">
             <div className="flex items-center gap-2 text-primary">
               <Pencil className="size-5" />
@@ -103,11 +122,11 @@ export function EditClassModal({
               </DialogTitle>
             </div>
             <DialogDescription className="text-xs text-muted-foreground">
-              Thay đổi tiêu đề môn học, học kỳ hoặc mô tả giới thiệu lớp.
+              Thay đổi môn học, tiêu đề, học kỳ, sĩ số hoặc mô tả giới thiệu lớp.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-1">
+          <div className="space-y-3.5 py-1">
             <div className="space-y-1.5">
               <Label htmlFor="edit-class-title" className="text-xs font-semibold text-foreground">
                 Tên lớp học <span className="text-destructive">*</span>
@@ -121,23 +140,18 @@ export function EditClassModal({
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="edit-class-subject"
-                  className="text-xs font-semibold text-foreground"
-                >
-                  Môn học <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="edit-class-subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="VD: Cấu trúc dữ liệu"
-                  className="h-10 text-sm rounded-xl"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                Môn học trực thuộc <span className="text-destructive">*</span>
+              </Label>
+              <SubjectSelectCombobox
+                value={subjectId}
+                onValueChange={setSubjectId}
+                disabled={isSubmitting}
+              />
+            </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label
                   htmlFor="edit-class-semester"
@@ -152,6 +166,28 @@ export function EditClassModal({
                   placeholder="VD: HK2 (2025 - 2026)"
                   className="h-10 text-sm rounded-xl"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="edit-class-max-students"
+                  className="text-xs font-semibold text-foreground"
+                >
+                  Sĩ số tối đa <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="edit-class-max-students"
+                    type="number"
+                    min={1}
+                    max={500}
+                    value={maxStudents}
+                    onChange={(e) => setMaxStudents(parseInt(e.target.value, 10) || 60)}
+                    placeholder="VD: 60"
+                    className="h-10 text-sm rounded-xl pl-9"
+                  />
+                  <Users className="w-4 h-4 text-muted-foreground absolute left-3 top-3 pointer-events-none" />
+                </div>
               </div>
             </div>
 

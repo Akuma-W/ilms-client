@@ -7,14 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ROLE_CONFIG } from '@/config';
 import { userService } from '../services/user.service';
 import { toast } from 'sonner';
-import {
-  Camera,
-  Loader2,
-  BookOpen,
-  Calendar,
-  School,
-  CheckCircle2,
-} from 'lucide-react';
+import { Camera, Loader2, BookOpen, Calendar, School, CheckCircle2 } from 'lucide-react';
 
 interface ProfileHeaderProps {
   user: User;
@@ -153,7 +146,9 @@ export function ProfileHeader({ user, mutateUser }: ProfileHeaderProps) {
             {user.school?.name && (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-semibold text-slate-700">
                 <School className="size-3.5 text-slate-500" />
-                <span className="truncate max-w-45">{user.school.shortname || user.school.name}</span>
+                <span className="truncate max-w-45">
+                  {user.school.shortname || user.school.name}
+                </span>
               </div>
             )}
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-100 text-xs font-bold text-indigo-700">

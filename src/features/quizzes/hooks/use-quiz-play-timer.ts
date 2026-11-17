@@ -10,7 +10,7 @@ interface UseQuizPlayTimerOptions {
 // Wall-clock countdown timer with automatic time-up callback
 export function useQuizPlayTimer({ startedAt, timeLimit, onTimeUp }: UseQuizPlayTimerOptions) {
   const [remainingSeconds, setRemainingSeconds] = useState(() =>
-    calcRemainingSeconds(startedAt, timeLimit)
+    calcRemainingSeconds(startedAt, timeLimit),
   );
 
   useEffect(() => {

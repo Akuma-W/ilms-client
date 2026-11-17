@@ -48,8 +48,8 @@ export default function Home() {
               Chức năng cốt lõi
             </h2>
             <p className="text-sm sm:text-base text-slate-600">
-              Cung cấp trọn bộ công cụ học tập, bài giảng tương tác và trợ lý AI thông minh đồng hành
-              suốt quá trình rèn luyện.
+              Cung cấp trọn bộ công cụ học tập, bài giảng tương tác và trợ lý AI thông minh đồng
+              hành suốt quá trình rèn luyện.
             </p>
           </div>
 
@@ -112,10 +112,10 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                KEIVerse ra đời với sứ mệnh mang đến một môi trường học tập số hóa tương tác toàn diện,
-                nơi tri thức được kết nối và lan tỏa. Chúng tôi tin rằng mỗi người học đều sở hữu tiềm
-                năng riêng, và KEIVerse là trợ thủ đắc lực giúp bạn tiếp cận nguồn tài nguyên phong phú
-                và bứt phá kết quả.
+                KEIVerse ra đời với sứ mệnh mang đến một môi trường học tập số hóa tương tác toàn
+                diện, nơi tri thức được kết nối và lan tỏa. Chúng tôi tin rằng mỗi người học đều sở
+                hữu tiềm năng riêng, và KEIVerse là trợ thủ đắc lực giúp bạn tiếp cận nguồn tài
+                nguyên phong phú và bứt phá kết quả.
               </p>
 
               <div className="grid grid-cols-2 gap-4 pt-2">
@@ -124,14 +124,18 @@ export default function Home() {
                     <Users className="size-4" />
                     <span className="text-xl sm:text-2xl font-black text-slate-900">10k+</span>
                   </div>
-                  <div className="text-xs text-slate-500 font-medium">Học sinh & Giảng viên tin dùng</div>
+                  <div className="text-xs text-slate-500 font-medium">
+                    Học sinh & Giảng viên tin dùng
+                  </div>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                   <div className="flex items-center gap-2 text-purple-600 mb-1">
                     <BookOpen className="size-4" />
                     <span className="text-xl sm:text-2xl font-black text-slate-900">500+</span>
                   </div>
-                  <div className="text-xs text-slate-500 font-medium">Lớp học & Khóa học đa dạng</div>
+                  <div className="text-xs text-slate-500 font-medium">
+                    Lớp học & Khóa học đa dạng
+                  </div>
                 </div>
               </div>
 
@@ -174,8 +178,8 @@ export default function Home() {
               Quy trình học tập hiện đại
             </h2>
             <p className="text-slate-400 text-sm sm:text-base">
-              Chỉ với vài thao tác trực quan, bạn đã sẵn sàng tham gia lớp học, làm bài tập và trao đổi
-              trực tiếp cùng giảng viên.
+              Chỉ với vài thao tác trực quan, bạn đã sẵn sàng tham gia lớp học, làm bài tập và trao
+              đổi trực tiếp cùng giảng viên.
             </p>
           </div>
 

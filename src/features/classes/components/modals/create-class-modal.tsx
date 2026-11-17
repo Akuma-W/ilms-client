@@ -8,6 +8,8 @@ import { useSWRConfig } from 'swr';
 import { CreateClassFormValues, createClassSchema } from '../../schemas/class.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { classService } from '../../services/class.service';
+import { AssistantTeacherSelect } from './assistant-teacher-select';
+import { SubjectSelectCombobox } from '@/features/subjects/components/subject-select-combobox';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -30,9 +32,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-const DEFAULT_CREATE_CLASS_VALUES = {
+const DEFAULT_CREATE_CLASS_VALUES: CreateClassFormValues = {
   title: '',
-  subject: '',
+  subjectId: '',
+  maxStudents: 60,
+  assistantIds: [],
   isPrivate: false,
   description: '',
   semester: '',
@@ -60,7 +64,10 @@ export function CreateClassModal() {
     try {
       const data = await classService.createClass({
         title: values.title,
-        subject: values.subject,
+        subjectId: values.subjectId,
+        maxStudents: values.maxStudents,
+        assistantIds:
+          values.assistantIds && values.assistantIds.length > 0 ? values.assistantIds : undefined,
         isPrivate: values.isPrivate,
         description: values.description || undefined,
         semester: values.semester || undefined,
@@ -76,7 +83,9 @@ export function CreateClassModal() {
         description: data?.title,
       });
 
-      router.push(`/classes/${data?.id}/info`);
+      if (data?.id) {
+        router.push(`/classes/${data.id}/info`);
+      }
       handleOpenChange(false);
     } catch (error) {
       const status = (error as { status?: number }).status;
@@ -104,22 +113,45 @@ export function CreateClassModal() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
-          <Plus className="w-4 h-4" />
+        <Button className="bg-galaxy hover:opacity-90 text-white h-11 px-6 shadow-lg shadow-blue-500/20">
+          <Plus className="w-4 h-4 mr-1.5" />
           Tạo lớp
         </Button>
       </DialogTrigger>
 
       <DialogContent
-        className="sm:max-w-125"
+        className="sm:max-w-xl max-h-[90vh] overflow-y-auto"
         onInteractOutside={(e) => isSubmitting && e.preventDefault()}
         onEscapeKeyDown={(e) => isSubmitting && e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-galaxy-blue">Tạo lớp học mới</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-galaxy-blue">Tạo lớp học mới</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
-          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-2" noValidate>
+          <form id={formId} onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-1" noValidate>
+            {/* Subject Select Combobox */}
+            <FormField
+              control={control}
+              name="subjectId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Môn học trực thuộc <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <SubjectSelectCombobox
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Class Title */}
             <FormField
               control={control}
               name="title"
@@ -130,7 +162,7 @@ export function CreateClassModal() {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="VD: Lập trình Web nâng cao"
+                      placeholder="VD: Lập trình Web nâng cao - Nhóm 01"
                       disabled={isSubmitting}
                       {...field}
                     />
@@ -139,30 +171,77 @@ export function CreateClassModal() {
                 </FormItem>
               )}
             />
+
+            {/* Capacity & Semester */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="maxStudents"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Sĩ số tối đa <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={500}
+                        placeholder="60"
+                        disabled={isSubmitting}
+                        value={field.value ?? 60}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={control}
+                name="semester"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Học kỳ (Tùy chọn)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="VD: HK1 (2026 - 2027)"
+                        disabled={isSubmitting}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Assistant Teachers */}
             <FormField
               control={control}
-              name="subject"
+              name="assistantIds"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Môn học <span className="text-red-500">*</span>
-                  </FormLabel>
+                  <FormLabel>Bổ nhiệm Trợ giảng (Tùy chọn)</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="VD: Công nghệ thông tin"
+                    <AssistantTeacherSelect
+                      value={field.value}
+                      onChange={field.onChange}
                       disabled={isSubmitting}
-                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Privacy Mode */}
             <FormField
               control={control}
               name="isPrivate"
               render={({ field }) => (
-                <FormItem className="flex">
+                <FormItem className="space-y-1.5">
                   <FormLabel>
                     Chế độ hiển thị <span className="text-red-500">*</span>
                   </FormLabel>
@@ -170,24 +249,24 @@ export function CreateClassModal() {
                     <RadioGroup
                       value={field.value ? 'private' : 'public'}
                       onValueChange={(v) => field.onChange(v === 'private')}
-                      className="flex gap-6 cursor-pointer"
+                      className="flex gap-6 pt-1"
                     >
-                      <FormItem className="flex items-center gap-2">
+                      <FormItem className="flex items-center gap-2 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="public" className="cursor-pointer" />
+                          <RadioGroupItem value="public" />
                         </FormControl>
-                        <FormLabel className="cursor-pointer flex items-center gap-2 font-normal text-green-600">
-                          <Globe className="h-3.5 w-3.5" />
-                          Công khai
+                        <FormLabel className="flex items-center gap-1.5 font-normal text-green-700 cursor-pointer">
+                          <Globe className="h-4 w-4" />
+                          Công khai (Tự động duyệt)
                         </FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center gap-2">
+                      <FormItem className="flex items-center gap-2 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="private" className="cursor-pointer" />
+                          <RadioGroupItem value="private" />
                         </FormControl>
-                        <FormLabel className="cursor-pointer flex items-center gap-2 font-normal text-red-600">
-                          <Lock className="h-3.5 w-3.5" />
-                          Riêng tư
+                        <FormLabel className="flex items-center gap-1.5 font-normal text-amber-700 cursor-pointer">
+                          <Lock className="h-4 w-4" />
+                          Riêng tư (Chờ phê duyệt)
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>
@@ -195,16 +274,18 @@ export function CreateClassModal() {
                 </FormItem>
               )}
             />
+
+            {/* Description */}
             <FormField
               control={control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mô tả (tùy chọn)</FormLabel>
+                  <FormLabel>Mô tả lớp học (Tùy chọn)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Mô tả ngắn gọn về lớp học..."
-                      rows={3}
+                      placeholder="Mô tả tóm tắt về mục tiêu hoặc tài liệu môn học..."
+                      rows={2}
                       className="resize-none"
                       disabled={isSubmitting}
                       {...field}
@@ -214,27 +295,25 @@ export function CreateClassModal() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={control}
-              name="semester"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Học kỳ (Tùy chọn)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="VD: Học kỳ 2 - 2024" disabled={isSubmitting} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </form>
         </Form>
-        <DialogFooter>
-          <Button variant="outline" className="cursor-pointer" onClick={() => setIsOpen(false)}>
+
+        <DialogFooter className="pt-2">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => setIsOpen(false)}
+            disabled={isSubmitting}
+          >
             Hủy
           </Button>
-          <Button className="cursor-pointer bg-galaxy text-white" onClick={handleSubmit(onSubmit)}>
-            Tạo lớp
+          <Button
+            className="bg-galaxy text-white"
+            type="submit"
+            form={formId}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Đang tạo lớp...' : 'Tạo lớp học'}
           </Button>
         </DialogFooter>
       </DialogContent>

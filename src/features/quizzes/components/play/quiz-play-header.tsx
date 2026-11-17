@@ -66,11 +66,17 @@ export function QuizPlayHeader({
                 Câu {currentIndex + 1}
                 <span className="text-slate-400 font-normal"> / {totalQuestions}</span>
               </span>
-              <Badge variant="outline" className="text-[11px] px-1.5 py-0 border-white/20 bg-white/5 text-slate-300">
+              <Badge
+                variant="outline"
+                className="text-[11px] px-1.5 py-0 border-white/20 bg-white/5 text-slate-300"
+              >
                 Đã làm {answeredCount}/{totalQuestions}
               </Badge>
               {isImmediate && accumulatedPoints !== undefined && (
-                <Badge variant="outline" className="text-[11px] px-1.5 py-0 border-amber-500/30 bg-amber-500/10 text-amber-400 font-bold gap-1">
+                <Badge
+                  variant="outline"
+                  className="text-[11px] px-1.5 py-0 border-amber-500/30 bg-amber-500/10 text-amber-400 font-bold gap-1"
+                >
                   <Sparkles className="w-3 h-3" />
                   {Math.round(accumulatedPoints * 100) / 100} đ
                 </Badge>

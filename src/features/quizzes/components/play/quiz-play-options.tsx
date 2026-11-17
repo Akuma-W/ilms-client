@@ -18,49 +18,57 @@ const OPTION_THEMES = [
     letter: 'A',
     badge: 'bg-rose-500 text-white shadow-md shadow-rose-500/30',
     idle: 'border-rose-500/30 hover:border-rose-400 bg-rose-500/10 hover:bg-rose-500/15 text-white',
-    selected: 'border-rose-500 bg-rose-500/25 ring-2 ring-rose-400 text-white shadow-lg shadow-rose-500/20',
+    selected:
+      'border-rose-500 bg-rose-500/25 ring-2 ring-rose-400 text-white shadow-lg shadow-rose-500/20',
   },
   {
     letter: 'B',
     badge: 'bg-sky-500 text-white shadow-md shadow-sky-500/30',
     idle: 'border-sky-500/30 hover:border-sky-400 bg-sky-500/10 hover:bg-sky-500/15 text-white',
-    selected: 'border-sky-500 bg-sky-500/25 ring-2 ring-sky-400 text-white shadow-lg shadow-sky-500/20',
+    selected:
+      'border-sky-500 bg-sky-500/25 ring-2 ring-sky-400 text-white shadow-lg shadow-sky-500/20',
   },
   {
     letter: 'C',
     badge: 'bg-amber-500 text-white shadow-md shadow-amber-500/30',
     idle: 'border-amber-500/30 hover:border-amber-400 bg-amber-500/10 hover:bg-amber-500/15 text-white',
-    selected: 'border-amber-500 bg-amber-500/25 ring-2 ring-amber-400 text-white shadow-lg shadow-amber-500/20',
+    selected:
+      'border-amber-500 bg-amber-500/25 ring-2 ring-amber-400 text-white shadow-lg shadow-amber-500/20',
   },
   {
     letter: 'D',
     badge: 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30',
     idle: 'border-emerald-500/30 hover:border-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/15 text-white',
-    selected: 'border-emerald-500 bg-emerald-500/25 ring-2 ring-emerald-400 text-white shadow-lg shadow-emerald-500/20',
+    selected:
+      'border-emerald-500 bg-emerald-500/25 ring-2 ring-emerald-400 text-white shadow-lg shadow-emerald-500/20',
   },
   {
     letter: 'E',
     badge: 'bg-purple-500 text-white shadow-md shadow-purple-500/30',
     idle: 'border-purple-500/30 hover:border-purple-400 bg-purple-500/10 hover:bg-purple-500/15 text-white',
-    selected: 'border-purple-500 bg-purple-500/25 ring-2 ring-purple-400 text-white shadow-lg shadow-purple-500/20',
+    selected:
+      'border-purple-500 bg-purple-500/25 ring-2 ring-purple-400 text-white shadow-lg shadow-purple-500/20',
   },
   {
     letter: 'F',
     badge: 'bg-indigo-500 text-white shadow-md shadow-indigo-500/30',
     idle: 'border-indigo-500/30 hover:border-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/15 text-white',
-    selected: 'border-indigo-500 bg-indigo-500/25 ring-2 ring-indigo-400 text-white shadow-lg shadow-indigo-500/20',
+    selected:
+      'border-indigo-500 bg-indigo-500/25 ring-2 ring-indigo-400 text-white shadow-lg shadow-indigo-500/20',
   },
   {
     letter: 'G',
     badge: 'bg-teal-500 text-white shadow-md shadow-teal-500/30',
     idle: 'border-teal-500/30 hover:border-teal-400 bg-teal-500/10 hover:bg-teal-500/15 text-white',
-    selected: 'border-teal-500 bg-teal-500/25 ring-2 ring-teal-400 text-white shadow-lg shadow-teal-500/20',
+    selected:
+      'border-teal-500 bg-teal-500/25 ring-2 ring-teal-400 text-white shadow-lg shadow-teal-500/20',
   },
   {
     letter: 'H',
     badge: 'bg-pink-500 text-white shadow-md shadow-pink-500/30',
     idle: 'border-pink-500/30 hover:border-pink-400 bg-pink-500/10 hover:bg-pink-500/15 text-white',
-    selected: 'border-pink-500 bg-pink-500/25 ring-2 ring-pink-400 text-white shadow-lg shadow-pink-500/20',
+    selected:
+      'border-pink-500 bg-pink-500/25 ring-2 ring-pink-400 text-white shadow-lg shadow-pink-500/20',
   },
 ];
 
@@ -101,8 +109,7 @@ export function QuizPlayOptions({
                   'border-emerald-400 bg-emerald-600 text-white shadow-xl ring-2 ring-emerald-300';
                 statusIcon = <Check className="w-5 h-5 text-white stroke-3" />;
               } else if (isSelected && !isCorrectAnswer) {
-                cardStyle =
-                  'border-rose-400 bg-rose-600 text-white shadow-xl ring-2 ring-rose-300';
+                cardStyle = 'border-rose-400 bg-rose-600 text-white shadow-xl ring-2 ring-rose-300';
                 statusIcon = <X className="w-5 h-5 text-white stroke-3" />;
               } else {
                 cardStyle = 'opacity-30 border-white/10 bg-white/5 text-slate-400';

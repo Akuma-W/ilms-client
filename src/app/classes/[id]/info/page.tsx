@@ -22,7 +22,5 @@ export default async function ClassInformation({ params }: ClassInfoProps) {
     enrollmentServerService.getMyRelationInClass(id).catch(() => null),
   ]);
 
-  return (
-    <InfoClient initialClassData={classData as Class} relation={relation} />
-  );
+  return <InfoClient initialClassData={classData as Class} relation={relation} />;
 }

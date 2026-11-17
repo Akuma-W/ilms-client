@@ -24,11 +24,7 @@ interface ForumDetailClientProps {
   isTeacher: boolean;
 }
 
-export function ForumDetailClient({
-  initialForum,
-  classId,
-  isTeacher,
-}: ForumDetailClientProps) {
+export function ForumDetailClient({ initialForum, classId, isTeacher }: ForumDetailClientProps) {
   const { user: currentUser } = useCurrentUser();
   const router = useRouter();
   const [forum, setForum] = useState<Forum>(initialForum);

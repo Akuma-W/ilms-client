@@ -51,11 +51,16 @@ export function QuizPlayConfirmDialog({
           <DialogDescription className="text-sm pt-1">
             {isComplete ? (
               <span>
-                Bạn đã hoàn thành toàn bộ <strong>{totalQuestions}</strong> câu hỏi. Bạn có chắc chắn muốn nộp bài để xem kết quả?
+                Bạn đã hoàn thành toàn bộ <strong>{totalQuestions}</strong> câu hỏi. Bạn có chắc
+                chắn muốn nộp bài để xem kết quả?
               </span>
             ) : (
               <span>
-                Bạn mới chỉ hoàn thành <strong>{answeredCount}/{totalQuestions}</strong> câu hỏi. Còn{' '}
+                Bạn mới chỉ hoàn thành{' '}
+                <strong>
+                  {answeredCount}/{totalQuestions}
+                </strong>{' '}
+                câu hỏi. Còn{' '}
                 <strong className="text-rose-500">{unansweredCount} câu chưa trả lời</strong>.
               </span>
             )}

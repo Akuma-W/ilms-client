@@ -11,12 +11,7 @@ import { CLASS_SIDEBAR_NAV } from '@/config';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import {
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-} from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { DeadlineWidget } from './deadline-widget';
 import useSidebarStore from '@/stores/sidebar-store';
 import { useStarredClasses } from '../../hooks/use-starred-classes';

@@ -63,7 +63,7 @@ export function QuizSaveSettingsModal({
   const [description, setDescription] = useState(initialValues.description);
   const [timeLimit, setTimeLimit] = useState(initialValues.timeLimit);
   const [reviewMode, setReviewMode] = useState<ReviewMode>(
-    initialValues.reviewMode || ReviewMode.after_submission
+    initialValues.reviewMode || ReviewMode.after_submission,
   );
 
   const totalQuestions = questions.length;
@@ -101,7 +101,8 @@ export function QuizSaveSettingsModal({
             Cấu hình & Lưu trữ bộ đề thi
           </DialogTitle>
           <DialogDescription>
-            Kiểm tra thông số bộ đề, cấu hình chế độ xem đáp án và bấm chọn một trong các hình thức phát hành bên dưới để hoàn tất.
+            Kiểm tra thông số bộ đề, cấu hình chế độ xem đáp án và bấm chọn một trong các hình thức
+            phát hành bên dưới để hoàn tất.
           </DialogDescription>
         </DialogHeader>
 
@@ -143,9 +144,12 @@ export function QuizSaveSettingsModal({
             <div className="flex items-start gap-2.5 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs">
               <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Có {invalidQuestions.length} câu hỏi chưa hoàn thiện:</p>
+                <p className="font-semibold">
+                  Có {invalidQuestions.length} câu hỏi chưa hoàn thiện:
+                </p>
                 <p className="mt-0.5 text-muted-foreground">
-                  Các câu: {invalidQuestions.map((q) => `#${q.index}`).join(', ')} ({invalidQuestions[0]?.error})
+                  Các câu: {invalidQuestions.map((q) => `#${q.index}`).join(', ')} (
+                  {invalidQuestions[0]?.error})
                 </p>
                 <p className="mt-1 text-rose-400 font-medium">
                   Vui lòng chỉnh sửa trước khi lưu hoặc xuất bản.
@@ -200,11 +204,16 @@ export function QuizSaveSettingsModal({
                 value={timeLimit}
                 onChange={(e) => setTimeLimit(Math.max(0, parseInt(e.target.value, 10) || 0))}
               />
-              <span className="text-[11px] text-muted-foreground">0 = Không giới hạn thời gian</span>
+              <span className="text-[11px] text-muted-foreground">
+                0 = Không giới hạn thời gian
+              </span>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="quiz-review" className="text-xs font-medium flex items-center gap-1.5">
+              <Label
+                htmlFor="quiz-review"
+                className="text-xs font-medium flex items-center gap-1.5"
+              >
                 <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                 Chế độ xem đáp án mặc định
               </Label>
@@ -244,7 +253,8 @@ export function QuizSaveSettingsModal({
                   Lưu bản nháp
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed mt-2.5">
-                  Bộ đề đang soạn thảo dở dang. Chỉ hiển thị trong danh sách của bạn và chưa thể phát hành vào lớp.
+                  Bộ đề đang soạn thảo dở dang. Chỉ hiển thị trong danh sách của bạn và chưa thể
+                  phát hành vào lớp.
                 </p>
               </div>
               <div className="mt-4 pt-2.5 border-t border-border/40 text-[11px] font-semibold text-slate-500 dark:text-slate-400 group-hover:text-foreground flex items-center justify-between">
@@ -273,7 +283,8 @@ export function QuizSaveSettingsModal({
                   Hoàn tất riêng tư
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed mt-2.5">
-                  Đề thi hoàn thiện 100%, bảo mật riêng tư. Sẵn sàng xuất bản vào các lớp học mà không bị lộ câu hỏi trên Thư viện.
+                  Đề thi hoàn thiện 100%, bảo mật riêng tư. Sẵn sàng xuất bản vào các lớp học mà
+                  không bị lộ câu hỏi trên Thư viện.
                 </p>
               </div>
               <div className="mt-4 pt-2.5 border-t border-emerald-500/20 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 group-hover:underline flex items-center justify-between">
@@ -302,7 +313,8 @@ export function QuizSaveSettingsModal({
                   Công khai Thư viện
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed mt-2.5">
-                  Chia sẻ đề thi lên Thư viện chung của trường để giáo viên khác và học sinh toàn trường cùng khám phá và tự ôn tập.
+                  Chia sẻ đề thi lên Thư viện chung của trường để giáo viên khác và học sinh toàn
+                  trường cùng khám phá và tự ôn tập.
                 </p>
               </div>
               <div className="mt-4 pt-2.5 border-t border-indigo-500/20 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 group-hover:underline flex items-center justify-between">

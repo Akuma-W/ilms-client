@@ -1,7 +1,7 @@
 'use client';
 
 import { BookOpen, Pencil } from 'lucide-react';
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -26,7 +26,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { TopicFormValues, topicSchema } from '../schemas/topic.schema';
 import { topicsService } from '../services/topics.service';
+import { materialsService } from '@/features/materials/services/materials.service';
+import { uploadService } from '@/features/upload/services/upload.service';
+import { TopicAttachmentsQueue } from './topic-attachments-queue';
 import type { Topic } from '@/types/topic';
+import type { StagedMaterialItem } from '@/types/material';
 
 interface TopicModalProps {
   classId: string;
@@ -42,9 +46,6 @@ const DEFAULT_VALUES: TopicFormValues = {
   description: '',
 };
 
-/**
- * Modal dialog for teachers to create or edit a lecture topic.
- */
 export function TopicModal({
   classId,
   isOpen,
@@ -55,6 +56,8 @@ export function TopicModal({
 }: TopicModalProps) {
   const formId = useId();
   const isEdit = mode === 'edit';
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [stagedItems, setStagedItems] = useState<StagedMaterialItem[]>([]);
 
   const form = useForm<TopicFormValues>({
     resolver: zodResolver(topicSchema),
@@ -78,6 +81,8 @@ export function TopicModal({
       } else {
         reset(DEFAULT_VALUES);
       }
+      setStagedItems([]);
+      setShowAttachments(false);
     }
   }, [isOpen, isEdit, initialData, reset]);
 
@@ -85,6 +90,8 @@ export function TopicModal({
     if (isSubmitting) return;
     onOpenChange(false);
     reset(DEFAULT_VALUES);
+    setStagedItems([]);
+    setShowAttachments(false);
   };
 
   const onSubmit = async (values: TopicFormValues) => {
@@ -104,16 +111,46 @@ export function TopicModal({
 
         toast.success('Cập nhật chủ đề thành công!');
       } else {
+        // Step 1: Create the topic
         const res = await topicsService.createTopic(classId, {
           title: values.title,
           description: values.description || undefined,
         });
 
-        if (!res.success) {
+        if (!res.success || !res.data) {
           throw new Error(res.message || 'Tạo chủ đề thất bại');
         }
 
-        toast.success('Tạo chủ đề bài giảng thành công!');
+        const newTopicId = res.data.id;
+
+        // Step 2: Upload and attach multiple staged materials and links
+        if (stagedItems.length > 0) {
+          toast.info(`Đang tải lên ${stagedItems.length} tài liệu đính kèm...`);
+
+          for (const item of stagedItems) {
+            try {
+              let fileUrl: string | undefined = undefined;
+
+              if (item.file) {
+                const formData = new FormData();
+                formData.append('file', item.file);
+                const uploadResult = await uploadService.uploadFile(formData, 'materials');
+                fileUrl = uploadResult.data?.url || undefined;
+              }
+
+              await materialsService.createMaterial(newTopicId, {
+                title: item.title,
+                materialType: item.materialType,
+                fileUrl: fileUrl || item.fileUrl || undefined,
+                externalUrl: item.externalUrl || undefined,
+              });
+            } catch (err) {
+              console.error('Error attaching resource:', err);
+            }
+          }
+        }
+
+        toast.success('Tạo chủ đề và đính kèm tài liệu thành công!');
       }
 
       onSuccess();
@@ -128,7 +165,7 @@ export function TopicModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-md rounded-xl border border-border bg-card text-card-foreground shadow-xl p-6"
+        className="sm:max-w-2xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-6 max-h-[90vh] overflow-y-auto"
         onInteractOutside={(e) => isSubmitting && e.preventDefault()}
         onEscapeKeyDown={(e) => isSubmitting && e.preventDefault()}
       >
@@ -143,7 +180,7 @@ export function TopicModal({
             <DialogDescription className="text-xs text-muted-foreground mt-0.5">
               {isEdit
                 ? 'Cập nhật tiêu đề hoặc mô tả giới thiệu của chủ đề.'
-                : 'Phân nhóm tài liệu, bài tập và bài giảng theo tiến độ học.'}
+                : 'Tạo chủ đề và đính kèm nhiều bài giảng, tài liệu cùng lúc.'}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -161,7 +198,7 @@ export function TopicModal({
                   <FormControl>
                     <Input
                       placeholder="vd: Chương 1 - Giới thiệu lập trình Web"
-                      className="h-9 text-xs rounded-lg bg-background"
+                      className="h-10 text-sm rounded-xl bg-background"
                       {...field}
                     />
                   </FormControl>
@@ -181,7 +218,7 @@ export function TopicModal({
                   <FormControl>
                     <Textarea
                       placeholder="Tóm tắt nội dung chính hoặc mục tiêu học tập của chương này..."
-                      className="text-xs rounded-lg bg-background resize-none min-h-20"
+                      className="text-sm rounded-xl bg-background resize-none min-h-20"
                       {...field}
                     />
                   </FormControl>
@@ -189,6 +226,17 @@ export function TopicModal({
                 </FormItem>
               )}
             />
+
+            {/* Multiple files and links attachment queue when creating */}
+            {!isEdit && (
+              <TopicAttachmentsQueue
+                stagedItems={stagedItems}
+                setStagedItems={setStagedItems}
+                isOpen={showAttachments}
+                onToggle={() => setShowAttachments(!showAttachments)}
+                disabled={isSubmitting}
+              />
+            )}
           </form>
         </Form>
 
@@ -197,7 +245,7 @@ export function TopicModal({
             type="button"
             variant="outline"
             size="sm"
-            className="rounded-lg text-xs h-8.5 cursor-pointer"
+            className="rounded-lg text-xs h-8.5"
             onClick={handleClose}
             disabled={isSubmitting}
           >
@@ -207,7 +255,7 @@ export function TopicModal({
             type="submit"
             form={formId}
             size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium cursor-pointer"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium"
             disabled={isSubmitting}
           >
             {isSubmitting

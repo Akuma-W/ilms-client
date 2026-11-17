@@ -14,10 +14,10 @@ import {
   Users,
   XCircle,
 } from 'lucide-react';
-import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { InfoItem } from '@/features/classes/components/items/info-item';
 import { JoinClassModal } from '../modals/join-class-modal';
 import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
@@ -191,20 +191,16 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             {/* Teacher In Charge */}
             <div className="flex items-center gap-3.5 p-3 sm:p-3.5 rounded-xl bg-card border border-border/80 shadow-2xs">
-              <div className="relative size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary overflow-hidden shrink-0 border border-primary/20">
-                {classData.teacher?.avatar ? (
-                  <Image
-                    src={classData.teacher.avatar}
-                    alt={classData.teacher.fullName}
-                    fill
-                    sizes="40px"
-                    className="object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <User2 className="size-5" />
-                )}
-              </div>
+              <Avatar className="size-10 rounded-xl border border-primary/20 shrink-0 overflow-hidden">
+                <AvatarImage
+                  src={classData.teacher?.avatar || undefined}
+                  alt={classData.teacher?.fullName}
+                  className="object-cover size-full rounded-xl"
+                />
+                <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                  {classData.teacher?.fullName?.charAt(0) || <User2 className="size-5" />}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex flex-col min-w-0">
                 <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
                   GIẢNG VIÊN PHỤ TRÁCH

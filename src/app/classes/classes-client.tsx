@@ -9,21 +9,20 @@ import { cn } from '@/lib/utils';
 import { ClassTabs } from '@/types/enum';
 import type { QueryResponse } from '@/types/api';
 import type { Class, ClassParams } from '@/types/class';
-import type { User } from '@/types/user';
 import { School } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { ClassList } from '@/features/classes/components/ui/class-list';
 import { useCurrentUser } from '@/features/user/hooks/use-current-user';
+import { SubjectFilterCombobox } from '@/features/subjects/components/subject-filter-combobox';
 
 interface ClassesClientProps {
-  user?: User | null;
   initialData: QueryResponse<Class> | null;
   initialParams: ClassParams;
 }
 
-export default function ClassesClient({ user: propUser, initialData, initialParams }: ClassesClientProps) {
-  const { user } = useCurrentUser({ initialUser: propUser });
+export default function ClassesClient({ initialData, initialParams }: ClassesClientProps) {
+  const { user } = useCurrentUser();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -33,6 +32,7 @@ export default function ClassesClient({ user: propUser, initialData, initialPara
     ? (searchParams.get('tab') as ClassTabs)
     : initialParams.tab || ClassTabs.DISCOVERY;
   const search = searchParams.get('search') ?? initialParams.search ?? '';
+  const subjectId = searchParams.get('subjectId') ?? initialParams.subjectId ?? undefined;
   const page = Number(searchParams.get('page') ?? initialParams.page);
   const limit = Number(searchParams.get('limit') ?? initialParams.limit);
 
@@ -67,6 +67,13 @@ export default function ClassesClient({ user: propUser, initialData, initialPara
     [updateParams],
   );
 
+  const handleSubjectChange = useCallback(
+    (nextSubjectId: string | null) => {
+      updateParams({ subjectId: nextSubjectId, page: '1' });
+    },
+    [updateParams],
+  );
+
   const handlePageChange = useCallback(
     (p: number) => {
       updateParams({ page: String(p) });
@@ -74,22 +81,31 @@ export default function ClassesClient({ user: propUser, initialData, initialPara
     [updateParams],
   );
 
-  const listParams = useMemo(() => ({ tab, search, page, limit }), [tab, search, page, limit]);
+  const listParams = useMemo(
+    () => ({ tab, search, page, limit, subjectId }),
+    [tab, search, page, limit, subjectId],
+  );
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto w-full">
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-tight text-galaxy-blue">Danh sách lớp học</h1>
-        <h2 className="font-semibold text-gray-500">
+        <h1 className="text-3xl font-black tracking-tight text-foreground">Danh sách lớp học</h1>
+        <h2 className="font-semibold text-muted-foreground">
           Xin chào{' '}
-          <span className={user?.role === 'teacher' ? 'text-red-600' : 'text-green-600'}>
+          <span
+            className={
+              user?.role === 'teacher' ? 'text-primary font-bold' : 'text-emerald-600 font-bold'
+            }
+          >
             {user?.role === 'teacher' ? 'giảng viên ' : 'sinh viên '}
           </span>
-          <span className="text-galaxy-blue font-bold text-[18px]">{user?.fullName}</span>
+          <span className="text-foreground font-bold text-[18px]">{user?.fullName}</span>
         </h2>
         <div className="space-y-2">
-          <p className="text-gray-500 text-md font-medium">Quản lý và khám phá các lớp học tại</p>
+          <p className="text-muted-foreground text-md font-medium">
+            Quản lý và khám phá các lớp học tại
+          </p>
           <div className="flex items-center gap-2 text-primary font-black text-[12px] uppercase tracking-[0.2em] mb-2">
             <School className="w-3.5 h-3.5" />
             {user?.school?.name} ({user?.school?.shortname})
@@ -97,14 +113,22 @@ export default function ClassesClient({ user: propUser, initialData, initialPara
         </div>
       </div>
 
-      {/* Page Tools: Search, Create Class, Find Class */}
-      <div className="flex flex-col lg:flex-row lg:items-end gap-4">
-        <div className="relative w-full">
+      {/* Search, Subject Filter & Action Modals */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3.5">
+        <div className="relative flex-1">
           <ClassSearch value={search} onSearch={handleSearch} />
         </div>
 
-        {/* Modals */}
-        <div className="flex items-center gap-3">
+        {/* Searchable Subject Combobox */}
+        <div className="shrink-0">
+          <SubjectFilterCombobox
+            selectedSubjectId={subjectId}
+            onSelectSubject={handleSubjectChange}
+          />
+        </div>
+
+        {/* Action Modals */}
+        <div className="flex items-center gap-2.5 shrink-0">
           {/* Find Class by Code */}
           <FindClassModal />
           {/* Create Class (Teacher) */}

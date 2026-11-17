@@ -75,7 +75,9 @@ export function ForgotPasswordClient() {
       toast.success('Mã xác thực hợp lệ! Vui lòng thiết lập mật khẩu mới.');
       setStep('password');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Mã OTP không chính xác hoặc đã hết hạn');
+      toast.error(
+        error instanceof Error ? error.message : 'Mã OTP không chính xác hoặc đã hết hạn',
+      );
     } finally {
       setLoading(false);
     }

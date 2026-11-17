@@ -22,7 +22,8 @@ export default async function ClassGradesPage({ params }: ClassGradesProps) {
   ]);
 
   const isTeacher = Boolean(
-    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
+    relation?.roleIn === 'teacher' ||
+    (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
   return <GradesClient classId={id} isTeacher={isTeacher} />;

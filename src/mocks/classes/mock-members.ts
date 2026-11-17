@@ -81,7 +81,27 @@ export const approveMockMember = (memberId: string) => {
 };
 
 export const rejectMockMember = (memberId: string) => {
-  mutableMockMembers = mutableMockMembers.filter((m) => m.id !== memberId);
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, status: EnrollmentStatus.rejected } : m,
+  );
+};
+
+export const reApproveMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, status: EnrollmentStatus.approved } : m,
+  );
+};
+
+export const banMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, status: EnrollmentStatus.suspended } : m,
+  );
+};
+
+export const unbanMockMember = (memberId: string) => {
+  mutableMockMembers = mutableMockMembers.map((m) =>
+    m.id === memberId ? { ...m, status: EnrollmentStatus.approved } : m,
+  );
 };
 
 export const removeMockMember = (memberId: string) => {
@@ -92,4 +112,17 @@ export const updateMockMemberRole = (memberId: string, newRole: Role) => {
   mutableMockMembers = mutableMockMembers.map((m) =>
     m.id === memberId ? { ...m, role: newRole } : m,
   );
+};
+
+export const addMockAssistant = (user: User) => {
+  const newAssistant = {
+    id: `mem-assist-${Date.now()}`,
+    userId: user.id,
+    user,
+    role: Role.teacher,
+    status: EnrollmentStatus.approved,
+    joinedAt: new Date().toISOString(),
+    studentCode: user.identityCode || undefined,
+  };
+  mutableMockMembers = [newAssistant, ...mutableMockMembers];
 };

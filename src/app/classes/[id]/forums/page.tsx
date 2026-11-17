@@ -25,14 +25,9 @@ export default async function ClassForumsPage({ params }: ClassForumsPageProps) 
   ]);
 
   const isTeacher = Boolean(
-    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
+    relation?.roleIn === 'teacher' ||
+    (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
-  return (
-    <ForumsClient
-      initialForums={initialForums}
-      classId={id}
-      isTeacher={isTeacher}
-    />
-  );
+  return <ForumsClient initialForums={initialForums} classId={id} isTeacher={isTeacher} />;
 }

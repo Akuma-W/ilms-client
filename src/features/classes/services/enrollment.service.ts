@@ -5,10 +5,6 @@ import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
 import type { EnrollmentStatus } from '@/types/enum';
 
-/**
- * Client-side enrollment service for Browser Components (CSR, SWR, Star, Join).
- * Encapsulates try/catch and fallback to mock data when API errors or fails.
- */
 export const enrollmentService = {
   async joinClass(
     payload: { classId: string; roleIn?: string; isStarred?: boolean } | string,

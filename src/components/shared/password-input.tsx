@@ -3,8 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Input } from '../ui/input';
 import { cn } from '@/lib/utils';
 
-export interface PasswordInputProps
-  extends React.ComponentProps<'input'> {
+export interface PasswordInputProps extends React.ComponentProps<'input'> {
   iconClassName?: string;
   placeholder?: string;
 }

@@ -76,9 +76,7 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-1.5">
-              <FormLabel className="text-xs font-semibold text-slate-700">
-                Địa chỉ Email
-              </FormLabel>
+              <FormLabel className="text-xs font-semibold text-slate-700">Địa chỉ Email</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
@@ -103,9 +101,7 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <FormLabel className="text-xs font-semibold text-slate-700">
-                  Mật khẩu
-                </FormLabel>
+                <FormLabel className="text-xs font-semibold text-slate-700">Mật khẩu</FormLabel>
                 <Link
                   href="/forgot-password"
                   className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"

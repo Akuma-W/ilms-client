@@ -9,7 +9,15 @@ import {
 } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Crown, GraduationCap, IdCard, Mail, ShieldCheck, User as UserIcon } from 'lucide-react';
+import {
+  Calendar,
+  Crown,
+  GraduationCap,
+  IdCard,
+  Mail,
+  ShieldCheck,
+  User as UserIcon,
+} from 'lucide-react';
 import { EnrollmentStatus, Role } from '@/types/enum';
 import type { ClassMember } from '@/types/member';
 import type { User } from '@/types/user';
@@ -36,7 +44,9 @@ export function MemberDetailDialog({
   const email = targetUser.email;
   const avatarUrl = targetUser.avatar || targetUser.avatarUrl || undefined;
   const identityCode = member?.studentCode || targetUser.identityCode;
-  const joinedDate = member?.joinedAt ? new Date(member.joinedAt).toLocaleDateString('vi-VN') : undefined;
+  const joinedDate = member?.joinedAt
+    ? new Date(member.joinedAt).toLocaleDateString('vi-VN')
+    : undefined;
   const isStudent = member?.role === Role.student || (!member && targetUser.role === Role.student);
 
   return (
@@ -81,9 +91,7 @@ export function MemberDetailDialog({
               )}
 
               {member?.status === EnrollmentStatus.pending && (
-                <Badge className="bg-amber-100 text-amber-800 text-xs font-medium">
-                  Chờ duyệt
-                </Badge>
+                <Badge className="bg-amber-100 text-amber-800 text-xs font-medium">Chờ duyệt</Badge>
               )}
             </div>
           </div>

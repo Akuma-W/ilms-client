@@ -8,6 +8,13 @@ export interface Class {
   id: string;
   title: string;
   subject: string;
+  subjectId?: string;
+  subjectRef?: {
+    id: string;
+    code: string;
+    name: string;
+    credits: number;
+  } | null;
   description: string | null;
   courseCode: string;
   semester: string | null;
@@ -17,6 +24,7 @@ export interface Class {
   isArchived?: boolean;
   schoolId: string;
   teacherId: string;
+  maxStudents?: number;
   createdAt: Date;
 
   school: School;
@@ -40,14 +48,18 @@ export interface ClassParams {
   search?: string;
   page?: number;
   limit?: number;
+  subjectId?: string;
 }
 
 export interface CreateClassPayload {
   title: string;
-  subject: string;
+  subjectId: string;
+  subject?: string;
   description?: string;
   semester?: string;
   isPrivate: boolean;
+  maxStudents?: number;
+  assistantIds?: string[];
 }
 
 export interface ClassroomTabColors {

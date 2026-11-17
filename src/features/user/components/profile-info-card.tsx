@@ -8,16 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { userService } from '../services/user.service';
 import { toast } from 'sonner';
-import {
-  Edit3,
-  Check,
-  X,
-  Shield,
-  Calendar,
-  Loader2,
-  Lock,
-  UserCheck,
-} from 'lucide-react';
+import { Edit3, Check, X, Shield, Calendar, Loader2, Lock, UserCheck } from 'lucide-react';
 
 interface ProfileInfoCardProps {
   user: User;
@@ -140,7 +131,10 @@ export function ProfileInfoCard({ user, mutateUser }: ProfileInfoCardProps) {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="profile-identityCode" className="text-xs font-semibold text-slate-700">
+                <Label
+                  htmlFor="profile-identityCode"
+                  className="text-xs font-semibold text-slate-700"
+                >
                   {user.role === 'student' ? 'Mã số sinh viên (MSSV)' : 'Mã số giảng viên (MSGV)'}
                 </Label>
                 <Input
@@ -170,7 +164,9 @@ export function ProfileInfoCard({ user, mutateUser }: ProfileInfoCardProps) {
                   <Lock className="size-3" /> Cố định
                 </span>
               </div>
-              <p className="text-sm font-semibold text-slate-900 opacity-100 font-mono">{user.email}</p>
+              <p className="text-sm font-semibold text-slate-900 opacity-100 font-mono">
+                {user.email}
+              </p>
             </div>
 
             {/* Identity Code (MSSV / MSGV) */}
@@ -185,9 +181,13 @@ export function ProfileInfoCard({ user, mutateUser }: ProfileInfoCardProps) {
 
             {/* School Affiliation */}
             <div className="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-1">
-              <span className="text-xs font-medium text-slate-500 block">Trường học trực thuộc</span>
+              <span className="text-xs font-medium text-slate-500 block">
+                Trường học trực thuộc
+              </span>
               <p className="text-sm font-semibold text-slate-900 opacity-100 truncate">
-                {user.school?.name ? `(${user.school.shortname}) ${user.school.name}` : 'Chưa liên kết trường'}
+                {user.school?.name
+                  ? `(${user.school.shortname}) ${user.school.name}`
+                  : 'Chưa liên kết trường'}
               </p>
             </div>
           </div>

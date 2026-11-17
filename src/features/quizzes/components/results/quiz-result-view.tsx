@@ -35,7 +35,7 @@ export function QuizResultView({
         content: q.content,
         options: (q.options || []).map((opt) => ({ id: opt.id, content: opt.content })),
       },
-    ])
+    ]),
   );
 
   return (
@@ -50,7 +50,11 @@ export function QuizResultView({
         </Button>
 
         {retakeUrl ? (
-          <Button asChild size="sm" className="gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Button
+            asChild
+            size="sm"
+            className="gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
             <Link href={retakeUrl}>
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Làm lại bài này</span>

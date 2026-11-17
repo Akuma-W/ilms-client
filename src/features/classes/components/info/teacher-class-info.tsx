@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSWRConfig } from 'swr';
 import {
   BookOpen,
   Calendar,
@@ -12,11 +13,12 @@ import {
   Pencil,
   Trash2,
   User2,
+  Users,
 } from 'lucide-react';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { InfoItem } from '@/features/classes/components/items/info-item';
 import { classService } from '@/features/classes/services/class.service';
@@ -37,6 +39,7 @@ interface TeacherClassInfoProps {
  */
 export function TeacherClassInfo({ classData, userData, onClassUpdated }: TeacherClassInfoProps) {
   const router = useRouter();
+  const { mutate } = useSWRConfig();
   const [currentClass, setCurrentClass] = useState<Class>(classData);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -58,9 +61,11 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
       if (res && res.success === false) {
         throw new Error(res.message || 'Xóa lớp học thất bại');
       }
+      await mutate(() => true, undefined, { revalidate: true });
       toast.success('Lớp học đã được xóa vĩnh viễn thành công.');
       setIsDeleteModalOpen(false);
-      router.push('/classes?tab=created');
+      router.refresh();
+      router.replace('/classes?tab=created');
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Xóa lớp học thất bại. Vui lòng thử lại sau.',
@@ -99,9 +104,18 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
     {
       icon: GraduationCap,
       label: 'Môn học',
-      value: currentClass.subject,
+      value: currentClass.subjectRef
+        ? `[${currentClass.subjectRef.code}] ${currentClass.subjectRef.name} (${currentClass.subjectRef.credits} tín chỉ)`
+        : currentClass.subject,
       subtleBg: subjectTheme.subtleBg,
       iconClass: subjectTheme.icon,
+    },
+    {
+      icon: Users,
+      label: 'Sĩ số học sinh',
+      value: `${studentCount} / ${currentClass.maxStudents ?? 60} sinh viên`,
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
     },
     {
       icon: Globe,
@@ -166,19 +180,16 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
         </CardHeader>
         <CardContent className="px-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-            <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-xl font-bold border border-primary/20 shrink-0 overflow-hidden">
-              {userData.avatarUrl ? (
-                <Image
-                  src={userData.avatarUrl}
-                  alt={userData.fullName}
-                  width={64}
-                  height={64}
-                  className="rounded-2xl object-cover size-full"
-                />
-              ) : (
-                userData.fullName.charAt(0)
-              )}
-            </div>
+            <Avatar className="size-16 rounded-2xl border border-primary/20 shrink-0 overflow-hidden shadow-2xs">
+              <AvatarImage
+                src={userData.avatar || undefined}
+                alt={userData.fullName}
+                className="object-cover size-full rounded-2xl"
+              />
+              <AvatarFallback className="rounded-2xl bg-primary/10 text-primary font-bold text-xl">
+                {userData.fullName?.charAt(0) || <User2 className="size-6" />}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="flex-1 space-y-2 text-center sm:text-left">
               <div className="space-y-1">

@@ -25,14 +25,14 @@ export const quizAttemptsService = {
   async checkAnswer(
     attemptId: string,
     questionId: string,
-    selectedOptionIds: string[]
+    selectedOptionIds: string[],
   ): Promise<CheckedAnswerResult> {
     const res = await clientApiClient<CheckedAnswerResult>(
       `/quiz-attempts/${attemptId}/check-answer`,
       {
         method: 'POST',
         body: JSON.stringify({ questionId, selectedOptionIds }),
-      }
+      },
     );
     if (!res || res.success === false || !res.data) {
       throw new Error(res?.message || 'Không thể kiểm tra câu trả lời');

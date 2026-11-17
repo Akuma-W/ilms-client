@@ -14,12 +14,13 @@ import {
   Info,
   LogOut,
   User2,
+  Users,
   Video,
 } from 'lucide-react';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { InfoItem } from '@/features/classes/components/items/info-item';
 import { enrollmentService } from '@/features/classes/services/enrollment.service';
@@ -91,9 +92,18 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
     {
       icon: GraduationCap,
       label: 'Môn học',
-      value: classData.subject,
+      value: classData.subjectRef
+        ? `[${classData.subjectRef.code}] ${classData.subjectRef.name} (${classData.subjectRef.credits} tín chỉ)`
+        : classData.subject,
       subtleBg: subjectTheme.subtleBg,
       iconClass: subjectTheme.icon,
+    },
+    {
+      icon: Users,
+      label: 'Sĩ số lớp học',
+      value: `${classData.totalStudents ?? 0} / ${classData.maxStudents ?? 60} sinh viên`,
+      subtleBg: classTheme.subtleBg,
+      iconClass: classTheme.icon,
     },
     {
       icon: Globe,
@@ -122,19 +132,16 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
         </CardHeader>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-            <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-xl font-bold border border-primary/20 shrink-0">
-              {userData.avatarUrl ? (
-                <Image
-                  src={userData.avatarUrl}
-                  alt={userData.fullName}
-                  width={64}
-                  height={64}
-                  className="rounded-2xl object-cover size-full"
-                />
-              ) : (
-                userData.fullName.charAt(0)
-              )}
-            </div>
+            <Avatar className="size-16 rounded-2xl border border-primary/20 shrink-0 overflow-hidden shadow-2xs">
+              <AvatarImage
+                src={userData.avatar || undefined}
+                alt={userData.fullName}
+                className="object-cover size-full rounded-2xl"
+              />
+              <AvatarFallback className="rounded-2xl bg-primary/10 text-primary font-bold text-xl">
+                {userData.fullName?.charAt(0) || <User2 className="size-6" />}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="flex-1 space-y-2 text-center sm:text-left">
               <div className="space-y-0.5">
@@ -249,20 +256,16 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2">
             <div className="flex items-center gap-3.5 p-4 rounded-xl bg-card border border-border shadow-2xs">
-              <div className="relative size-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary overflow-hidden shrink-0">
-                {classData.teacher?.avatar ? (
-                  <Image
-                    src={classData.teacher.avatar}
-                    alt={classData.teacher.fullName}
-                    fill
-                    sizes="44px"
-                    className="object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <User2 className="size-5" />
-                )}
-              </div>
+              <Avatar className="size-11 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0 overflow-hidden">
+                <AvatarImage
+                  src={classData.teacher?.avatar || undefined}
+                  alt={classData.teacher?.fullName}
+                  className="object-cover size-full rounded-xl"
+                />
+                <AvatarFallback className="rounded-xl text-sm font-bold">
+                  {classData.teacher?.fullName?.charAt(0) || <User2 className="size-5" />}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
                   Giảng viên phụ trách
@@ -317,6 +320,7 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
         title="Xác nhận rời lớp học"
         description={`Bạn có chắc chắn muốn rời khỏi lớp "${classData.title}"? Dữ liệu bài nộp và điểm số của bạn có thể sẽ không còn truy cập được.`}
         itemTypeLabel="lớp học"
+        deleteLabel="Rời lớp"
         itemName={classData.title}
         isDeleting={isLeaving}
         onConfirm={handleConfirmLeave}

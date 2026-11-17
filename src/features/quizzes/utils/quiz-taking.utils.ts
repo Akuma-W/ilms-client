@@ -1,8 +1,5 @@
 // Calculate remaining seconds based on wall-clock time
-export function calcRemainingSeconds(
-  startedAt: string | Date,
-  timeLimitMinutes: number
-): number {
+export function calcRemainingSeconds(startedAt: string | Date, timeLimitMinutes: number): number {
   if (!timeLimitMinutes || timeLimitMinutes <= 0) return 0;
   const startTime = new Date(startedAt).getTime();
   const deadline = startTime + timeLimitMinutes * 60 * 1000;

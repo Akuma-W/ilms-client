@@ -219,12 +219,18 @@ export function RegisterForm() {
                     render={({ field }) => (
                       <FormItem className="space-y-1 min-w-0">
                         <FormLabel className="text-xs font-semibold text-slate-700">
-                          {selectedRole === 'student' ? 'Mã số sinh viên (MSSV)' : 'Mã số giảng viên (MSGV)'}
+                          {selectedRole === 'student'
+                            ? 'Mã số sinh viên (MSSV)'
+                            : 'Mã số giảng viên (MSGV)'}
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder={selectedRole === 'student' ? 'VD: SV21120001' : 'VD: GV123456 (Tùy chọn)'}
+                            placeholder={
+                              selectedRole === 'student'
+                                ? 'VD: SV21120001'
+                                : 'VD: GV123456 (Tùy chọn)'
+                            }
                             className="h-10 text-xs sm:text-sm bg-white border-slate-200 text-slate-900 rounded-xl focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
                         </FormControl>

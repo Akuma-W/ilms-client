@@ -143,13 +143,18 @@ export function EditPublicationModal({
                 value={closeAt}
                 onChange={(e) => setCloseAt(e.target.value)}
               />
-              <span className="text-[11px] text-muted-foreground">Để trống = Không giới hạn hạn</span>
+              <span className="text-[11px] text-muted-foreground">
+                Để trống = Không giới hạn hạn
+              </span>
             </div>
           </div>
 
           {/* Review Mode Option */}
           <div className="space-y-1.5">
-            <Label htmlFor="edit-reviewMode" className="text-xs font-medium flex items-center gap-1.5">
+            <Label
+              htmlFor="edit-reviewMode"
+              className="text-xs font-medium flex items-center gap-1.5"
+            >
               <Eye className="w-3.5 h-3.5 text-muted-foreground" />
               Chế độ xem đáp án của học sinh
             </Label>
@@ -168,9 +173,7 @@ export function EditPublicationModal({
               <option value={ReviewMode.after_closed}>
                 Xem sau khi toàn lớp kết thúc (Thi chính thức)
               </option>
-              <option value={ReviewMode.never}>
-                Không cho xem đáp án
-              </option>
+              <option value={ReviewMode.never}>Không cho xem đáp án</option>
             </select>
           </div>
 

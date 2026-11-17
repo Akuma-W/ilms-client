@@ -153,7 +153,9 @@ export function QuizResultQuestionItem({
       {!canViewAnswers && (
         <div className="p-3 rounded-xl bg-muted/30 border border-border/50 text-xs text-muted-foreground flex items-center gap-2">
           <Lock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <span>Đáp án chính thức và điểm số chi tiết sẽ được công bố sau khi đợt thi kết thúc.</span>
+          <span>
+            Đáp án chính thức và điểm số chi tiết sẽ được công bố sau khi đợt thi kết thúc.
+          </span>
         </div>
       )}
 

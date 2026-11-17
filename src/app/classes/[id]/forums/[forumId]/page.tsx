@@ -36,14 +36,9 @@ export default async function ForumDetailPage({ params }: ForumDetailPageProps) 
   }
 
   const isTeacher = Boolean(
-    relation?.roleIn === 'teacher' || (classData && relation?.userId && classData.teacherId === relation.userId),
+    relation?.roleIn === 'teacher' ||
+    (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
-  return (
-    <ForumDetailClient
-      initialForum={forumDetail}
-      classId={id}
-      isTeacher={isTeacher}
-    />
-  );
+  return <ForumDetailClient initialForum={forumDetail} classId={id} isTeacher={isTeacher} />;
 }

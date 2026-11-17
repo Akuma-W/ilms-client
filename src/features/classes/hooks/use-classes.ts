@@ -10,17 +10,23 @@ interface UseClassesParams extends ClassParams {
   initialData?: QueryResponse<Class> | null;
 }
 
-export function useClasses({ tab, search, page, limit, initialData }: UseClassesParams) {
-  const key = buildClassKey(tab, search, page, limit);
+export function useClasses({ tab, search, page, limit, subjectId, initialData }: UseClassesParams) {
+  const key = buildClassKey(tab, search, page, limit, subjectId);
 
   const { data, isLoading, error, mutate } = useSWR(
     key,
-    ([tab, search, page, limit]) => {
-      return fetchClasses(tab as ClassTabs, { search, page: Number(page), limit: Number(limit) });
+    ([tab, search, page, limit, subjectId]) => {
+      return fetchClasses(tab as ClassTabs, {
+        search,
+        page: Number(page),
+        limit: Number(limit),
+        subjectId: subjectId || undefined,
+      });
     },
     {
       fallbackData: initialData,
-      revalidateOnMount: !initialData,
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
     },
   );
 

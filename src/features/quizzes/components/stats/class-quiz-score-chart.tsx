@@ -41,7 +41,8 @@ export function ClassQuizScoreChart({ attempts, totalPoints }: ClassQuizScoreCha
                   {bin.label}
                 </span>
                 <span className="text-muted-foreground font-medium">
-                  <strong className="text-foreground">{bin.count}</strong> học sinh ({bin.percentage}%)
+                  <strong className="text-foreground">{bin.count}</strong> học sinh (
+                  {bin.percentage}%)
                 </span>
               </div>
 

@@ -3,10 +3,6 @@ import { getMockClass } from '@/mocks/classes/class-data.mock';
 import type { QueryResponse } from '@/types/api';
 import type { Class, ClassClient } from '@/types/class';
 
-/**
- * Server-side classes service for Server Components (SSR).
- * Encapsulates try/catch and fallback to mock data when API errors or fails.
- */
 export const classServerService = {
   async getClassData(id: string): Promise<Class | ClassClient> {
     try {
@@ -26,12 +22,14 @@ export const classServerService = {
     page?: number;
     limit?: number;
     search?: string;
+    subjectId?: string;
   }): Promise<QueryResponse<Class> | null> {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);
+      if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
       const result = await serverApiClient<QueryResponse<Class>>(url, {
@@ -50,12 +48,14 @@ export const classServerService = {
     page?: number;
     limit?: number;
     search?: string;
+    subjectId?: string;
   }): Promise<QueryResponse<Class> | null> {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);
+      if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString()
         ? `/classes/me/created?${query.toString()}`

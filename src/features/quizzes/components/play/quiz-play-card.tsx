@@ -29,7 +29,10 @@ export function QuizPlayCard({ question, questionNumber }: QuizPlayCardProps) {
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Câu {questionNumber}
           </span>
-          <Badge variant="outline" className="text-[11px] font-medium border-white/20 bg-white/5 text-slate-300">
+          <Badge
+            variant="outline"
+            className="text-[11px] font-medium border-white/20 bg-white/5 text-slate-300"
+          >
             {getQuestionTypeLabel(question.questionType)}
           </Badge>
         </div>

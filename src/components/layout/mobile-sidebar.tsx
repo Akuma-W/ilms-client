@@ -20,7 +20,10 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <SheetContent side="left" className="w-75 sm:w-100 p-0 bg-slate-900 border-r border-slate-800 text-slate-100">
+    <SheetContent
+      side="left"
+      className="w-75 sm:w-100 p-0 bg-slate-900 border-r border-slate-800 text-slate-100"
+    >
       <SheetHeader className="p-6 border-b border-slate-800">
         <SheetTitle className="text-left">
           <Logo size="sm" variant="dark" withSlogan={true} />
@@ -52,10 +55,18 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1 h-8 text-[10px] border-slate-700 bg-slate-800 text-slate-200">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 h-8 text-[10px] border-slate-700 bg-slate-800 text-slate-200"
+              >
                 <Bell className="w-3 h-3 mr-1 text-cyan-400" /> Thông báo
               </Button>
-              <Button variant="outline" size="sm" className="flex-1 h-8 text-[10px] border-slate-700 bg-slate-800 text-slate-200">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 h-8 text-[10px] border-slate-700 bg-slate-800 text-slate-200"
+              >
                 <MessageCircle className="w-3 h-3 mr-1 text-cyan-400" /> Tin nhắn
               </Button>
             </div>
@@ -132,7 +143,10 @@ export function MobileSidebar({ user, logout }: MobileSidebarProps) {
           {!user ? (
             <div className="grid grid-cols-2 gap-3">
               <Link href="/login">
-                <Button variant="outline" className="w-full border-slate-700 bg-slate-800 text-slate-200">
+                <Button
+                  variant="outline"
+                  className="w-full border-slate-700 bg-slate-800 text-slate-200"
+                >
                   Đăng nhập
                 </Button>
               </Link>
