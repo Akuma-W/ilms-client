@@ -122,6 +122,7 @@ export const ClassTabs = {
   JOINED: 'joined',
   PENDING: 'pending',
   CREATED: 'created',
+  ARCHIVED: 'archived',
 } as const;
 
 export type ClassTabs = (typeof ClassTabs)[keyof typeof ClassTabs];

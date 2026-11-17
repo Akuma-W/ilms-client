@@ -31,7 +31,7 @@ interface CommentItemProps {
   forumId: string;
   currentUser?: User | null;
   isTeacher?: boolean;
-  onTriggerReply: (commentId: string, authorName: string) => void;
+  onTriggerReply?: (commentId: string, authorName: string) => void;
   onEditComment?: (commentId: string, newContent: string) => Promise<void>;
   onDeleteComment?: (commentId: string) => void;
   isNestedReply?: boolean;
@@ -278,7 +278,7 @@ export function CommentItem({
         )}
 
         {/* Reply Trigger Button */}
-        {!isEditing && (
+        {!isEditing && onTriggerReply && (
           <div className="pt-2 flex items-center">
             <Button
               type="button"

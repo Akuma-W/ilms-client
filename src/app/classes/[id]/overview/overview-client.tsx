@@ -24,9 +24,15 @@ interface OverviewClientProps {
   classId: string;
   initialTopics: Topic[];
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
-export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewClientProps) {
+export function OverviewClient({
+  classId,
+  initialTopics,
+  isTeacher,
+  isArchived = false,
+}: OverviewClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
@@ -209,7 +215,10 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
         searchPlaceholder="Tìm kiếm tài nguyên..."
         onToggleExpandAll={toggleExpandAll}
         showExpandAll={topics.length > 0}
-        actions={isTeacher && <CreateTopicModal classId={classId} onSuccess={() => mutate()} />}
+        actions={
+          isTeacher &&
+          !isArchived && <CreateTopicModal classId={classId} onSuccess={() => mutate()} />
+        }
       />
 
       {/* 2. Topics Accordion List */}
@@ -224,7 +233,7 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
             {searchQuery
               ? 'Vui lòng thử tìm kiếm với từ khóa khác.'
-              : isTeacher
+              : isTeacher && !isArchived
                 ? 'Hãy bấm nút "Thêm chủ đề" để thiết lập lộ trình học tập cho sinh viên.'
                 : 'Giảng viên chưa đăng tải nội dung bài giảng cho học phần này.'}
           </p>
@@ -237,7 +246,7 @@ export function OverviewClient({ classId, initialTopics, isTeacher }: OverviewCl
               topic={topic}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
-              isTeacher={isTeacher}
+              isTeacher={isTeacher && !isArchived}
               mode="overview"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}

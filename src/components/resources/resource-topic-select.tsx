@@ -1,6 +1,6 @@
 'use client';
 
-import { Layers } from 'lucide-react';
+import { AlertCircle, Layers } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -19,9 +19,6 @@ interface ResourceTopicSelectProps {
   isReadOnly?: boolean;
 }
 
-/**
- * Topic selector with read-only view when adding from a specific topic.
- */
 export function ResourceTopicSelect({
   topics = [],
   selectedTopicId,
@@ -54,7 +51,26 @@ export function ResourceTopicSelect({
     );
   }
 
-  if (topics.length === 0) return null;
+  if (topics.length === 0) {
+    return (
+      <div className="space-y-1.5 w-full">
+        <Label className="text-sm font-medium flex items-center gap-1.5 text-foreground">
+          <Layers className="size-3.5 text-emerald-500" />
+          Chủ đề bài học <span className="text-destructive">*</span>
+        </Label>
+        <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs">
+          <AlertCircle className="size-4 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <span className="font-semibold block">Lớp học chưa có chủ đề bài học nào.</span>
+            <span className="text-muted-foreground block text-[11px]">
+              Vui lòng tạo chủ đề bài học tại tab Tổng quan trước khi thêm tài liệu hoặc giao bài
+              tập.
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-1.5">

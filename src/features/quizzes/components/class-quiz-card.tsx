@@ -31,6 +31,7 @@ interface ClassQuizCardProps {
   quiz: QuizClassItem;
   classId: string;
   isTeacher?: boolean;
+  isArchived?: boolean;
   onViewStats?: (quiz: QuizClassItem) => void;
   onEditPublication?: (quiz: QuizClassItem) => void;
   onUnpublish?: (quizId: string) => void;
@@ -40,6 +41,7 @@ export function ClassQuizCard({
   quiz,
   classId,
   isTeacher = false,
+  isArchived = false,
   onViewStats,
   onEditPublication,
   onUnpublish,
@@ -288,16 +290,27 @@ export function ClassQuizCard({
                 </Link>
               </Button>
             ) : displayStatus === 'not_submitted_open' ? (
-              <Button
-                size="sm"
-                asChild
-                className="w-full h-9 text-sm font-semibold rounded-xl gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white"
-              >
-                <Link href={`/classes/${classId}/quizzes/${quiz.publicationId}`}>
-                  <Play className="size-4 fill-white" />
-                  <span>Vào làm bài kiểm tra</span>
-                </Link>
-              </Button>
+              isArchived ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  className="w-full h-9 text-sm font-semibold rounded-xl opacity-60"
+                >
+                  Lớp học đã lưu trữ
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  asChild
+                  className="w-full h-9 text-sm font-semibold rounded-xl gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white"
+                >
+                  <Link href={`/classes/${classId}/quizzes/${quiz.publicationId}`}>
+                    <Play className="size-4 fill-white" />
+                    <span>Vào làm bài kiểm tra</span>
+                  </Link>
+                </Button>
+              )
             ) : displayStatus === 'upcoming' ? (
               <Button
                 variant="outline"

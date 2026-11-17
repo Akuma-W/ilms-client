@@ -12,6 +12,7 @@ interface StudentSubmissionStatusCardProps {
   onToggleForm: () => void;
   isEditing: boolean;
   onToggleEdit: () => void;
+  isArchived?: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ export function StudentSubmissionStatusCard({
   onToggleForm,
   isEditing,
   onToggleEdit,
+  isArchived = false,
 }: StudentSubmissionStatusCardProps) {
   const deadlineInfo = getDeadlineInfo(assignment.dueAt, submission);
   const totalSubmissions = assignment.submissionCount ?? (assignment.submissions?.length || 0);
@@ -75,7 +77,11 @@ export function StudentSubmissionStatusCard({
 
         {/* Action Trigger Button */}
         <div className="shrink-0 self-end sm:self-auto">
-          {!submission ? (
+          {isArchived ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-muted text-muted-foreground border border-border">
+              Đã đóng cổng nộp bài
+            </span>
+          ) : !submission ? (
             <Button
               type="button"
               onClick={onToggleForm}

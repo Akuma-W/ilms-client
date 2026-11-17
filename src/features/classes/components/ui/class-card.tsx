@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { BookOpen, ChevronRight, Star, Users } from 'lucide-react';
+import { Archive, Ban, BookOpen, ChevronRight, Clock, Lock, Star, Users } from 'lucide-react';
 import type { Class } from '@/types/class';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,9 +16,28 @@ interface ClassCardProps {
 }
 
 export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
-  const ctaText = classData.enrollment?.status === 'approved' ? 'Vào học' : 'Tham gia';
   const classTheme = getClassTheme(classData);
   const subjectTheme = getSubjectTheme(classData.subject);
+
+  let ctaText = 'Tham gia';
+  let ctaVariant: 'default' | 'outline' | 'secondary' | 'destructive' = 'outline';
+  let isCtaDisabled = false;
+
+  if (classData.isArchived && classData.enrollment?.status !== 'approved') {
+    ctaText = 'Đã lưu trữ';
+    ctaVariant = 'outline';
+    isCtaDisabled = true;
+  } else if (classData.enrollment?.status === 'suspended') {
+    ctaText = 'Bị cấm';
+    ctaVariant = 'destructive';
+    isCtaDisabled = true;
+  } else if (classData.enrollment?.status === 'pending') {
+    ctaText = 'Chờ duyệt';
+    ctaVariant = 'secondary';
+  } else if (classData.enrollment?.status === 'approved') {
+    ctaText = 'Vào học';
+    ctaVariant = 'default';
+  }
 
   return (
     <motion.div
@@ -26,13 +45,27 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       whileHover={{ y: -5 }}
-      className={
-        'group relative border border-gray-200 rounded-3xl overflow-hidden flex flex-col h-full transition-all hover:shadow-lg'
-      }
+      className="group relative border border-gray-200 rounded-3xl overflow-hidden flex flex-col h-full transition-all hover:shadow-lg"
     >
       {/* Card Header / Banner */}
       <div className={cn('h-28 relative overflow-hidden bg-linear-to-br', classTheme.gradient)}>
         <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/20 blur-2xl" />
+
+        {/* Badges on Top Left */}
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 flex-wrap">
+          {classData.isPrivate && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/40 backdrop-blur-md text-[10px] font-semibold text-white border border-white/20 shadow-2xs">
+              <Lock className="w-3 h-3" />
+              <span>Riêng tư</span>
+            </span>
+          )}
+          {classData.isArchived && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-600/80 backdrop-blur-md text-[10px] font-semibold text-white border border-white/20 shadow-2xs">
+              <Archive className="w-3 h-3" />
+              <span>Lưu trữ</span>
+            </span>
+          )}
+        </div>
 
         {/* Starred */}
         <div className="absolute top-4 right-4 z-10">
@@ -133,12 +166,42 @@ export function ClassCard({ classData, index, toggleStar }: ClassCardProps) {
 
         {/* CTA Button */}
         <div className="pt-4 mt-auto flex items-center justify-between">
-          <Link href={`/classes/${classData.id}`} className="w-full">
-            <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-xl px-6 h-10 group/btn">
-              {ctaText}
-              <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+          {isCtaDisabled ? (
+            <Button
+              variant={ctaVariant}
+              disabled
+              className={cn(
+                'w-full font-bold rounded-xl px-6 h-10 shadow-xs cursor-not-allowed opacity-60',
+                ctaVariant === 'destructive' &&
+                  'bg-destructive/10 text-destructive border border-destructive/20',
+              )}
+            >
+              {classData.enrollment?.status === 'suspended' && (
+                <Ban className="w-4 h-4 mr-1 text-red-600" />
+              )}
+              <span>{ctaText}</span>
             </Button>
-          </Link>
+          ) : (
+            <Link href={`/classes/${classData.id}`} className="w-full">
+              <Button
+                variant={ctaVariant}
+                className={cn(
+                  'w-full font-bold rounded-xl px-6 h-10 group/btn shadow-xs',
+                  ctaVariant === 'default' && 'bg-primary hover:bg-primary/90 text-white',
+                  ctaVariant === 'secondary' &&
+                    'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20',
+                )}
+              >
+                {classData.enrollment?.status === 'pending' && (
+                  <Clock className="w-4 h-4 mr-1 text-amber-600" />
+                )}
+                <span>{ctaText}</span>
+                {classData.enrollment?.status !== 'pending' && (
+                  <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform ml-1" />
+                )}
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 

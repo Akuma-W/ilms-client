@@ -57,6 +57,7 @@ export const enrollmentService = {
   async getMyEnrollments(params: {
     status?: EnrollmentStatus;
     isStarred?: boolean;
+    isArchived?: boolean;
     page?: number;
     limit?: number;
     search?: string;
@@ -65,6 +66,7 @@ export const enrollmentService = {
       const query = new URLSearchParams();
       if (params.status) query.set('status', params.status);
       if (params.isStarred !== undefined) query.set('isStarred', String(params.isStarred));
+      if (params.isArchived !== undefined) query.set('isArchived', String(params.isArchived));
       if (params.page) query.set('page', String(params.page));
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);

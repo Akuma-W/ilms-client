@@ -12,6 +12,7 @@ interface TeacherGradesToolbarProps {
   isSaving: boolean;
   hasCategoriesHandler: boolean;
   hasInvalidScore?: boolean;
+  isArchived?: boolean;
   onSearchChange: (term: string) => void;
   onOpenCategories: () => void;
   onExportCsv: () => void;
@@ -31,6 +32,7 @@ export function TeacherGradesToolbar({
   isSaving,
   hasCategoriesHandler,
   hasInvalidScore = false,
+  isArchived = false,
   onSearchChange,
   onOpenCategories,
   onExportCsv,
@@ -52,9 +54,11 @@ export function TeacherGradesToolbar({
           )}
         </div>
         <CardDescription className="text-xs">
-          {isEditing
-            ? 'Đang ở chế độ chỉnh sửa điểm trực tiếp. Cột Tổng kết tự động tính toán lại theo thời gian thực.'
-            : 'Bảng điểm ở chế độ chỉ đọc. Nhấn "Sửa điểm" để bắt đầu cập nhật.'}
+          {isArchived
+            ? 'Lớp học đã được lưu trữ. Bảng điểm ở chế độ chỉ đọc.'
+            : isEditing
+              ? 'Đang ở chế độ chỉnh sửa điểm trực tiếp. Cột Tổng kết tự động tính toán lại theo thời gian thực.'
+              : 'Bảng điểm ở chế độ chỉ đọc. Nhấn "Sửa điểm" để bắt đầu cập nhật.'}
         </CardDescription>
       </div>
 
@@ -71,7 +75,7 @@ export function TeacherGradesToolbar({
         </div>
 
         {/* Manage Categories Button */}
-        {hasCategoriesHandler && (
+        {!isArchived && hasCategoriesHandler && (
           <Button
             variant="outline"
             size="sm"
@@ -96,7 +100,9 @@ export function TeacherGradesToolbar({
 
         {/* Action Buttons: Stabilized group */}
         <div className="flex items-center gap-1.5">
-          {!isEditing ? (
+          {isArchived ? (
+            <span className="text-xs text-muted-foreground italic px-2 py-1">Lớp đã lưu trữ</span>
+          ) : !isEditing ? (
             <Button
               variant="default"
               size="sm"

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import { Archive, MessageSquare, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { ForumDetailView } from '@/features/forums/components/forum-detail-view';
@@ -22,9 +22,15 @@ interface ForumDetailClientProps {
   initialForum: Forum;
   classId: string;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
-export function ForumDetailClient({ initialForum, classId, isTeacher }: ForumDetailClientProps) {
+export function ForumDetailClient({
+  initialForum,
+  classId,
+  isTeacher,
+  isArchived = false,
+}: ForumDetailClientProps) {
   const { user: currentUser } = useCurrentUser();
   const router = useRouter();
   const [forum, setForum] = useState<Forum>(initialForum);
@@ -206,8 +212,10 @@ export function ForumDetailClient({ initialForum, classId, isTeacher }: ForumDet
         classId={classId}
         currentUser={currentUser}
         isTeacher={isTeacher}
-        onEdit={() => setIsEditModalOpen(true)}
-        onDelete={() => setDeleteModal({ isOpen: true, isDeleting: false })}
+        onEdit={!isArchived ? () => setIsEditModalOpen(true) : undefined}
+        onDelete={
+          !isArchived ? () => setDeleteModal({ isOpen: true, isDeleting: false }) : undefined
+        }
       />
 
       {/* 2. Threaded Discussion Section (Shown BEFORE comment composer) */}
@@ -235,9 +243,9 @@ export function ForumDetailClient({ initialForum, classId, isTeacher }: ForumDet
                 forumId={forum.id}
                 currentUser={currentUser}
                 isTeacher={isTeacher}
-                onTriggerReply={handleTriggerReply}
-                onEditComment={handleEditComment}
-                onDeleteComment={handleDeleteComment}
+                onTriggerReply={!isArchived ? handleTriggerReply : undefined}
+                onEditComment={!isArchived ? handleEditComment : undefined}
+                onDeleteComment={!isArchived ? handleDeleteComment : undefined}
               />
             ))}
           </div>
@@ -246,21 +254,33 @@ export function ForumDetailClient({ initialForum, classId, isTeacher }: ForumDet
 
       {/* 3. Unified Comment / Reply Composer (Positioned at the bottom) */}
       <div ref={composerRef} className="space-y-2 pt-2">
-        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wider">
-          <MessageSquare className="size-4 text-primary" />
-          <span>
-            {replyingTo
-              ? `Trả lời phản hồi của @${replyingTo.authorName}`
-              : 'Để lại câu trả lời hoặc thảo luận'}
-          </span>
-        </h3>
-        <CommentInput
-          forumId={forum.id}
-          currentUser={currentUser}
-          replyingTo={replyingTo}
-          onCancelReply={() => setReplyingTo(null)}
-          onSubmit={handleAddComment}
-        />
+        {isArchived ? (
+          <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs font-medium flex items-center gap-2">
+            <Archive className="size-4 shrink-0" />
+            <span>
+              Lớp học đã được lưu trữ. Diễn đàn ở chế độ chỉ đọc, không thể đăng bài, bình luận hoặc
+              chỉnh sửa.
+            </span>
+          </div>
+        ) : (
+          <>
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wider">
+              <MessageSquare className="size-4 text-primary" />
+              <span>
+                {replyingTo
+                  ? `Trả lời phản hồi của @${replyingTo.authorName}`
+                  : 'Để lại câu trả lời hoặc thảo luận'}
+              </span>
+            </h3>
+            <CommentInput
+              forumId={forum.id}
+              currentUser={currentUser}
+              replyingTo={replyingTo}
+              onCancelReply={() => setReplyingTo(null)}
+              onSubmit={handleAddComment}
+            />
+          </>
+        )}
       </div>
 
       {/* Edit Forum Modal */}

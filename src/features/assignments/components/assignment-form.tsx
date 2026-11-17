@@ -118,6 +118,12 @@ export function AssignmentForm({
   };
 
   const onSubmit = async (values: AssignmentFormValues) => {
+    if (topics.length === 0) {
+      toast.error(
+        'Lớp học chưa có chủ đề bài học nào. Vui lòng tạo chủ đề trước khi giao bài tập.',
+      );
+      return;
+    }
     setIsSubmitting(true);
     try {
       // 1. Upload any staged local files to MinIO storage first
@@ -218,7 +224,7 @@ export function AssignmentForm({
           </Button>
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || topics.length === 0}
             className="bg-amber-600 hover:bg-amber-700 text-white gap-2 font-medium shadow-xs"
           >
             {isSubmitting ? (

@@ -24,6 +24,7 @@ interface AssignmentDetailClientProps {
   assignmentId?: string;
   classId: string;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
 export function AssignmentDetailClient({
@@ -31,6 +32,7 @@ export function AssignmentDetailClient({
   assignmentId,
   classId,
   isTeacher,
+  isArchived = false,
 }: AssignmentDetailClientProps) {
   const { user: currentUser } = useCurrentUser();
   const router = useRouter();
@@ -164,7 +166,7 @@ export function AssignmentDetailClient({
         </div>
 
         {/* Teacher Actions */}
-        {isTeacher && (
+        {isTeacher && !isArchived && (
           <div className="flex items-center gap-2 self-end md:self-auto">
             <Button
               type="button"
@@ -227,7 +229,11 @@ export function AssignmentDetailClient({
 
           {/* Teacher Submissions Grading Table */}
           <div className="space-y-3">
-            <TeacherSubmissionsTable assignment={assignment} onGraded={handleTeacherGraded} />
+            <TeacherSubmissionsTable
+              assignment={assignment}
+              onGraded={handleTeacherGraded}
+              isArchived={isArchived}
+            />
           </div>
         </div>
       ) : (
@@ -270,9 +276,10 @@ export function AssignmentDetailClient({
             assignment={assignment}
             submission={studentSubmission}
             isFormOpen={isFormOpen}
-            onToggleForm={() => setIsFormOpen((prev) => !prev)}
+            onToggleForm={() => !isArchived && setIsFormOpen((prev) => !prev)}
             isEditing={isEditing}
-            onToggleEdit={() => setIsEditing((prev) => !prev)}
+            onToggleEdit={() => !isArchived && setIsEditing((prev) => !prev)}
+            isArchived={isArchived}
           />
 
           {/* Student Assignment Work Card */}
@@ -280,8 +287,8 @@ export function AssignmentDetailClient({
             assignment={assignment}
             submission={studentSubmission}
             currentUser={currentUser}
-            isFormOpen={isFormOpen}
-            isEditing={isEditing}
+            isFormOpen={!isArchived && isFormOpen}
+            isEditing={!isArchived && isEditing}
             onCancelForm={() => setIsFormOpen(false)}
             onCancelEdit={() => setIsEditing(false)}
             onSubmissionChange={handleStudentSubmissionChange}

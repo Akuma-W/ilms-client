@@ -12,9 +12,10 @@ import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 interface GradesClientProps {
   classId: string;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
-export function GradesClient({ classId, isTeacher }: GradesClientProps) {
+export function GradesClient({ classId, isTeacher, isArchived = false }: GradesClientProps) {
   const { user: currentUser } = useCurrentUser();
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<GradeCategory[]>([]);
@@ -137,6 +138,7 @@ export function GradesClient({ classId, isTeacher }: GradesClientProps) {
           rows={matrixRows}
           onSaveBatch={handleSaveBatch}
           onSaveCategories={handleSaveCategories}
+          isArchived={isArchived}
         />
       ) : studentRecord ? (
         <StudentGradesView record={studentRecord} />

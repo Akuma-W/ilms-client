@@ -39,6 +39,7 @@ export default async function ClassMaterials({ params }: ClassMaterialsProps) {
       initialMaterials={materials}
       topics={topics}
       isTeacher={isTeacher}
+      isArchived={Boolean(classData?.isArchived)}
     />
   );
 }

@@ -5,14 +5,7 @@ import { HelpCircle, MessageSquare, Plus, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { DataPagination } from '@/components/shared/data-pagination';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-toolbar';
 import { ForumCard } from '@/features/forums/components/forum-card';
@@ -26,9 +19,15 @@ interface ForumsClientProps {
   initialForums: Forum[];
   classId: string;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
-export function ForumsClient({ initialForums, classId, isTeacher }: ForumsClientProps) {
+export function ForumsClient({
+  initialForums,
+  classId,
+  isTeacher,
+  isArchived = false,
+}: ForumsClientProps) {
   const { user: currentUser } = useCurrentUser();
   const [forums, setForums] = useState<Forum[]>(initialForums);
   const [searchQuery, setSearchQuery] = useState('');
@@ -169,14 +168,16 @@ export function ForumsClient({ initialForums, classId, isTeacher }: ForumsClient
         onSearchChange={handleSearchChange}
         searchPlaceholder="Tìm kiếm câu hỏi, nội dung thảo luận..."
         actions={
-          <Button
-            type="button"
-            onClick={() => handleOpenCreateModal()}
-            className="h-9 px-3.5 text-sm font-semibold rounded-lg gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white shrink-0"
-          >
-            <Plus className="size-4" />
-            <span>Đặt câu hỏi</span>
-          </Button>
+          !isArchived ? (
+            <Button
+              type="button"
+              onClick={() => handleOpenCreateModal()}
+              className="h-9 px-3.5 text-sm font-semibold rounded-lg gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white shrink-0"
+            >
+              <Plus className="size-4" />
+              <span>Đặt câu hỏi</span>
+            </Button>
+          ) : undefined
         }
       />
 
@@ -260,14 +261,16 @@ export function ForumsClient({ initialForums, classId, isTeacher }: ForumsClient
               ? `Không có chủ đề nào khớp với từ khóa "${searchQuery}". Vui lòng thử lại với từ khóa khác.`
               : 'Chưa có bài thảo luận nào trong danh mục này. Hãy là người đầu tiên đặt câu hỏi cho lớp!'}
           </p>
-          <Button
-            type="button"
-            onClick={() => handleOpenCreateModal()}
-            className="h-9 px-4 text-xs font-semibold rounded-xl gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white"
-          >
-            <Plus className="size-4" />
-            <span>Tạo câu hỏi đầu tiên</span>
-          </Button>
+          {!isArchived && (
+            <Button
+              type="button"
+              onClick={() => handleOpenCreateModal()}
+              className="h-9 px-4 text-xs font-semibold rounded-xl gap-1.5 shadow-xs bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
+              <Plus className="size-4" />
+              <span>Tạo câu hỏi đầu tiên</span>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -279,50 +282,20 @@ export function ForumsClient({ initialForums, classId, isTeacher }: ForumsClient
                 classId={classId}
                 currentUser={currentUser}
                 isTeacher={isTeacher}
-                onEdit={handleOpenEditModal}
-                onDelete={handleDeleteRequest}
+                onEdit={!isArchived ? handleOpenEditModal : undefined}
+                onDelete={!isArchived ? handleDeleteRequest : undefined}
               />
             ))}
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center pt-3">
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent className="gap-1">
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className={
-                        currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                      }
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <PaginationItem key={p}>
-                      <PaginationLink
-                        isActive={p === currentPage}
-                        onClick={() => setCurrentPage(p)}
-                        className="cursor-pointer"
-                      >
-                        {p}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      className={
-                        currentPage === totalPages
-                          ? 'pointer-events-none opacity-50'
-                          : 'cursor-pointer'
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+          <DataPagination
+            page={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredForums.length}
+            limit={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
 

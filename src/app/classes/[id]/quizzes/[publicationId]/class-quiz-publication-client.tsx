@@ -20,7 +20,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { quizAttemptsService } from '@/features/quizzes/services/quiz-attempts.service';
 import {
+  exportClassQuizCsv,
   formatQuizDateTime,
+  getReviewModeLabel,
   mapQuizPublicationToClassItem,
 } from '@/features/quizzes/utils/quiz.utils';
 import { ClassQuizStatsKpi } from '@/features/quizzes/components/stats/class-quiz-stats-kpi';
@@ -28,7 +30,6 @@ import { ClassQuizScoreChart } from '@/features/quizzes/components/stats/class-q
 import { ClassQuizStudentsTable } from '@/features/quizzes/components/stats/class-quiz-students-table';
 import { EditPublicationModal } from '@/features/quizzes/components/edit-publication-modal';
 import { ClassStudentAttemptHistory } from '@/features/quizzes/components/class-student-attempt-history';
-import { ReviewMode } from '@/types/enum';
 import type { QuizAttempt, QuizClassStats, QuizPublication } from '@/types/quiz';
 
 interface ClassQuizPublicationClientProps {
@@ -36,6 +37,7 @@ interface ClassQuizPublicationClientProps {
   publicationId: string;
   publication: QuizPublication;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
 // Detailed class quiz publication dashboard with analytics and student history
@@ -44,6 +46,7 @@ export function ClassQuizPublicationClient({
   publicationId,
   publication,
   isTeacher,
+  isArchived = false,
 }: ClassQuizPublicationClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -71,43 +74,13 @@ export function ClassQuizPublicationClient({
   const hasSubmitted = !!latestAttempt?.submittedAt;
   const quizClassItem = mapQuizPublicationToClassItem(publication, classId);
 
-  const getReviewModeLabel = (mode?: ReviewMode) => {
-    switch (mode) {
-      case ReviewMode.immediate:
-        return 'Xem đáp án sau mỗi câu trả lời';
-      case ReviewMode.after_closed:
-        return 'Xem đáp án sau khi hết hạn đợt thi';
-      case ReviewMode.never:
-        return 'Không hiển thị đáp án';
-      case ReviewMode.after_submission:
-      default:
-        return 'Xem đáp án sau khi nộp bài';
-    }
-  };
-
   // Export CSV of classroom students scores
   const handleExportCSV = () => {
-    if (!stats || !stats.students || stats.students.length === 0) {
+    if (!stats?.students?.length) {
       toast.info('Chưa có dữ liệu học sinh để xuất file');
       return;
     }
-    const header = 'Họ và tên,Email,MSSV,Trạng thái,Điểm số,Thời gian nộp\n';
-    const rows = stats.students
-      .map((st) => {
-        const score = st.score !== null ? `${st.score}` : '';
-        const status = st.isSubmitted ? 'Đã nộp' : 'Chưa làm';
-        const time = st.submittedAt ? formatQuizDateTime(st.submittedAt) : '';
-        return `"${st.name}","${st.email}","${st.identityCode || ''}","${status}","${score}","${time}"`;
-      })
-      .join('\n');
-
-    const blob = new Blob(['\uFEFF' + header + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Bang_diem_${publication.quiz?.title || 'quiz'}_${classId}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    exportClassQuizCsv(stats.students, publication.quiz?.title, classId);
     toast.success('Đã tải xuống bảng điểm CSV của lớp!');
   };
 
@@ -158,15 +131,17 @@ export function ClassQuizPublicationClient({
           )}
           {isTeacher && (
             <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditModalOpen(true)}
-                className="text-xs h-8 gap-1.5"
-              >
-                <Calendar className="w-3.5 h-3.5 text-indigo-500" />
-                <span>Chỉnh sửa đợt thi</span>
-              </Button>
+              {!isArchived && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="text-xs h-8 gap-1.5"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Chỉnh sửa đợt thi</span>
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -288,7 +263,7 @@ export function ClassQuizPublicationClient({
                       </Link>
                     </Button>
                   )}
-                  {isOpen && (
+                  {isOpen && !isArchived && (
                     <Button asChild variant="outline" size="default" className="gap-1.5">
                       <Link href={`/classes/${classId}/quizzes/${publicationId}/take`}>
                         <RotateCcw className="w-4 h-4" />
@@ -311,7 +286,11 @@ export function ClassQuizPublicationClient({
                     bài khi hết thời gian.
                   </p>
                 </div>
-                {isOpen ? (
+                {isArchived ? (
+                  <p className="text-xs text-amber-500 font-semibold">
+                    Lớp học đã được lưu trữ, đợt thi đã đóng.
+                  </p>
+                ) : isOpen ? (
                   <Button
                     asChild
                     size="lg"

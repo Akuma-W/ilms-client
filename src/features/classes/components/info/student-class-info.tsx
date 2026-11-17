@@ -39,10 +39,6 @@ interface StudentClassInfoProps {
   relation: Enrollment;
 }
 
-/**
- * Info page view for enrolled students.
- * Displays class details, student profile, learning progress stats, and leave class action.
- */
 export function StudentClassInfo({ classData, userData, relation }: StudentClassInfoProps) {
   const router = useRouter();
   const [progress, setProgress] = useState<StudentClassProgress | null>(null);

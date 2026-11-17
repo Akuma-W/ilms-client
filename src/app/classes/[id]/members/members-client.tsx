@@ -166,6 +166,7 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
         isOpen={isInstructorsOpen}
         onToggle={() => setIsInstructorsOpen((prev) => !prev)}
         action={
+          !classData.isArchived &&
           isHeadTeacher && (
             <AddAssistantModal
               classId={classData.id}
@@ -179,8 +180,8 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
           instructors={filteredInstructors}
           headTeacherId={classData.teacherId}
           isHeadTeacher={isHeadTeacher}
-          onChangeRole={handleChangeRole}
-          onRemove={handleRemove}
+          onChangeRole={!classData.isArchived ? handleChangeRole : undefined}
+          onRemove={!classData.isArchived ? handleRemove : undefined}
           emptyTitle="Chưa có thông tin giảng viên hoặc trợ giảng"
           emptyDescription="Lớp học hiện chưa có thông tin ban giảng huấn hoặc không khớp với từ khóa tìm kiếm."
         />
@@ -199,12 +200,12 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
         <MemberStudentTable
           members={filteredApproved}
           isTeacher={isTeacher}
-          canEditRole={isHeadTeacher}
+          canEditRole={!classData.isArchived && isHeadTeacher}
           page={approvedPage}
           onPageChange={setApprovedPage}
-          onBan={handleBan}
-          onRemove={handleRemove}
-          onChangeRole={handleChangeRole}
+          onBan={!classData.isArchived ? handleBan : undefined}
+          onRemove={!classData.isArchived ? handleRemove : undefined}
+          onChangeRole={!classData.isArchived ? handleChangeRole : undefined}
           emptyTitle="Chưa có sinh viên chính thức"
           emptyDescription="Lớp học chưa có sinh viên nào tham gia hoặc không khớp với kết quả tìm kiếm."
         />
@@ -230,9 +231,9 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
               isTeacher={true}
               page={pendingPage}
               onPageChange={setPendingPage}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              onBan={handleBan}
+              onApprove={!classData.isArchived ? handleApprove : undefined}
+              onReject={!classData.isArchived ? handleReject : undefined}
+              onBan={!classData.isArchived ? handleBan : undefined}
               dateLabel="Ngày yêu cầu"
               emptyTitle="Không có yêu cầu chờ duyệt"
               emptyDescription="Hiện tại không có học sinh nào đang gửi yêu cầu tham gia lớp học."
@@ -253,9 +254,9 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
               isTeacher={true}
               page={rejectedPage}
               onPageChange={setRejectedPage}
-              onReApprove={handleReApprove}
-              onBan={handleBan}
-              onRemove={handleRemove}
+              onReApprove={!classData.isArchived ? handleReApprove : undefined}
+              onBan={!classData.isArchived ? handleBan : undefined}
+              onRemove={!classData.isArchived ? handleRemove : undefined}
               dateLabel="Ngày từ chối"
               emptyTitle="Không có yêu cầu bị từ chối"
               emptyDescription="Chưa có sinh viên nào bị từ chối tham gia lớp học."
@@ -276,9 +277,9 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
               isTeacher={true}
               page={suspendedPage}
               onPageChange={setSuspendedPage}
-              onUnbanAndApprove={handleUnbanAndApprove}
-              onResetBan={handleUnbanAndReset}
-              onRemove={handleRemove}
+              onUnbanAndApprove={!classData.isArchived ? handleUnbanAndApprove : undefined}
+              onResetBan={!classData.isArchived ? handleUnbanAndReset : undefined}
+              onRemove={!classData.isArchived ? handleRemove : undefined}
               dateLabel="Ngày cấm"
               emptyTitle="Không có sinh viên bị cấm"
               emptyDescription="Không có thành viên nào đang bị đình chỉ hoặc chặn khỏi lớp học này."

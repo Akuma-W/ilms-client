@@ -275,15 +275,13 @@ export function ReferenceModal({
 
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto py-3 space-y-3 pr-1">
-          {topics.length > 0 && (
-            <ResourceTopicSelect
-              topics={topics}
-              selectedTopicId={selectedTopicId}
-              onTopicChange={setSelectedTopicId}
-              disabled={isSubmitting}
-              isReadOnly={Boolean(topicId || isEdit)}
-            />
-          )}
+          <ResourceTopicSelect
+            topics={topics}
+            selectedTopicId={selectedTopicId}
+            onTopicChange={setSelectedTopicId}
+            disabled={isSubmitting}
+            isReadOnly={Boolean(topicId || isEdit)}
+          />
 
           {/* Dual Input Zone */}
           {(!isEdit || stagedItems.length === 0) && (
@@ -393,7 +391,7 @@ export function ReferenceModal({
             size="sm"
             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs h-8.5 px-4 font-medium"
             onClick={handleSubmit}
-            disabled={isSubmitting || stagedItems.length === 0}
+            disabled={isSubmitting || stagedItems.length === 0 || (!topicId && topics.length === 0)}
           >
             {isSubmitting
               ? 'Đang tải lên...'

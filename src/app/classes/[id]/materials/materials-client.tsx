@@ -24,12 +24,14 @@ interface MaterialsClientProps {
   initialMaterials?: MaterialWithTopic[];
   topics?: Topic[];
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
 export function MaterialsClient({
   classId,
   topics: initialTopics = [],
   isTeacher,
+  isArchived = false,
 }: MaterialsClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
@@ -197,7 +199,8 @@ export function MaterialsClient({
         onToggleExpandAll={toggleExpandAll}
         showExpandAll={topics.length > 0}
         actions={
-          isTeacher && (
+          isTeacher &&
+          !isArchived && (
             <ResourceAddDropdown
               mode="materials"
               variant="button"
@@ -236,7 +239,7 @@ export function MaterialsClient({
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
             {searchQuery
               ? 'Vui lòng thử tìm kiếm với từ khóa khác.'
-              : isTeacher
+              : isTeacher && !isArchived
                 ? 'Hãy bấm nút "Thêm tài liệu" để tải lên bài giảng hoặc tài liệu tham khảo cho sinh viên.'
                 : 'Giảng viên chưa đăng tải học liệu cho lớp học này.'}
           </p>
@@ -249,7 +252,7 @@ export function MaterialsClient({
               topic={topic}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
-              isTeacher={isTeacher}
+              isTeacher={isTeacher && !isArchived}
               mode="materials"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}

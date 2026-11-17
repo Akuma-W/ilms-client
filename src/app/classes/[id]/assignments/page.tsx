@@ -35,6 +35,7 @@ export default async function ClassAssignments({ params }: ClassAssignmentsProps
       topics={topics}
       isTeacher={isTeacher}
       studentId={relation?.userId}
+      isArchived={Boolean(classData?.isArchived)}
     />
   );
 }

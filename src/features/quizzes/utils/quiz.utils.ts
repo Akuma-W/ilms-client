@@ -1,5 +1,5 @@
 import type { ParsedQuestion, QuizClassItem, QuizPublication } from '@/types/quiz';
-import { QuestionType } from '@/types/enum';
+import { QuestionType, ReviewMode } from '@/types/enum';
 
 export function normalizeQuizPublications(data: unknown): QuizPublication[] {
   return normalizeQuizArray<QuizPublication>(data);
@@ -235,4 +235,49 @@ export function getQuizTimeRowText(quiz: QuizClassItem, now: Date = new Date()):
     default:
       return `${openFormatted} - ${closeFormatted}`;
   }
+}
+
+export function getReviewModeLabel(mode?: ReviewMode): string {
+  switch (mode) {
+    case ReviewMode.immediate:
+      return 'Xem đáp án sau mỗi câu trả lời';
+    case ReviewMode.after_closed:
+      return 'Xem đáp án sau khi hết hạn đợt thi';
+    case ReviewMode.never:
+      return 'Không hiển thị đáp án';
+    case ReviewMode.after_submission:
+    default:
+      return 'Xem đáp án sau khi nộp bài';
+  }
+}
+
+export function exportClassQuizCsv(
+  students: {
+    name: string;
+    email: string;
+    identityCode?: string | null;
+    isSubmitted: boolean;
+    score?: number | null;
+    submittedAt?: string | null;
+  }[],
+  quizTitle = 'quiz',
+  classId = '',
+): void {
+  const header = 'Họ và tên,Email,MSSV,Trạng thái,Điểm số,Thời gian nộp\n';
+  const rows = students
+    .map((st) => {
+      const score = st.score !== null && st.score !== undefined ? `${st.score}` : '';
+      const status = st.isSubmitted ? 'Đã nộp' : 'Chưa làm';
+      const time = st.submittedAt ? formatQuizDateTime(st.submittedAt) : '';
+      return `"${st.name}","${st.email}","${st.identityCode || ''}","${status}","${score}","${time}"`;
+    })
+    .join('\n');
+
+  const blob = new Blob(['\uFEFF' + header + rows], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Bang_diem_${quizTitle}_${classId}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }

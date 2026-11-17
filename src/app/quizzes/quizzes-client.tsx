@@ -6,7 +6,6 @@ import { QuizRepositoryCard } from '@/features/quizzes/components/repository/qui
 import { QuizDashboardHeader } from '@/features/quizzes/components/repository/quiz-dashboard-header';
 import { QuizGridSkeleton } from '@/features/quizzes/components/repository/quiz-grid-skeleton';
 import { QuizEmptyState } from '@/features/quizzes/components/repository/quiz-empty-state';
-import { QuizPagination } from '@/features/quizzes/components/repository/quiz-pagination';
 import { useQuizzes } from '@/features/quizzes/hooks/use-quizzes';
 import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 import { quizzesService } from '@/features/quizzes/services/quizzes.service';
@@ -16,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
+import { DataPagination } from '@/components/shared/data-pagination';
 
 interface QuizzesClientProps {
   currentUser?: User | null;
@@ -97,6 +97,7 @@ export function QuizzesClient({ currentUser, initialData }: QuizzesClientProps) 
   // Derived computed stats for KPI strip
   const totalItems = data?.meta.total ?? 0;
   const totalPages = data?.meta.totalPages ?? 1;
+  const limit = data?.meta.limit ?? 0;
   const totalQuestions = data?.items.reduce(
     (sum, q) => sum + (q.totalQuestions ?? q.questions?.length ?? 0),
     0,
@@ -167,7 +168,13 @@ export function QuizzesClient({ currentUser, initialData }: QuizzesClientProps) 
             })}
           </div>
 
-          <QuizPagination page={page} totalPages={totalPages} onPageChange={setPage} />
+          <DataPagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            limit={limit}
+            onPageChange={setPage}
+          />
         </div>
       )}
 

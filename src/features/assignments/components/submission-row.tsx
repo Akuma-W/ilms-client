@@ -10,7 +10,7 @@ import type { Assignment, Submission } from '@/types/assignment';
 interface SubmissionRowProps {
   submission: Submission;
   assignment: Assignment;
-  onOpenGradeDialog: (sub: Submission) => void;
+  onOpenGradeDialog?: (sub: Submission) => void;
 }
 
 export function SubmissionRow({
@@ -106,28 +106,32 @@ export function SubmissionRow({
           )}
         </div>
 
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => onOpenGradeDialog(sub)}
-          className={`h-9 text-sm font-medium gap-1.5 rounded-xl shadow-xs ${
-            isGraded
-              ? 'bg-muted hover:bg-muted/80 text-foreground border border-border'
-              : 'bg-amber-600 hover:bg-amber-700 text-white'
-          }`}
-        >
-          {isGraded ? (
-            <>
-              <Pencil className="size-3.5 text-amber-600" />
-              <span>Sửa điểm & nhận xét</span>
-            </>
-          ) : (
-            <>
-              <Award className="size-4" />
-              <span>Chấm bài tập</span>
-            </>
-          )}
-        </Button>
+        {onOpenGradeDialog ? (
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => onOpenGradeDialog(sub)}
+            className={`h-9 text-sm font-medium gap-1.5 rounded-xl shadow-xs ${
+              isGraded
+                ? 'bg-muted hover:bg-muted/80 text-foreground border border-border'
+                : 'bg-amber-600 hover:bg-amber-700 text-white'
+            }`}
+          >
+            {isGraded ? (
+              <>
+                <Pencil className="size-3.5 text-amber-600" />
+                <span>Sửa điểm & nhận xét</span>
+              </>
+            ) : (
+              <>
+                <Award className="size-4" />
+                <span>Chấm bài tập</span>
+              </>
+            )}
+          </Button>
+        ) : (
+          <span className="text-xs text-muted-foreground italic px-2 py-1">Lớp học đã lưu trữ</span>
+        )}
       </div>
     </div>
   );

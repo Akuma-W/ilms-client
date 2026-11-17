@@ -68,6 +68,7 @@ export const CLASSES_FILTER_TABS = [
   { value: 'joined', label: 'Đã tham gia' },
   { value: 'pending', label: 'Chờ duyệt' },
   { value: 'created', label: 'Đã tạo' },
+  { value: 'archived', label: 'Đã lưu trữ' },
 ] as const;
 
 export const CLASSROOM_NAV_TABS: ClassroomTabConfig[] = [

@@ -7,21 +7,36 @@ import { QueryResponse } from '@/types/api';
 import { ClassTabs } from '@/types/enum';
 
 interface UseClassesParams extends ClassParams {
+  role?: string;
+  userId?: string;
   initialData?: QueryResponse<Class> | null;
 }
 
-export function useClasses({ tab, search, page, limit, subjectId, initialData }: UseClassesParams) {
-  const key = buildClassKey(tab, search, page, limit, subjectId);
+export function useClasses({
+  tab,
+  search,
+  page,
+  limit,
+  subjectId,
+  role,
+  userId,
+  initialData,
+}: UseClassesParams) {
+  const key = buildClassKey(tab, search, page, limit, subjectId, role, userId);
 
   const { data, isLoading, error, mutate } = useSWR(
     key,
-    ([tab, search, page, limit, subjectId]) => {
-      return fetchClasses(tab as ClassTabs, {
-        search,
-        page: Number(page),
-        limit: Number(limit),
-        subjectId: subjectId || undefined,
-      });
+    ([tab, search, page, limit, subjectId, role]) => {
+      return fetchClasses(
+        tab as ClassTabs,
+        {
+          search,
+          page: Number(page),
+          limit: Number(limit),
+          subjectId: subjectId || undefined,
+        },
+        role,
+      );
     },
     {
       fallbackData: initialData,

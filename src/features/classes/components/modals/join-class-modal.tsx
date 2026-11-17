@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { mutate } from 'swr';
 import { Loader2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -23,9 +24,6 @@ interface JoinClassModalProps {
   onSuccess?: (status?: EnrollmentStatus) => void;
 }
 
-/**
- * Confirmation dialog for requesting enrollment into a class.
- */
 export function JoinClassModal({
   isOpen,
   onOpenChange,
@@ -54,6 +52,7 @@ export function JoinClassModal({
         );
       }
 
+      await mutate(() => true, undefined, { revalidate: true });
       onSuccess?.(enrollment.status);
       onOpenChange(false);
     } catch {

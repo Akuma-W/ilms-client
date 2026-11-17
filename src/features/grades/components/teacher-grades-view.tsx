@@ -38,6 +38,7 @@ interface TeacherGradesViewProps {
     }[],
   ) => Promise<void>;
   className?: string;
+  isArchived?: boolean;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -52,6 +53,7 @@ export function TeacherGradesView({
   onSaveBatch,
   onSaveCategories,
   className = 'lop-hoc',
+  isArchived = false,
 }: TeacherGradesViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -208,13 +210,14 @@ export function TeacherGradesView({
           isSaving={isSaving}
           hasCategoriesHandler={Boolean(onSaveCategories)}
           hasInvalidScore={hasInvalidScore}
+          isArchived={isArchived}
           onSearchChange={(val) => {
             setSearchTerm(val);
             setPage(1);
           }}
           onOpenCategories={() => setIsCategoryModalOpen(true)}
           onExportCsv={() => exportGradesToCsv(sortedCategories, rows, className)}
-          onStartEdit={() => setIsEditing(true)}
+          onStartEdit={() => !isArchived && setIsEditing(true)}
           onCancelEdit={handleCancelEdit}
           onSaveGrades={handleSaveGrades}
         />
@@ -321,7 +324,7 @@ export function TeacherGradesView({
       </Card>
 
       {/* Category Management Modal */}
-      {onSaveCategories && (
+      {onSaveCategories && !isArchived && (
         <CategoryManagementModal
           isOpen={isCategoryModalOpen}
           onOpenChange={setIsCategoryModalOpen}

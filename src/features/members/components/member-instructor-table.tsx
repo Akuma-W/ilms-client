@@ -180,6 +180,10 @@ export function MemberInstructorTable({
                         <span className="text-xs text-muted-foreground italic font-medium px-2 py-1">
                           Trưởng phụ trách
                         </span>
+                      ) : !onChangeRole && !onRemove ? (
+                        <span className="text-xs text-muted-foreground italic font-medium px-2 py-1">
+                          Trợ giảng
+                        </span>
                       ) : (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

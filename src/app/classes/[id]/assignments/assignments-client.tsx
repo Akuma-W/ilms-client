@@ -20,6 +20,7 @@ interface AssignmentsClientProps {
   isTeacher: boolean;
   studentId?: string;
   topics?: Topic[];
+  isArchived?: boolean;
 }
 
 export function AssignmentsClient({
@@ -28,6 +29,7 @@ export function AssignmentsClient({
   isTeacher,
   studentId,
   topics = [],
+  isArchived = false,
 }: AssignmentsClientProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -152,7 +154,8 @@ export function AssignmentsClient({
         onSearchChange={setSearchQuery}
         searchPlaceholder="Tìm kiếm bài tập..."
         actions={
-          isTeacher && (
+          isTeacher &&
+          !isArchived && (
             <Button
               onClick={() => router.push(`/classes/${classId}/assignments/create`)}
               className="bg-amber-600 hover:bg-amber-700 text-white font-medium gap-2 shadow-xs"
@@ -195,7 +198,7 @@ export function AssignmentsClient({
               key={assignment.id}
               assignment={assignment}
               classId={classId}
-              isTeacher={isTeacher}
+              isTeacher={isTeacher && !isArchived}
               studentId={studentId}
               topicTitle={assignment.topicId ? topicMap.get(assignment.topicId) : undefined}
               onDelete={handleDeleteAssignment}

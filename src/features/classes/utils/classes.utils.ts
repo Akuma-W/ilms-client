@@ -12,11 +12,13 @@ export async function fetchClasses(
     limit?: number;
     subjectId?: string;
   },
+  role?: string,
 ): Promise<QueryResponse<Class> | null> {
   switch (tab) {
     case 'joined':
       return enrollmentService.getMyEnrollments({
         status: 'approved',
+        isArchived: false,
         ...params,
       });
     case 'pending':
@@ -25,7 +27,22 @@ export async function fetchClasses(
         ...params,
       });
     case 'created':
-      return classService.getMyCreatedClasses(params);
+      return classService.getMyCreatedClasses({
+        isArchived: false,
+        ...params,
+      });
+    case 'archived':
+      if (role === 'teacher') {
+        return classService.getMyCreatedClasses({
+          isArchived: true,
+          ...params,
+        });
+      }
+      return enrollmentService.getMyEnrollments({
+        status: 'approved',
+        isArchived: true,
+        ...params,
+      });
     default:
       return classService.getClasses(params);
   }
@@ -37,6 +54,16 @@ export function buildClassKey(
   page?: number,
   limit?: number,
   subjectId?: string,
+  role?: string,
+  userId?: string,
 ) {
-  return [tab, search || '', String(page) || '1', String(limit) || '10', subjectId || ''];
+  return [
+    tab,
+    search || '',
+    String(page) || '1',
+    String(limit) || '10',
+    subjectId || '',
+    role || '',
+    userId || '',
+  ];
 }

@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CLASSES_FILTER_TABS } from '@/config';
-import { ClassSearch } from '@/features/classes/components/ui/class-search';
+import { DebouncedSearchBar } from '@/components/shared/debounced-search-bar';
 import { CreateClassModal } from '@/features/classes/components/modals/create-class-modal';
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
 import { cn } from '@/lib/utils';
@@ -82,8 +82,8 @@ export default function ClassesClient({ initialData, initialParams }: ClassesCli
   );
 
   const listParams = useMemo(
-    () => ({ tab, search, page, limit, subjectId }),
-    [tab, search, page, limit, subjectId],
+    () => ({ tab, search, page, limit, subjectId, role: user?.role, userId: user?.id }),
+    [tab, search, page, limit, subjectId, user?.role, user?.id],
   );
 
   return (
@@ -116,7 +116,11 @@ export default function ClassesClient({ initialData, initialParams }: ClassesCli
       {/* Search, Subject Filter & Action Modals */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3.5">
         <div className="relative flex-1">
-          <ClassSearch value={search} onSearch={handleSearch} />
+          <DebouncedSearchBar
+            value={search}
+            onSearch={handleSearch}
+            placeholder="Tìm lớp học bằng tên lớp, tên giảng viên, môn học..."
+          />
         </div>
 
         {/* Searchable Subject Combobox */}

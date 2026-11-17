@@ -329,7 +329,7 @@ export function MemberRow({
               )}
 
               {/* Actions for Approved Members: Đuổi khỏi lớp hoặc Cấm */}
-              {isApproved && (
+              {isApproved && ((canEditRole && onChangeRole) || onBan || onRemove) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button

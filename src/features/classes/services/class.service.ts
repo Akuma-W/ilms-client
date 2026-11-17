@@ -43,6 +43,7 @@ export const classService = {
     limit?: number;
     search?: string;
     subjectId?: string;
+    isArchived?: boolean;
   }) {
     try {
       const query = new URLSearchParams();
@@ -50,6 +51,7 @@ export const classService = {
       if (params.limit) query.set('limit', String(params.limit));
       if (params.search) query.set('search', params.search);
       if (params.subjectId) query.set('subjectId', params.subjectId);
+      if (params.isArchived !== undefined) query.set('isArchived', String(params.isArchived));
 
       const url = query.toString()
         ? `/classes/me/created?${query.toString()}`
@@ -116,5 +118,29 @@ export const classService = {
       // Fallback
     }
     return { success: false, message: 'Xóa lớp học thất bại', data: null, statusCode: 500 };
+  },
+
+  async archiveClass(id: string) {
+    try {
+      const result = await clientApiClient<{ message: string }>(`/classes/${id}/archive`, {
+        method: 'PATCH',
+      });
+      return result;
+    } catch {
+      // Fallback
+    }
+    return { success: false, message: 'Lưu trữ lớp học thất bại', data: null, statusCode: 500 };
+  },
+
+  async unarchiveClass(id: string) {
+    try {
+      const result = await clientApiClient<{ message: string }>(`/classes/${id}/unarchive`, {
+        method: 'PATCH',
+      });
+      return result;
+    } catch {
+      // Fallback
+    }
+    return { success: false, message: 'Mở lại lớp học thất bại', data: null, statusCode: 500 };
   },
 };

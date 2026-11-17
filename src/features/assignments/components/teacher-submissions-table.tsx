@@ -21,11 +21,16 @@ import type { Assignment, Submission } from '@/types/assignment';
 interface TeacherSubmissionsTableProps {
   assignment: Assignment;
   onGraded: (updatedSubmissions: Submission[]) => void;
+  isArchived?: boolean;
 }
 
 const PAGE_SIZE = 5;
 
-export function TeacherSubmissionsTable({ assignment, onGraded }: TeacherSubmissionsTableProps) {
+export function TeacherSubmissionsTable({
+  assignment,
+  onGraded,
+  isArchived = false,
+}: TeacherSubmissionsTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending_grade' | 'graded'>('all');
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -194,7 +199,7 @@ export function TeacherSubmissionsTable({ assignment, onGraded }: TeacherSubmiss
               key={sub.id}
               submission={sub}
               assignment={assignment}
-              onOpenGradeDialog={handleOpenGradeDialog}
+              onOpenGradeDialog={!isArchived ? handleOpenGradeDialog : undefined}
             />
           ))}
         </div>

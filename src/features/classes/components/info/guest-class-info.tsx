@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Archive,
+  Ban,
   BookOpen,
   Calendar,
   Clock,
@@ -30,10 +32,6 @@ interface GuestClassInfoProps {
   relation?: Enrollment | null;
 }
 
-/**
- * Info page view for guests/non-enrolled students.
- * Provides class overview and enrollment request CTA or status feedback.
- */
 export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
   const router = useRouter();
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -85,7 +83,58 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
   return (
     <div className="space-y-6">
       {/* 1. Action Banner / Status Callout */}
-      {requestStatus === EnrollmentStatus.pending ? (
+      {requestStatus === EnrollmentStatus.suspended ? (
+        <div className="p-5 rounded-2xl border border-destructive/30 bg-destructive/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-start gap-3.5">
+            <div className="size-10 rounded-xl bg-destructive/20 text-destructive flex items-center justify-center shrink-0 border border-destructive/30">
+              <Ban className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-foreground">
+                  Bạn đã bị đình chỉ khỏi lớp học này
+                </h3>
+                <Badge
+                  variant="outline"
+                  className="border-destructive/40 text-destructive bg-destructive/10 text-xs font-semibold"
+                >
+                  Bị cấm
+                </Badge>
+              </div>
+              <p className="text-sm text-foreground/90 font-medium">
+                Tài khoản của bạn đã bị giảng viên đình chỉ quyền truy cập vào lớp học này.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Vui lòng liên hệ trực tiếp với giảng viên phụ trách nếu bạn cho rằng đây là một sự
+                nhầm lẫn.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : classData.isArchived ? (
+        <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-start gap-3.5">
+            <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+              <Archive className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-foreground">Lớp học này đã được lưu trữ</h3>
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-xs font-semibold"
+                >
+                  Đã lưu trữ
+                </Badge>
+              </div>
+              <p className="text-sm text-foreground/90 font-medium">
+                Lớp học đã kết thúc hoặc được lưu trữ bởi giảng viên và hiện không còn nhận thành
+                viên mới.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : requestStatus === EnrollmentStatus.pending ? (
         <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
           <div className="flex items-start gap-3.5">
             <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
@@ -239,6 +288,7 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
             router.refresh();
           } else {
             setRequestStatus(EnrollmentStatus.pending);
+            router.refresh();
           }
         }}
       />

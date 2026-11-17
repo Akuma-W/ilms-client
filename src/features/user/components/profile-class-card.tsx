@@ -40,14 +40,21 @@ export function ProfileClassCard({ classItem, isStudent }: ProfileClassCardProps
         {/* Top Header Badge & Course Code */}
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1 min-w-0">
-            <span
-              className={cn(
-                'text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border',
-                classTheme.badgeBg || 'bg-indigo-50 text-indigo-700 border-indigo-100',
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span
+                className={cn(
+                  'text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border',
+                  classTheme.badgeBg || 'bg-indigo-50 text-indigo-700 border-indigo-100',
+                )}
+              >
+                {classItem.courseCode || 'Chưa có mã'}
+              </span>
+              {classItem.isArchived && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md border bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
+                  Đã lưu trữ
+                </span>
               )}
-            >
-              {classItem.courseCode || 'Chưa có mã'}
-            </span>
+            </div>
             <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate mt-1">
               {classItem.title}
             </h4>

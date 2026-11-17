@@ -26,5 +26,7 @@ export default async function ClassGradesPage({ params }: ClassGradesProps) {
     (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
-  return <GradesClient classId={id} isTeacher={isTeacher} />;
+  return (
+    <GradesClient classId={id} isTeacher={isTeacher} isArchived={Boolean(classData?.isArchived)} />
+  );
 }

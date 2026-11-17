@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSWRConfig } from 'swr';
 import {
+  Archive,
+  ArchiveRestore,
   BookOpen,
   Calendar,
   Globe,
   GraduationCap,
   Info,
-  LogOut,
   Pencil,
   Trash2,
   User2,
@@ -23,7 +24,9 @@ import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { InfoItem } from '@/features/classes/components/items/info-item';
 import { classService } from '@/features/classes/services/class.service';
 import { EditClassModal } from '../modals/edit-class-modal';
+import { ArchiveClassDialog } from '../modals/archive-class-dialog';
 import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
+import { cn } from '@/lib/utils';
 import type { Class } from '@/types/class';
 import type { User } from '@/types/user';
 
@@ -33,15 +36,13 @@ interface TeacherClassInfoProps {
   onClassUpdated?: (updated: Class) => void;
 }
 
-/**
- * Info page view for class teachers.
- * Displays class details, teacher profile, and management controls (Edit, Delete, Conditional Leave).
- */
 export function TeacherClassInfo({ classData, userData, onClassUpdated }: TeacherClassInfoProps) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const [currentClass, setCurrentClass] = useState<Class>(classData);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -52,6 +53,36 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
   const handleClassUpdated = (updated: Class) => {
     setCurrentClass(updated);
     onClassUpdated?.(updated);
+  };
+
+  const handleToggleArchive = async () => {
+    setIsArchiving(true);
+    try {
+      const isCurrentlyArchived = Boolean(currentClass.isArchived);
+      const res = isCurrentlyArchived
+        ? await classService.unarchiveClass(currentClass.id)
+        : await classService.archiveClass(currentClass.id);
+
+      if (res && res.success === false) {
+        throw new Error(res.message || 'Thao tác thất bại');
+      }
+
+      const updated = { ...currentClass, isArchived: !isCurrentlyArchived };
+      setCurrentClass(updated);
+      onClassUpdated?.(updated);
+      await mutate(() => true, undefined, { revalidate: true });
+      toast.success(
+        isCurrentlyArchived ? 'Đã mở lại lớp học thành công.' : 'Đã lưu trữ lớp học thành công.',
+      );
+      setIsArchiveModalOpen(false);
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Thao tác thất bại. Vui lòng thử lại sau.',
+      );
+    } finally {
+      setIsArchiving(false);
+    }
   };
 
   const handleDeleteClass = async () => {
@@ -72,18 +103,6 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
       );
       setIsDeleting(false);
     }
-  };
-
-  const handleTeacherLeave = () => {
-    // Safety requirement: Teacher can only leave if class has 0 students and has replacement
-    if (studentCount > 0) {
-      toast.error('Không thể rời lớp học!', {
-        description: `Lớp học hiện vẫn còn ${studentCount} học sinh. Giảng viên chỉ có thể rời lớp khi lớp không còn học sinh và đã bàn giao cho giảng viên thay thế, hoặc thực hiện Xóa lớp học.`,
-      });
-      return;
-    }
-
-    toast.info('Yêu cầu chuyển giao quyền giảng viên đang được xử lý.');
   };
 
   const classInfoItems = [
@@ -145,17 +164,31 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-9 px-4 text-sm rounded-xl gap-1.5 shadow-xs"
           >
             <Pencil className="size-3.5" />
-            <span>Sửa thông tin lớp</span>
+            <span>Sửa thông tin</span>
           </Button>
 
           <Button
             type="button"
             variant="outline"
-            onClick={handleTeacherLeave}
-            className="border-border text-foreground hover:bg-muted text-sm font-semibold h-9 px-3 rounded-xl gap-1.5"
+            onClick={() => setIsArchiveModalOpen(true)}
+            className={cn(
+              'text-sm font-semibold h-9 px-3.5 rounded-xl gap-1.5 shadow-xs transition-colors',
+              currentClass.isArchived
+                ? 'border-emerald-500/30 text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/20'
+                : 'border-amber-500/30 text-amber-600 bg-amber-500/10 hover:bg-amber-500/20',
+            )}
           >
-            <LogOut className="size-3.5" />
-            <span>Rời lớp</span>
+            {currentClass.isArchived ? (
+              <>
+                <ArchiveRestore className="size-3.5" />
+                <span>Mở lại lớp</span>
+              </>
+            ) : (
+              <>
+                <Archive className="size-3.5" />
+                <span>Lưu trữ lớp</span>
+              </>
+            )}
           </Button>
 
           <Button
@@ -256,12 +289,25 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
         onSuccess={handleClassUpdated}
       />
 
+      {/* Archive / Unarchive Class Modal */}
+      <ArchiveClassDialog
+        isOpen={isArchiveModalOpen}
+        onOpenChange={setIsArchiveModalOpen}
+        isArchived={Boolean(currentClass.isArchived)}
+        isArchiving={isArchiving}
+        onConfirm={handleToggleArchive}
+      />
+
       {/* Delete Class Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
         title="Xác nhận xóa lớp học vĩnh viễn"
-        description={`Hành động này không thể hoàn tác. Toàn bộ dữ liệu bài giảng, tài liệu, bài tập và bảng điểm của lớp "${currentClass.title}" sẽ bị xóa vĩnh viễn.`}
+        description={
+          studentCount > 0
+            ? `Cảnh báo: Lớp học hiện có ${studentCount} sinh viên. Nếu xóa, toàn bộ dữ liệu bài tập, bài nộp và bảng điểm sẽ bị mất vĩnh viễn. Chúng tôi khuyến nghị bạn nên Lưu trữ lớp thay vì Xóa.`
+            : `Hành động này không thể hoàn tác. Toàn bộ dữ liệu của lớp "${currentClass.title}" sẽ bị xóa vĩnh viễn.`
+        }
         itemTypeLabel="lớp học"
         itemName={currentClass.title}
         isDeleting={isDeleting}

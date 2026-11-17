@@ -32,6 +32,7 @@ export default async function ClassOverview({ params }: ClassOverviewProps) {
       classId={classId}
       initialTopics={initialTopicsWithMaterials}
       isTeacher={isTeacher}
+      isArchived={Boolean(classData?.isArchived)}
     />
   );
 }

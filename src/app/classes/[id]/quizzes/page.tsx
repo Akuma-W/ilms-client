@@ -37,6 +37,7 @@ export default async function ClassQuizzesPage({ params }: ClassQuizzesPageProps
       topics={topics}
       classId={id}
       isTeacher={isTeacher}
+      isArchived={Boolean(classData?.isArchived)}
     />
   );
 }

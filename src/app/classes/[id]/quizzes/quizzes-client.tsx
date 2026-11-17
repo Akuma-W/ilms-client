@@ -4,14 +4,7 @@ import { useMemo, useState } from 'react';
 import { HelpCircle, Plus, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { DataPagination } from '@/components/shared/data-pagination';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
 import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-toolbar';
 import { ClassQuizCard } from '@/features/quizzes/components/class-quiz-card';
@@ -29,14 +22,15 @@ interface QuizzesClientProps {
   topics: Topic[];
   classId: string;
   isTeacher: boolean;
+  isArchived?: boolean;
 }
 
-// Manages classroom quiz filters and teacher publication actions.
 export function QuizzesClient({
   initialQuizzes,
   topics = [],
   classId,
   isTeacher,
+  isArchived = false,
 }: QuizzesClientProps) {
   const [quizzes, setQuizzes] = useState<QuizClassItem[]>(initialQuizzes);
   const [searchQuery, setSearchQuery] = useState('');
@@ -160,7 +154,8 @@ export function QuizzesClient({
         onSearchChange={handleSearchChange}
         searchPlaceholder="Tìm kiếm đề thi, chủ đề bài học..."
         actions={
-          isTeacher && (
+          isTeacher &&
+          !isArchived && (
             <Button
               onClick={() => setIsPublishModalOpen(true)}
               className="h-9 px-3.5 text-sm font-semibold rounded-lg gap-1.5 shadow-xs bg-rose-600 hover:bg-rose-700 text-white shrink-0"
@@ -214,7 +209,7 @@ export function QuizzesClient({
               ? `Không có bài thi nào khớp với từ khóa "${searchQuery}". Vui lòng thử lại với từ khóa khác.`
               : 'Hiện chưa có bài trắc nghiệm nào trong danh mục hoặc chủ đề này.'}
           </p>
-          {isTeacher && (
+          {isTeacher && !isArchived && (
             <Button
               type="button"
               onClick={() => setIsPublishModalOpen(true)}
@@ -234,55 +229,33 @@ export function QuizzesClient({
                 quiz={quiz}
                 classId={classId}
                 isTeacher={isTeacher}
-                onEditPublication={(q) => {
-                  setEditingQuiz(q);
-                  setIsEditModalOpen(true);
-                }}
-                onUnpublish={(publicationId) =>
-                  setUnpublishModal({ isOpen: true, publicationId, isUnpublishing: false })
+                isArchived={isArchived}
+                onEditPublication={
+                  !isArchived
+                    ? (q) => {
+                        setEditingQuiz(q);
+                        setIsEditModalOpen(true);
+                      }
+                    : undefined
+                }
+                onUnpublish={
+                  !isArchived
+                    ? (publicationId) =>
+                        setUnpublishModal({ isOpen: true, publicationId, isUnpublishing: false })
+                    : undefined
                 }
               />
             ))}
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center pt-3">
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent className="gap-1">
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      className={
-                        currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                      }
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <PaginationItem key={p}>
-                      <PaginationLink
-                        isActive={p === currentPage}
-                        onClick={() => setCurrentPage(p)}
-                        className="cursor-pointer"
-                      >
-                        {p}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      className={
-                        currentPage === totalPages
-                          ? 'pointer-events-none opacity-50'
-                          : 'cursor-pointer'
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+          <DataPagination
+            page={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredQuizzes.length}
+            limit={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
 

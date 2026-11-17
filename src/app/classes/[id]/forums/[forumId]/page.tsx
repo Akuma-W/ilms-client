@@ -40,5 +40,12 @@ export default async function ForumDetailPage({ params }: ForumDetailPageProps) 
     (classData && relation?.userId && classData.teacherId === relation.userId),
   );
 
-  return <ForumDetailClient initialForum={forumDetail} classId={id} isTeacher={isTeacher} />;
+  return (
+    <ForumDetailClient
+      initialForum={forumDetail}
+      classId={id}
+      isTeacher={isTeacher}
+      isArchived={Boolean(classData?.isArchived)}
+    />
+  );
 }

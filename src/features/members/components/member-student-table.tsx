@@ -2,14 +2,7 @@
 
 import { Users } from 'lucide-react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { DataPagination } from '@/components/shared/data-pagination';
 import { MemberRow } from './member-row';
 import { Role } from '@/types/enum';
 import type { ClassMember } from '@/types/member';
@@ -109,55 +102,16 @@ export function MemberStudentTable({
           </TableBody>
         </Table>
 
-        {/* Pagination using shadcn Pagination */}
+        {/* Pagination using DataPagination */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span>
-              Hiển thị {(safePage - 1) * pageSize + 1} -{' '}
-              {Math.min(safePage * pageSize, members.length)} trên tổng số {members.length} thành
-              viên
-            </span>
-
-            <Pagination className="mx-0 w-auto justify-end">
-              <PaginationContent className="gap-1">
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (safePage > 1) onPageChange(safePage - 1);
-                    }}
-                    className={safePage <= 1 ? 'pointer-events-none opacity-50' : ''}
-                  />
-                </PaginationItem>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <PaginationItem key={p}>
-                    <PaginationLink
-                      href="#"
-                      isActive={p === safePage}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onPageChange(p);
-                      }}
-                    >
-                      {p}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (safePage < totalPages) onPageChange(safePage + 1);
-                    }}
-                    className={safePage >= totalPages ? 'pointer-events-none opacity-50' : ''}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+          <div className="p-4 border-t border-border/60">
+            <DataPagination
+              page={safePage}
+              totalPages={totalPages}
+              totalItems={members.length}
+              limit={pageSize}
+              onPageChange={onPageChange}
+            />
           </div>
         )}
       </div>

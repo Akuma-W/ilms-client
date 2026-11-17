@@ -8,7 +8,7 @@ import ClassListSkeleton from './class-list-skeleton';
 import { ClassCard } from './class-card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BookOpen } from 'lucide-react';
-import { ClassPagination } from './class-pagination';
+import { DataPagination } from '@/components/shared/data-pagination';
 import { useStarredClasses } from '../../hooks/use-starred-classes';
 import { enrollmentService } from '../../services/enrollment.service';
 
@@ -20,6 +20,7 @@ interface ClassListProps {
     page?: number;
     limit?: number;
     subjectId?: string;
+    role?: string;
   };
   onPageChange: (page: number) => void;
 }
@@ -59,17 +60,16 @@ export function ClassList({ initialData, params, onPageChange }: ClassListProps)
       joined: 'Bạn chưa tham gia lớp nào',
       pending: 'Không có yêu cầu nào',
       created: 'Bạn chưa tạo lớp nào',
+      archived: 'Không có lớp học nào được lưu trữ',
     };
 
     return (
-      <div className="flex flex-col items-center py-20 text-gray-500">
+      <div className="flex flex-col items-center py-20 text-muted-foreground">
         <BookOpen className="w-10 h-10 mb-3" />
-        <p>{map[params.tab]}</p>
+        <p>{map[params.tab] || 'Không tìm thấy lớp học'}</p>
       </div>
     );
   }
-
-  if (!meta?.totalPages || !meta.page) return null;
 
   return (
     <div className="space-y-6">
@@ -78,11 +78,16 @@ export function ClassList({ initialData, params, onPageChange }: ClassListProps)
           <ClassCard key={cls.id} classData={cls} index={index} toggleStar={toggleStar} />
         ))}
       </div>
-      <ClassPagination
-        totalPages={meta?.totalPages}
-        page={meta?.page}
-        onPageChange={onPageChange}
-      />
+      {meta && (
+        <DataPagination
+          totalPages={meta.totalPages}
+          page={meta.page}
+          totalItems={meta.total}
+          limit={params.limit || 12}
+          itemLabel="lớp học"
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 }

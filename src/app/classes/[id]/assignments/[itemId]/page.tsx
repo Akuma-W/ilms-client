@@ -37,6 +37,7 @@ export default async function AssignmentDetailPage({ params }: AssignmentDetailP
         assignmentId={itemId}
         classId={classId}
         isTeacher={isTeacher}
+        isArchived={Boolean(classData?.isArchived)}
       />
     </div>
   );
