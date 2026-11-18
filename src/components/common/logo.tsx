@@ -8,6 +8,7 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   withText?: boolean;
   withSlogan?: boolean;
+  subTitle?: string;
   className?: string;
 }
 
@@ -16,6 +17,7 @@ export function Logo({
   size = 'md',
   withText = true,
   withSlogan = false,
+  subTitle,
   className,
 }: LogoProps) {
   const { name, slogan, logo } = SITE_CONFIG;
@@ -67,6 +69,10 @@ export function Logo({
           >
             {slogan}
           </span>
+        )}
+
+        {subTitle && (
+          <span className="text-[10px] text-slate-400 font-medium tracking-wide">{subTitle}</span>
         )}
       </div>
     </Link>

@@ -1,5 +1,5 @@
 import { ClassTabs } from '@/types/enum';
-import type { QueryResponse } from '@/types/api';
+import type { PaginatedResult } from '@/types/api';
 import type { Class } from '@/types/class';
 import { enrollmentService } from '../services/enrollment.service';
 import { classService } from '../services/class.service';
@@ -13,7 +13,7 @@ export async function fetchClasses(
     subjectId?: string;
   },
   role?: string,
-): Promise<QueryResponse<Class> | null> {
+): Promise<PaginatedResult<Class> | null> {
   switch (tab) {
     case 'joined':
       return enrollmentService.getMyEnrollments({

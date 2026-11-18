@@ -1,6 +1,6 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
 import { MOCK_ENROLLMENT } from '@/mocks/classes/class-data.mock';
-import type { QueryResponse } from '@/types/api';
+import type { PaginatedResult } from '@/types/api';
 import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
 import type { EnrollmentStatus } from '@/types/enum';
@@ -72,7 +72,7 @@ export const enrollmentService = {
       if (params.search) query.set('search', params.search);
 
       const url = query.toString() ? `/enrollments/me?${query.toString()}` : '/enrollments/me';
-      const result = await clientApiClient<QueryResponse<Class>>(url);
+      const result = await clientApiClient<PaginatedResult<Class>>(url);
       if (result.success !== false && result.data !== null && result.data !== undefined) {
         return result.data;
       }

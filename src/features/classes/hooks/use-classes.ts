@@ -3,13 +3,13 @@
 import useSWR from 'swr';
 import { Class, ClassParams } from '@/types/class';
 import { buildClassKey, fetchClasses } from '../utils/classes.utils';
-import { QueryResponse } from '@/types/api';
+import { PaginatedResult } from '@/types/api';
 import { ClassTabs } from '@/types/enum';
 
 interface UseClassesParams extends ClassParams {
   role?: string;
   userId?: string;
-  initialData?: QueryResponse<Class> | null;
+  initialData?: PaginatedResult<Class> | null;
 }
 
 export function useClasses({

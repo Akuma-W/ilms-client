@@ -1,6 +1,6 @@
 import { serverApiClient } from '@/lib/api/server-api-client';
 import { getMockClass } from '@/mocks/classes/class-data.mock';
-import type { QueryResponse } from '@/types/api';
+import type { PaginatedResult } from '@/types/api';
 import type { Class, ClassClient } from '@/types/class';
 
 export const classServerService = {
@@ -23,7 +23,7 @@ export const classServerService = {
     limit?: number;
     search?: string;
     subjectId?: string;
-  }): Promise<QueryResponse<Class> | null> {
+  }): Promise<PaginatedResult<Class> | null> {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
@@ -32,7 +32,7 @@ export const classServerService = {
       if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
-      const result = await serverApiClient<QueryResponse<Class>>(url, {
+      const result = await serverApiClient<PaginatedResult<Class>>(url, {
         ignoreAuthError: true,
       });
       if (result.success !== false && result.data !== null && result.data !== undefined) {
@@ -49,7 +49,7 @@ export const classServerService = {
     limit?: number;
     search?: string;
     subjectId?: string;
-  }): Promise<QueryResponse<Class> | null> {
+  }): Promise<PaginatedResult<Class> | null> {
     try {
       const query = new URLSearchParams();
       if (params.page) query.set('page', String(params.page));
@@ -60,7 +60,7 @@ export const classServerService = {
       const url = query.toString()
         ? `/classes/me/created?${query.toString()}`
         : '/classes/me/created';
-      const result = await serverApiClient<QueryResponse<Class>>(url, {
+      const result = await serverApiClient<PaginatedResult<Class>>(url, {
         ignoreAuthError: true,
       });
       if (result.success !== false && result.data !== null && result.data !== undefined) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -24,18 +24,26 @@ export function DebouncedSearchBar({
 }: DebouncedSearchBarProps) {
   const [internalValue, setInternalValue] = useState(value);
   const debounced = useDebounce(internalValue, debounceMs);
+  const isClearingRef = useRef(false);
 
   useEffect(() => {
     setInternalValue(value);
   }, [value]);
 
   useEffect(() => {
+    if (isClearingRef.current) {
+      if (debounced === '') {
+        isClearingRef.current = false;
+      }
+      return;
+    }
     if (debounced !== value) {
       onSearch(debounced);
     }
   }, [debounced, onSearch, value]);
 
   const handleClear = () => {
+    isClearingRef.current = true;
     setInternalValue('');
     onSearch('');
   };
@@ -45,9 +53,12 @@ export function DebouncedSearchBar({
       <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
       <Input
         value={internalValue}
-        onChange={(e) => setInternalValue(e.target.value)}
+        onChange={(e) => {
+          isClearingRef.current = false;
+          setInternalValue(e.target.value);
+        }}
         placeholder={placeholder}
-        className="pl-10 pr-10 h-11 rounded-2xl bg-background border-border/80 text-sm focus-visible:ring-primary/20 shadow-2xs"
+        className="pl-10 pr-10 h-11 rounded-2xl bg-background border-border/80 text-sm focus-visible:ring-primary/20 shadow-2xs truncate line-clamp-1"
       />
       {internalValue && (
         <Button

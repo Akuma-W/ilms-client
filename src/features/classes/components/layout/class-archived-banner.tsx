@@ -3,12 +3,39 @@
 import { Archive } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface ClassArchivedBannerProps {
+  isJoined: boolean;
   className?: string;
 }
 
-export function ClassArchivedBanner({ className }: ClassArchivedBannerProps) {
+export function ClassArchivedBanner({ isJoined, className }: ClassArchivedBannerProps) {
+  if (!isJoined) {
+    <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="flex items-start gap-3.5">
+        <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+          <Archive className="size-5" />
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-foreground">Lớp học này đã được lưu trữ</h3>
+            <Badge
+              variant="outline"
+              className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-xs font-semibold"
+            >
+              Đã lưu trữ
+            </Badge>
+          </div>
+          <p className="text-sm text-foreground/90 font-medium">
+            Lớp học đã kết thúc hoặc được lưu trữ bởi giảng viên và hiện không còn nhận thành viên
+            mới.
+          </p>
+        </div>
+      </div>
+    </div>;
+  }
+
   return (
     <div className={cn('w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4', className)}>
       <Alert className="rounded-2xl border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 shadow-2xs">

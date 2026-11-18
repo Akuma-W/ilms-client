@@ -3,7 +3,7 @@
 import { ClassTabs } from '@/types/enum';
 import { Class } from '@/types/class';
 import { useClasses } from '../../hooks/use-classes';
-import { QueryResponse } from '@/types/api';
+import { PaginatedResult } from '@/types/api';
 import ClassListSkeleton from './class-list-skeleton';
 import { ClassCard } from './class-card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -13,7 +13,7 @@ import { useStarredClasses } from '../../hooks/use-starred-classes';
 import { enrollmentService } from '../../services/enrollment.service';
 
 interface ClassListProps {
-  initialData: QueryResponse<Class> | null;
+  initialData: PaginatedResult<Class> | null;
   params: {
     tab: ClassTabs;
     search?: string;

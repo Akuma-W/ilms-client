@@ -30,7 +30,7 @@ export default async function ClassDetailLayout({
       <ClassNav classId={classData.id} isJoined={isJoined} />
 
       {/* 3. Read-only Warning Banner if archived */}
-      {classData.isArchived && <ClassArchivedBanner />}
+      {classData.isArchived && <ClassArchivedBanner isJoined />}
 
       {/* 4. Main Content Area */}
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</div>

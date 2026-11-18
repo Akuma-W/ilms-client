@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Archive,
   Ban,
   BookOpen,
   Calendar,
@@ -83,139 +82,117 @@ export function GuestClassInfo({ classData, relation }: GuestClassInfoProps) {
   return (
     <div className="space-y-6">
       {/* 1. Action Banner / Status Callout */}
-      {requestStatus === EnrollmentStatus.suspended ? (
-        <div className="p-5 rounded-2xl border border-destructive/30 bg-destructive/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-start gap-3.5">
-            <div className="size-10 rounded-xl bg-destructive/20 text-destructive flex items-center justify-center shrink-0 border border-destructive/30">
-              <Ban className="size-5" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-foreground">
-                  Bạn đã bị đình chỉ khỏi lớp học này
-                </h3>
-                <Badge
-                  variant="outline"
-                  className="border-destructive/40 text-destructive bg-destructive/10 text-xs font-semibold"
-                >
-                  Bị cấm
-                </Badge>
+      {!classData.isArchived &&
+        (requestStatus === EnrollmentStatus.suspended ? (
+          <div className="p-5 rounded-2xl border border-destructive/30 bg-destructive/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3.5">
+              <div className="size-10 rounded-xl bg-destructive/20 text-destructive flex items-center justify-center shrink-0 border border-destructive/30">
+                <Ban className="size-5" />
               </div>
-              <p className="text-sm text-foreground/90 font-medium">
-                Tài khoản của bạn đã bị giảng viên đình chỉ quyền truy cập vào lớp học này.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Vui lòng liên hệ trực tiếp với giảng viên phụ trách nếu bạn cho rằng đây là một sự
-                nhầm lẫn.
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : classData.isArchived ? (
-        <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-start gap-3.5">
-            <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
-              <Archive className="size-5" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-foreground">Lớp học này đã được lưu trữ</h3>
-                <Badge
-                  variant="outline"
-                  className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-xs font-semibold"
-                >
-                  Đã lưu trữ
-                </Badge>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-foreground">
+                    Bạn đã bị đình chỉ khỏi lớp học này
+                  </h3>
+                  <Badge
+                    variant="outline"
+                    className="border-destructive/40 text-destructive bg-destructive/10 text-xs font-semibold"
+                  >
+                    Bị cấm
+                  </Badge>
+                </div>
+                <p className="text-sm text-foreground/90 font-medium">
+                  Tài khoản của bạn đã bị giảng viên đình chỉ quyền truy cập vào lớp học này.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Vui lòng liên hệ trực tiếp với giảng viên phụ trách nếu bạn cho rằng đây là một sự
+                  nhầm lẫn.
+                </p>
               </div>
-              <p className="text-sm text-foreground/90 font-medium">
-                Lớp học đã kết thúc hoặc được lưu trữ bởi giảng viên và hiện không còn nhận thành
-                viên mới.
-              </p>
             </div>
           </div>
-        </div>
-      ) : requestStatus === EnrollmentStatus.pending ? (
-        <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-start gap-3.5">
-            <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
-              <Clock className="size-5" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-foreground">
-                  Yêu cầu tham gia đang được phê duyệt
-                </h3>
-                <Badge
-                  variant="outline"
-                  className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-xs font-semibold"
-                >
-                  Chờ duyệt
-                </Badge>
+        ) : requestStatus === EnrollmentStatus.pending ? (
+          <div className="p-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3.5">
+              <div className="size-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+                <Clock className="size-5" />
               </div>
-              <p className="text-sm text-foreground/90 font-medium">
-                Yêu cầu tham gia lớp học của bạn đã được gửi tới giảng viên.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Vui lòng chờ giảng viên phê duyệt để truy cập toàn bộ tài liệu và bài tập.
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : requestStatus === EnrollmentStatus.rejected ? (
-        <div className="p-5 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-          <div className="flex items-start gap-3.5">
-            <div className="size-10 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/30">
-              <XCircle className="size-5" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-foreground">
-                  Yêu cầu tham gia đã bị từ chối
-                </h3>
-                <Badge
-                  variant="outline"
-                  className="border-rose-500/40 text-rose-600 dark:text-rose-400 bg-rose-500/10 text-xs font-semibold"
-                >
-                  Bị từ chối
-                </Badge>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-foreground">
+                    Yêu cầu tham gia đang được phê duyệt
+                  </h3>
+                  <Badge
+                    variant="outline"
+                    className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 text-xs font-semibold"
+                  >
+                    Chờ duyệt
+                  </Badge>
+                </div>
+                <p className="text-sm text-foreground/90 font-medium">
+                  Yêu cầu tham gia lớp học của bạn đã được gửi tới giảng viên.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Vui lòng chờ giảng viên phê duyệt để truy cập toàn bộ tài liệu và bài tập.
+                </p>
               </div>
-              <p className="text-sm text-foreground/90 font-medium">
-                Yêu cầu gia nhập lớp học của bạn chưa được chấp thuận.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Bạn có thể gửi lại yêu cầu mới nếu có sự nhầm lẫn.
-              </p>
             </div>
           </div>
-          <Button
-            type="button"
-            onClick={() => setIsJoinModalOpen(true)}
-            variant="outline"
-            className="border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-semibold px-4 h-10 rounded-xl shadow-xs gap-2 shrink-0"
-          >
-            <LogIn className="size-4" />
-            <span>Gửi lại yêu cầu</span>
-          </Button>
-        </div>
-      ) : (
-        <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-          <div className="space-y-1 text-center sm:text-left">
-            <h3 className="text-base font-bold text-foreground">Bạn chưa tham gia lớp học này</h3>
-            <p className="text-sm text-muted-foreground max-w-xl">
-              Hãy gửi yêu cầu tham gia để được giảng viên xét duyệt, truy cập toàn bộ bài giảng, tài
-              liệu, nộp bài tập và tham gia kiểm tra trực tuyến.
-            </p>
+        ) : requestStatus === EnrollmentStatus.rejected ? (
+          <div className="p-5 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3.5">
+              <div className="size-10 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/30">
+                <XCircle className="size-5" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-foreground">
+                    Yêu cầu tham gia đã bị từ chối
+                  </h3>
+                  <Badge
+                    variant="outline"
+                    className="border-rose-500/40 text-rose-600 dark:text-rose-400 bg-rose-500/10 text-xs font-semibold"
+                  >
+                    Bị từ chối
+                  </Badge>
+                </div>
+                <p className="text-sm text-foreground/90 font-medium">
+                  Yêu cầu gia nhập lớp học của bạn chưa được chấp thuận.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Bạn có thể gửi lại yêu cầu mới nếu có sự nhầm lẫn.
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={() => setIsJoinModalOpen(true)}
+              variant="outline"
+              className="border-rose-500/40 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 font-semibold px-4 h-10 rounded-xl shadow-xs gap-2 shrink-0"
+            >
+              <LogIn className="size-4" />
+              <span>Gửi lại yêu cầu</span>
+            </Button>
           </div>
-          <Button
-            type="button"
-            onClick={() => setIsJoinModalOpen(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-11 rounded-xl shadow-xs gap-2 shrink-0"
-          >
-            <LogIn className="size-4" />
-            <span>Yêu cầu tham gia lớp</span>
-          </Button>
-        </div>
-      )}
+        ) : (
+          <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="space-y-1 text-center sm:text-left">
+              <h3 className="text-base font-bold text-foreground">Bạn chưa tham gia lớp học này</h3>
+              <p className="text-sm text-muted-foreground max-w-xl">
+                Hãy gửi yêu cầu tham gia để được giảng viên xét duyệt, truy cập toàn bộ bài giảng,
+                tài liệu, nộp bài tập và tham gia kiểm tra trực tuyến.
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={() => setIsJoinModalOpen(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 h-11 rounded-xl shadow-xs gap-2 shrink-0"
+            >
+              <LogIn className="size-4" />
+              <span>Yêu cầu tham gia lớp</span>
+            </Button>
+          </div>
+        ))}
 
       {/* 2. Class Overview Card */}
       <Card className="rounded-2xl border border-border/80 bg-card/90 shadow-xs overflow-hidden">

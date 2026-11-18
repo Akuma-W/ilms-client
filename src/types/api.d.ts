@@ -13,10 +13,9 @@ export interface ApiResponse<T> {
   data: T | null;
 }
 
-export type APIResponse<T> = ApiResponse<T>;
 export type PromiseResponse<T> = Promise<ApiResponse<T>>;
 
-export interface QueryResponse<T> {
+export interface PaginatedResult<T> {
   data: T[];
-  meta?: PaginationMeta;
+  meta: PaginationMeta;
 }

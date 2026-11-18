@@ -1,6 +1,6 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
 import { getMockClass } from '@/mocks/classes/class-data.mock';
-import type { QueryResponse } from '@/types/api';
+import type { PaginatedResult } from '@/types/api';
 import type { Class, ClassClient, CreateClassPayload } from '@/types/class';
 
 export const classService = {
@@ -28,7 +28,7 @@ export const classService = {
       if (params.subjectId) query.set('subjectId', params.subjectId);
 
       const url = query.toString() ? `/classes?${query.toString()}` : '/classes';
-      const result = await clientApiClient<QueryResponse<Class>>(url);
+      const result = await clientApiClient<PaginatedResult<Class>>(url);
       if (result.success !== false && result.data !== null && result.data !== undefined) {
         return result.data;
       }
@@ -56,7 +56,7 @@ export const classService = {
       const url = query.toString()
         ? `/classes/me/created?${query.toString()}`
         : '/classes/me/created';
-      const result = await clientApiClient<QueryResponse<Class>>(url);
+      const result = await clientApiClient<PaginatedResult<Class>>(url);
       if (result.success !== false && result.data !== null && result.data !== undefined) {
         return result.data;
       }

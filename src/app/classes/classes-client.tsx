@@ -7,7 +7,7 @@ import { CreateClassModal } from '@/features/classes/components/modals/create-cl
 import { FindClassModal } from '@/features/classes/components/modals/find-class-modal';
 import { cn } from '@/lib/utils';
 import { ClassTabs } from '@/types/enum';
-import type { QueryResponse } from '@/types/api';
+import type { PaginatedResult } from '@/types/api';
 import type { Class, ClassParams } from '@/types/class';
 import { School } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -17,7 +17,7 @@ import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 import { SubjectFilterCombobox } from '@/features/subjects/components/subject-filter-combobox';
 
 interface ClassesClientProps {
-  initialData: QueryResponse<Class> | null;
+  initialData: PaginatedResult<Class> | null;
   initialParams: ClassParams;
 }
 
