@@ -21,3 +21,27 @@ export interface HomeStep {
   description: string;
   icon: LucideIcon;
 }
+
+export interface HomeStat {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  color?: string;
+}
+
+export interface HomeAbout {
+  badge: string;
+  title: string;
+  highlightTitle: string;
+  description: string;
+  image: string;
+  stats: HomeStat[];
+  primaryCta: {
+    label: string;
+    href: string;
+  };
+  secondaryCta: {
+    label: string;
+    href: string;
+  };
+}

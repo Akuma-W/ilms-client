@@ -1,20 +1,20 @@
 import { BannerCarousel } from '@/components/home/banner-carousel';
-import { HOME_BANNERS, HOME_FEATURES, HOME_STEPS } from '@/config';
+import { HOME_ABOUT, HOME_BANNERS, HOME_FEATURES, HOME_STEPS } from '@/config';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ContactSection } from '@/components/common/contact-section';
 import { SITE_CONFIG } from '@/config';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Welcome',
 };
 
 export default function Home() {
-  const { slogan } = SITE_CONFIG;
+  const { fullName, slogan } = SITE_CONFIG;
 
   return (
     <section className="flex flex-col w-full overflow-x-hidden bg-slate-50/50">
@@ -29,7 +29,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10 max-w-4xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-semibold mb-3">
             <Sparkles className="size-3.5 text-indigo-400" />
-            <span>Nền tảng giáo dục thông minh KEIVerse</span>
+            {fullName}
           </div>
           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-wide leading-relaxed">
             &quot;{slogan}&quot;
@@ -88,8 +88,8 @@ export default function Home() {
             <div className="flex-1 relative w-full">
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 h-72 sm:h-96 w-full">
                 <Image
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80"
-                  alt="About KEIVerse Interactive Learning"
+                  src={HOME_ABOUT.image}
+                  alt={`About ${SITE_CONFIG.fullName}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
@@ -103,40 +103,38 @@ export default function Home() {
 
             <div className="flex-1 space-y-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
-                <span>Về chúng tôi</span>
+                <span>{HOME_ABOUT.badge}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight">
-                Kiến tạo tương lai <br />
+                {HOME_ABOUT.title} <br />
                 <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                  Học tập tương tác không giới hạn
+                  {HOME_ABOUT.highlightTitle}
                 </span>
               </h2>
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                KEIVerse ra đời với sứ mệnh mang đến một môi trường học tập số hóa tương tác toàn
-                diện, nơi tri thức được kết nối và lan tỏa. Chúng tôi tin rằng mỗi người học đều sở
-                hữu tiềm năng riêng, và KEIVerse là trợ thủ đắc lực giúp bạn tiếp cận nguồn tài
-                nguyên phong phú và bứt phá kết quả.
+                {HOME_ABOUT.description}
               </p>
 
               <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2 text-indigo-600 mb-1">
-                    <Users className="size-4" />
-                    <span className="text-xl sm:text-2xl font-black text-slate-900">10k+</span>
-                  </div>
-                  <div className="text-xs text-slate-500 font-medium">
-                    Học sinh & Giảng viên tin dùng
-                  </div>
-                </div>
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2 text-purple-600 mb-1">
-                    <BookOpen className="size-4" />
-                    <span className="text-xl sm:text-2xl font-black text-slate-900">500+</span>
-                  </div>
-                  <div className="text-xs text-slate-500 font-medium">
-                    Lớp học & Khóa học đa dạng
-                  </div>
-                </div>
+                {HOME_ABOUT.stats.map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <div key={index} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                      <div
+                        className={cn(
+                          'flex items-center gap-2 mb-1',
+                          stat.color || 'text-indigo-600',
+                        )}
+                      >
+                        <Icon className="size-4" />
+                        <span className="text-xl sm:text-2xl font-black text-slate-900">
+                          {stat.value}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 font-medium">{stat.label}</div>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -144,8 +142,8 @@ export default function Home() {
                   asChild
                   className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-11 px-6 font-semibold shadow-xs gap-2"
                 >
-                  <Link href="/classes">
-                    <span>Khám phá lớp học</span>
+                  <Link href={HOME_ABOUT.primaryCta.href}>
+                    <span>{HOME_ABOUT.primaryCta.label}</span>
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
@@ -154,8 +152,8 @@ export default function Home() {
                   variant="outline"
                   className="rounded-xl h-11 px-6 font-semibold border-slate-200 text-slate-700 hover:bg-slate-50"
                 >
-                  <Link href="/contact">
-                    <span>Liên hệ hỗ trợ</span>
+                  <Link href={HOME_ABOUT.secondaryCta.href}>
+                    <span>{HOME_ABOUT.secondaryCta.label}</span>
                   </Link>
                 </Button>
               </div>

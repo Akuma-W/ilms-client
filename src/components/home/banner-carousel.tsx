@@ -43,13 +43,13 @@ function BannerSlide({ banner }: { banner: HomeBanner }) {
       />
 
       {/* Overlay */}
-      {/* <div className="absolute inset-0 bg-black/40 pointer-events-none" /> */}
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" />
       {/* Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-        <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 className="text-3xl md:text-5xl font-bold text-slate-200 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           {banner.title}
         </h2>
-        <p className="text-lg md:text-xl text-muted-foreground mb-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+        <p className="text-lg md:text-xl text-slate-100/80 mb-8 drop-shadow-lg animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
           {banner.subtitle}
         </p>
         <Link href={banner.href}>

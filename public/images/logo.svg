@@ -2,25 +2,86 @@
 <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img"
   aria-labelledby="logoTitle logoDesc">
   <title id="logoTitle">KEIVerse Logo</title>
-  <defs id="logoDesc">
+  <desc id="logoDesc">
     Một logo hiện đại với khối cầu 3D màu xanh ở trung tâm, được bao quanh bởi hai quỹ đạo màu vàng và xanh dương giao
     nhau. Các chữ cái K, E, và I được đặt xung quanh quỹ đạo.
-  </defs>
+  </desc>
   <defs>
-    <linearGradient id="sphereGrad" cx="35%" cy="35%" r="65%" fx="30%" fy="30%">
-      <stop offset="0%" style="stop-color:#581c87;stop-opacity:1" />
-      <stop offset="40%" style="stop-color:#1e3a8a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#4cc9f0;stop-opacity:1" />
+    <!-- Khối cầu 3D trung tâm -->
+    <radialGradient id="sphereGrad" cx="35%" cy="32%" r="68%" fx="28%" fy="28%">
+      <stop offset="0%" stop-color="#6d28d9" />
+      <stop offset="45%" stop-color="#1e3a8a" />
+      <stop offset="85%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </radialGradient>
+    <!-- Điểm phản quang nhẹ trên bề mặt hành tinh -->
+    <radialGradient id="sphereHighlight" cx="32%" cy="28%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <!-- Gradient quỹ đạo tím -->
+    <linearGradient id="orbitPurpleBack" x1="5%" y1="50%" x2="95%" y2="50%">
+      <stop offset="0%" stop-color="#4c1d95" />
+      <stop offset="50%" stop-color="#6d28d9" />
+      <stop offset="100%" stop-color="#4c1d95" />
     </linearGradient>
+    <linearGradient id="orbitPurpleFront" x1="5%" y1="50%" x2="95%" y2="50%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="45%" stop-color="#a78bfa" />
+      <stop offset="65%" stop-color="#c4b5fd" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+    <!-- Gradient quỹ đạo xanh dương -->
+    <linearGradient id="orbitBlueBack" x1="5%" y1="50%" x2="95%" y2="50%">
+      <stop offset="0%" stop-color="#0369a1" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="orbitBlueFront" x1="5%" y1="50%" x2="95%" y2="50%">
+      <stop offset="0%" stop-color="#0ea5e9" />
+      <stop offset="45%" stop-color="#38bdf8" />
+      <stop offset="65%" stop-color="#bae6fd" />
+      <stop offset="100%" stop-color="#0ea5e9" />
+    </linearGradient>
+    <!-- Màu sắc nổi bật cho K, E, I -->
+    <linearGradient id="gradK" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <linearGradient id="gradE" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="gradI" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#9333ea" />
+    </linearGradient>
+    <!-- Bóng đổ mềm của dải vệ tinh phía trước lên bề mặt hành tinh -->
+    <filter id="orbitShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="1.1" stdDeviation="0.9" flood-color="#0f172a" flood-opacity="0.45" />
+    </filter>
   </defs>
-  <circle cx="50" cy="50" r="25" fill="url(#sphereGrad)" />
-  <g fill="none" stroke-width="2" stroke-linecap="round">
-    <ellipse cx="50" cy="50" rx="45" ry="15" stroke="#7e51e6" transform="rotate(-30 50 50)" />
-    <ellipse cx="50" cy="50" rx="45" ry="15" stroke="#54b1f0" transform="rotate(30 50 50)" />
+  <!-- 1. NỬA SAU CỦA HAI DẢI VỆ TINH -->
+  <g fill="none" stroke-width="1.4" stroke-linecap="round" opacity="0.88">
+    <path d="M 5 50 A 45 15 0 0 1 95 50" stroke="url(#orbitPurpleBack)" transform="rotate(-30 50 50)" />
+    <path d="M 5 50 A 45 15 0 0 1 95 50" stroke="url(#orbitBlueBack)" transform="rotate(30 50 50)" />
   </g>
-  <g font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="12" text-anchor="middle">
-    <text x="20" y="32" fill="#ffbc40">K</text>
-    <text x="20" y="80" fill="#10c6fd">E</text>
-    <text x="85" y="57" fill="#c00d84">I</text>
+  <!-- 2. HÀNH TINH TRUNG TÂM -->
+  <circle cx="50" cy="50" r="25" fill="url(#sphereGrad)" />
+  <circle cx="50" cy="50" r="25" fill="url(#sphereHighlight)" />
+  <!-- 3. NỬA TRƯỚC CỦA HAI DẢI VỆ TINH (vuốt thon liền mạch) -->
+  <g filter="url(#orbitShadow)">
+    <g transform="rotate(-30 50 50)">
+      <path d="M 4.3 50 A 45.7 16.3 0 0 0 95.7 50 L 94.3 50 A 44.3 13.7 0 0 1 5.7 50 Z" fill="url(#orbitPurpleFront)" />
+    </g>
+    <g transform="rotate(30 50 50)">
+      <path d="M 4.3 50 A 45.7 16.3 0 0 0 95.7 50 L 94.3 50 A 44.3 13.7 0 0 1 5.7 50 Z" fill="url(#orbitBlueFront)" />
+    </g>
+  </g>
+  <!-- 4. BA KÝ TỰ K, E, I -->
+  <g font-family="Inter, &#39;Segoe UI&#39;, Arial, sans-serif" font-weight="800" font-size="12" text-anchor="middle">
+    <text x="20" y="32" fill="url(#gradK)">K</text>
+    <text x="20" y="80" fill="url(#gradE)">E</text>
+    <text x="85" y="57" fill="url(#gradI)">I</text>
   </g>
 </svg>
