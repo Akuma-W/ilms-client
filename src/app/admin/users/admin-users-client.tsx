@@ -9,6 +9,8 @@ import { AdminUser } from '@/types/admin';
 import { AdminUsersTable } from '@/features/admin/components/users/admin-users-table';
 import { AdminUserModal } from '@/features/admin/components/users/admin-user-modal';
 import { AdminUserResetPasswordModal } from '@/features/admin/components/users/admin-user-reset-password-modal';
+import { AdminUserStatusReasonModal } from '@/features/admin/components/users/admin-user-status-reason-modal';
+import { AdminActionReasonModal } from '@/features/admin/components/shared/admin-action-reason-modal';
 
 export function AdminUsersClient() {
   const [page, setPage] = useState(1);
@@ -23,6 +25,14 @@ export function AdminUsersClient() {
 
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [resetUser, setResetUser] = useState<AdminUser | null>(null);
+
+  // Status reason inspection modal state
+  const [reasonModalUser, setReasonModalUser] = useState<AdminUser | null>(null);
+
+  // Status action modal states (Lock / Ban / Unban)
+  const [statusActionTarget, setStatusActionTarget] = useState<AdminUser | null>(null);
+  const [statusActionType, setStatusActionType] = useState<'lock' | 'ban' | 'unban' | null>(null);
+  const [isSubmittingStatus, setIsSubmittingStatus] = useState(false);
 
   const limit = 10;
 
@@ -53,53 +63,69 @@ export function AdminUsersClient() {
     setResetModalOpen(true);
   };
 
-  const handleToggleLock = async (user: AdminUser) => {
+  const handleToggleLock = (user: AdminUser) => {
     if (user.role === 'admin') {
       toast.error('Không thể khóa tài khoản quản trị viên');
       return;
     }
 
-    const nextStatus = user.status === 'locked' ? 'active' : 'locked';
-    setActionLoadingId(user.id);
-    try {
-      await adminUsersService.updateUser(user.id, { status: nextStatus });
-      toast.success(
-        nextStatus === 'active'
-          ? 'Đã mở khóa tài khoản thành công'
-          : 'Đã khóa tài khoản thành công',
-      );
-      mutate();
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Thao tác thất bại';
-      toast.error(errorMsg);
-    } finally {
-      setActionLoadingId(null);
+    if (user.status === 'locked') {
+      setStatusActionTarget(user);
+      setStatusActionType('unban'); // Re-activate
+    } else {
+      setStatusActionTarget(user);
+      setStatusActionType('lock');
     }
   };
 
-  const handleBanUser = async (user: AdminUser) => {
+  const handleBanUser = (user: AdminUser) => {
     if (user.role === 'admin') {
-      toast.error('Không thể cấm hoặc xóa tài khoản quản trị viên');
+      toast.error('Không thể đình chỉ tài khoản quản trị viên');
       return;
     }
 
-    if (!confirm(`Bạn có chắc chắn muốn vô hiệu hóa tài khoản "${user.fullName}"?`)) {
-      return;
+    if (user.status === 'banned') {
+      setStatusActionTarget(user);
+      setStatusActionType('unban');
+    } else {
+      setStatusActionTarget(user);
+      setStatusActionType('ban');
     }
+  };
 
-    setActionLoadingId(user.id);
+  const handleConfirmStatusAction = async (reason: string) => {
+    if (!statusActionTarget || !statusActionType) return;
+
+    setIsSubmittingStatus(true);
+    setActionLoadingId(statusActionTarget.id);
     try {
-      const res = await adminUsersService.deleteUser(user.id);
-      if (res.success) {
-        toast.success(res.message);
-        mutate();
-      } else {
-        toast.error(res.message);
+      if (statusActionType === 'lock') {
+        await adminUsersService.updateUser(statusActionTarget.id, {
+          status: 'locked',
+          statusReason: reason?.trim() || 'Tài khoản bị tạm khóa bởi quản trị viên',
+        });
+        toast.success('Đã tạm khóa tài khoản người dùng');
+      } else if (statusActionType === 'ban') {
+        await adminUsersService.updateUser(statusActionTarget.id, {
+          status: 'banned',
+          statusReason: reason?.trim() || 'Tài khoản bị đình chỉ bởi quản trị viên',
+        });
+        toast.success('Đã đình chỉ tài khoản người dùng');
+      } else if (statusActionType === 'unban') {
+        await adminUsersService.updateUser(statusActionTarget.id, {
+          status: 'active',
+          statusReason: '',
+        });
+        toast.success('Đã khôi phục tài khoản hoạt động bình thường');
       }
+      mutate();
+      setStatusActionTarget(null);
+      setStatusActionType(null);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Thao tác thất bại';
       toast.error(errorMsg);
     } finally {
+      setIsSubmittingStatus(false);
       setActionLoadingId(null);
     }
   };
@@ -128,8 +154,8 @@ export function AdminUsersClient() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Quản trị Người dùng Toàn Hệ thống
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-rose-950 dark:text-rose-100">
+          Quản lý Người dùng toàn Hệ thống
         </h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Quản lý tài khoản, phân quyền vai trò, mở/khóa truy cập và bảo vệ người dùng
@@ -159,6 +185,7 @@ export function AdminUsersClient() {
         onOpenResetPasswordModal={handleOpenResetPassword}
         onToggleLock={handleToggleLock}
         onBanUser={handleBanUser}
+        onViewStatusReason={setReasonModalUser}
       />
 
       {/* Create / Edit User Modal */}
@@ -174,6 +201,63 @@ export function AdminUsersClient() {
         open={resetModalOpen}
         onOpenChange={setResetModalOpen}
         user={resetUser}
+      />
+
+      {/* View Status Reason Details Modal */}
+      <AdminUserStatusReasonModal
+        user={reasonModalUser}
+        open={Boolean(reasonModalUser)}
+        onOpenChange={(open) => !open && setReasonModalUser(null)}
+      />
+
+      {/* Sensitive Action Modal (Lock / Ban / Unban) */}
+      <AdminActionReasonModal
+        isOpen={Boolean(statusActionTarget && statusActionType)}
+        onClose={() => {
+          setStatusActionTarget(null);
+          setStatusActionType(null);
+        }}
+        onConfirm={handleConfirmStatusAction}
+        title={
+          statusActionType === 'lock'
+            ? 'Tạm khóa tài khoản người dùng'
+            : statusActionType === 'ban'
+              ? 'Đình chỉ tài khoản vĩnh viễn'
+              : 'Khôi phục hoạt động tài khoản'
+        }
+        description={
+          statusActionType === 'lock'
+            ? 'Người dùng bị tạm khóa sẽ không thể đăng nhập hoặc tham gia các hoạt động lớp học.'
+            : statusActionType === 'ban'
+              ? 'Tài khoản bị đình chỉ sẽ bị chặn hoàn toàn quyền truy cập nền tảng.'
+              : 'Gỡ bỏ trạng thái khóa/đình chỉ và cấp lại quyền truy cập cho người dùng.'
+        }
+        actionLabel={
+          statusActionType === 'lock'
+            ? 'Khóa tài khoản'
+            : statusActionType === 'ban'
+              ? 'Đình chỉ tài khoản'
+              : 'Khôi phục tài khoản'
+        }
+        variant={
+          statusActionType === 'ban'
+            ? 'danger'
+            : statusActionType === 'lock'
+              ? 'warning'
+              : 'default'
+        }
+        targetName={
+          statusActionTarget
+            ? `${statusActionTarget.fullName} (${statusActionTarget.email})`
+            : undefined
+        }
+        placeholder={
+          statusActionType === 'unban'
+            ? 'Nhập lý do khôi phục tài khoản (tùy chọn)...'
+            : 'Nhập lý do thực hiện hành động này...'
+        }
+        requireReason={statusActionType === 'ban'}
+        isSubmitting={isSubmittingStatus}
       />
     </div>
   );

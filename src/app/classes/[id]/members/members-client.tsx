@@ -31,6 +31,8 @@ interface MembersClientProps {
 
 export function MembersClient({ classData, isTeacher }: MembersClientProps) {
   const { user: currentUser } = useCurrentUser();
+
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
   const [members, setMembers] = useState<ClassMember[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -129,14 +131,14 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
               ' (Đã đủ)'}
           </span>
 
-          {isTeacher && pendingStudents.length > 0 && (
+          {roleCanEdit && pendingStudents.length > 0 && (
             <span className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
               <Clock className="size-3.5" />
               <strong>{pendingStudents.length}</strong> chờ duyệt
             </span>
           )}
 
-          {isTeacher && suspendedStudents.length > 0 && (
+          {roleCanEdit && suspendedStudents.length > 0 && (
             <span className="px-3 py-1.5 rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center gap-1.5">
               <Ban className="size-3.5" />
               <strong>{suspendedStudents.length}</strong> bị cấm
@@ -199,7 +201,7 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
       >
         <MemberStudentTable
           members={filteredApproved}
-          isTeacher={isTeacher}
+          isTeacher={roleCanEdit}
           canEditRole={!classData.isArchived && isHeadTeacher}
           page={approvedPage}
           onPageChange={setApprovedPage}
@@ -212,7 +214,7 @@ export function MembersClient({ classData, isTeacher }: MembersClientProps) {
       </MemberSectionCard>
 
       {/* SECTIONS 3, 4, 5: Only visible to Instructors and Assistants */}
-      {isTeacher && (
+      {roleCanEdit && (
         <>
           {/* SECTION 3: Pending Student */}
           <MemberSectionCard

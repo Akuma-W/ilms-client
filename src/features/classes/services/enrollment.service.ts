@@ -1,5 +1,4 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import { MOCK_ENROLLMENT } from '@/mocks/classes/class-data.mock';
 import type { PaginatedResult } from '@/types/api';
 import type { Class } from '@/types/class';
 import type { Enrollment } from '@/types/enrollment';
@@ -31,9 +30,9 @@ export const enrollmentService = {
         return result.data;
       }
     } catch {
-      // Fallback
+      // Return null when unauthenticated or not enrolled
     }
-    return { ...MOCK_ENROLLMENT, classId };
+    return null;
   },
 
   async getStarredClasses() {

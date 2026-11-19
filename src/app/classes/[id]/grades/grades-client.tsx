@@ -17,6 +17,8 @@ interface GradesClientProps {
 
 export function GradesClient({ classId, isTeacher, isArchived = false }: GradesClientProps) {
   const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<GradeCategory[]>([]);
   const [matrixRows, setMatrixRows] = useState<ClassGradeMatrixRow[]>([]);
@@ -25,7 +27,7 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
   useEffect(() => {
     let isMounted = true;
 
-    if (isTeacher) {
+    if (roleCanEdit) {
       gradesService
         .getClassGradeMatrix(classId)
         .then((res) => {
@@ -53,7 +55,7 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
     return () => {
       isMounted = false;
     };
-  }, [classId, isTeacher, currentUser?.id]);
+  }, [classId, roleCanEdit, currentUser?.id]);
 
   const handleSaveBatch = async (
     updates: { studentId: string; categoryId: string; score: number }[],
@@ -114,17 +116,17 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/50 pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            {isTeacher ? (
+            {roleCanEdit ? (
               <GraduationCap className="h-6 w-6 text-primary" />
             ) : (
               <Award className="h-6 w-6 text-primary" />
             )}
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {isTeacher ? 'Quản lý bảng điểm lớp học' : 'Kết quả học tập & Bảng điểm'}
+              {roleCanEdit ? 'Quản lý bảng điểm lớp học' : 'Kết quả học tập & Bảng điểm'}
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            {isTeacher
+            {roleCanEdit
               ? 'Xem điểm danh sách lớp, tính toán tổng kết hệ 10 và cập nhật điểm theo cột trọng số.'
               : 'Theo dõi điểm số chi tiết từng hạng mục, bài tập và tiến độ hoàn thành môn học.'}
           </p>
@@ -132,7 +134,7 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
       </div>
 
       {/* Main View Presentation */}
-      {isTeacher ? (
+      {roleCanEdit ? (
         <TeacherGradesView
           categories={categories}
           rows={matrixRows}

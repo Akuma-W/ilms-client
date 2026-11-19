@@ -43,9 +43,12 @@ export const adminQuizzesService = {
     return res.data;
   },
 
-  // Force deletes quiz examination
-  async forceDeleteQuiz(id: string): Promise<AdminActionResult> {
-    const res = await clientApiClient<AdminActionResult>(`/admin/quizzes/${id}`, {
+  // Force deletes quiz examination with optional audit reason
+  async forceDeleteQuiz(id: string, reason?: string): Promise<AdminActionResult> {
+    const endpoint = reason
+      ? `/admin/quizzes/${id}?reason=${encodeURIComponent(reason)}`
+      : `/admin/quizzes/${id}`;
+    const res = await clientApiClient<AdminActionResult>(endpoint, {
       method: 'DELETE',
     });
     return {

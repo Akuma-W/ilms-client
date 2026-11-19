@@ -21,10 +21,16 @@ export const adminUsersService = {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
     if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.search) query.set('search', params.search);
-    if (params?.role) query.set('role', params.role);
-    if (params?.status) query.set('status', params.status);
-    if (params?.schoolId) query.set('schoolId', params.schoolId);
+    if (params?.search?.trim()) query.set('search', params.search.trim());
+    if (params?.role && params.role !== 'all' && params.role.trim() !== '') {
+      query.set('role', params.role.trim());
+    }
+    if (params?.status && params.status !== 'all' && params.status.trim() !== '') {
+      query.set('status', params.status.trim());
+    }
+    if (params?.schoolId && params.schoolId !== 'all' && params.schoolId.trim() !== '') {
+      query.set('schoolId', params.schoolId.trim());
+    }
 
     const endpoint = `/admin/users${query.toString() ? `?${query.toString()}` : ''}`;
     const res = await clientApiClient<PaginatedResult<AdminUser>>(endpoint);

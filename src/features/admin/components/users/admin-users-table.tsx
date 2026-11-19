@@ -9,6 +9,8 @@ import {
   KeyRound,
   UserX,
   ShieldAlert,
+  CheckCircle2,
+  Info,
 } from 'lucide-react';
 import {
   Table,
@@ -65,6 +67,7 @@ interface AdminUsersTableProps {
   onOpenResetPasswordModal: (user: AdminUser) => void;
   onToggleLock: (user: AdminUser) => void;
   onBanUser: (user: AdminUser) => void;
+  onViewStatusReason?: (user: AdminUser) => void;
 }
 
 export function AdminUsersTable({
@@ -89,12 +92,13 @@ export function AdminUsersTable({
   onOpenResetPasswordModal,
   onToggleLock,
   onBanUser,
+  onViewStatusReason,
 }: AdminUsersTableProps) {
   return (
     <div className="space-y-4">
-      {/* Search and Filters Toolbar: Full-width responsive flex container */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex flex-1 flex-wrap items-center gap-3 min-w-0">
+      {/* Search and Filters Toolbar: Responsive layout */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex flex-1 flex-wrap items-center gap-2.5 min-w-0 w-full sm:w-auto">
           <DebouncedSearchBar
             value={search}
             onSearch={onSearchChange}
@@ -108,7 +112,7 @@ export function AdminUsersTable({
               onRoleChange(val === 'all' ? undefined : (val as 'admin' | 'teacher' | 'student'))
             }
           >
-            <SelectTrigger className="w-36 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-32 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Vai trò" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -125,14 +129,14 @@ export function AdminUsersTable({
               onStatusChange(val === 'all' ? undefined : (val as 'active' | 'locked' | 'banned'))
             }
           >
-            <SelectTrigger className="w-36 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-32 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="all">Tất cả trạng thái</SelectItem>
               <SelectItem value="active">Hoạt động</SelectItem>
               <SelectItem value="locked">Bị khóa</SelectItem>
-              <SelectItem value="banned">Bị cấm</SelectItem>
+              <SelectItem value="banned">Đình chỉ</SelectItem>
             </SelectContent>
           </Select>
 
@@ -140,10 +144,10 @@ export function AdminUsersTable({
             value={schoolId || 'all'}
             onValueChange={(val) => onSchoolChange(val === 'all' ? undefined : val)}
           >
-            <SelectTrigger className="w-44 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-40 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Trường trực thuộc" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl">
+            <SelectContent className="rounded-xl max-h-60">
               <SelectItem value="all">Tất cả trường</SelectItem>
               {schools.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
@@ -156,9 +160,9 @@ export function AdminUsersTable({
 
         <Button
           onClick={onOpenCreateModal}
-          className="shrink-0 rounded-2xl h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-sm self-start sm:self-auto"
+          className="shrink-0 rounded-xl h-9 px-3.5 bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs shadow-xs self-end sm:self-auto"
         >
-          <Plus className="size-4 mr-1.5" />
+          <Plus className="size-3.5 mr-1.5" />
           Thêm người dùng
         </Button>
       </div>
@@ -232,10 +236,38 @@ export function AdminUsersTable({
                     <TableCell>
                       {(() => {
                         const { label, className } = getUserStatusBadgeConfig(u.status);
+                        const hasReason = Boolean(u.statusReason && u.statusReason.trim());
+
+                        if (!hasReason) {
+                          return (
+                            <Badge variant="outline" className={className}>
+                              {label}
+                            </Badge>
+                          );
+                        }
+
                         return (
-                          <Badge variant="outline" className={className}>
-                            {label}
-                          </Badge>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant="outline"
+                                onClick={() => onViewStatusReason?.(u)}
+                                className={`${className} inline-flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity`}
+                              >
+                                {label}
+                                <Info className="size-3 shrink-0 opacity-70" />
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs text-xs space-y-1">
+                              <p className="font-semibold">Lý do ({label.toLowerCase()}):</p>
+                              <p className="text-[11px] text-muted-foreground whitespace-pre-wrap">
+                                {u.statusReason}
+                              </p>
+                              <p className="text-[10px] text-primary/80 italic pt-0.5">
+                                Nhấp vào huy hiệu để xem chi tiết
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
                         );
                       })()}
                     </TableCell>
@@ -247,7 +279,7 @@ export function AdminUsersTable({
                             <MoreVertical className="size-4 text-slate-500" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-xl w-48">
+                        <DropdownMenuContent align="end" className="rounded-xl w-52">
                           <DropdownMenuItem onClick={() => onOpenEditModal(u)} className="text-xs">
                             <Edit2 className="size-3.5 mr-2 text-amber-500" />
                             Cập nhật thông tin
@@ -264,7 +296,7 @@ export function AdminUsersTable({
                           {!isAdmin && (
                             <DropdownMenuItem
                               onClick={() => onToggleLock(u)}
-                              disabled={actionLoadingId === u.id}
+                              disabled={actionLoadingId === u.id || u.status === 'banned'}
                               className="text-xs"
                             >
                               {u.status === 'locked' ? (
@@ -275,7 +307,7 @@ export function AdminUsersTable({
                               ) : (
                                 <>
                                   <Lock className="size-3.5 mr-2 text-amber-500" />
-                                  Khóa tài khoản
+                                  Tạm khóa tài khoản
                                 </>
                               )}
                             </DropdownMenuItem>
@@ -298,10 +330,23 @@ export function AdminUsersTable({
                             <DropdownMenuItem
                               onClick={() => onBanUser(u)}
                               disabled={actionLoadingId === u.id}
-                              className="text-xs text-rose-600 dark:text-rose-400"
+                              className={
+                                u.status === 'banned'
+                                  ? 'text-xs text-emerald-600 dark:text-emerald-400'
+                                  : 'text-xs text-rose-600 dark:text-rose-400'
+                              }
                             >
-                              <UserX className="size-3.5 mr-2" />
-                              Vô hiệu hóa tài khoản
+                              {u.status === 'banned' ? (
+                                <>
+                                  <CheckCircle2 className="size-3.5 mr-2" />
+                                  Gỡ đình chỉ tài khoản
+                                </>
+                              ) : (
+                                <>
+                                  <UserX className="size-3.5 mr-2" />
+                                  Đình chỉ tài khoản
+                                </>
+                              )}
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>

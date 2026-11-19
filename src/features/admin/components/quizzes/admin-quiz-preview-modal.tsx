@@ -28,7 +28,7 @@ export function AdminQuizPreviewModal({ open, onOpenChange, quizId }: AdminQuizP
           <div className="flex items-center gap-2">
             <Badge
               variant="outline"
-              className="text-[11px] font-semibold text-blue-600 dark:text-blue-400"
+              className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700"
             >
               {quiz?.visibility === 'public' ? 'Đề thi công khai' : 'Đề thi riêng tư'}
             </Badge>
@@ -64,7 +64,7 @@ export function AdminQuizPreviewModal({ open, onOpenChange, quizId }: AdminQuizP
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-semibold text-xs md:text-sm text-slate-900 dark:text-slate-100">
-                    Câu {qIndex + 1}: {q.text}
+                    Câu {qIndex + 1}: {q.content}
                   </span>
                   <Badge variant="secondary" className="text-[10px] shrink-0 font-mono">
                     {q.points} điểm
@@ -88,7 +88,7 @@ export function AdminQuizPreviewModal({ open, onOpenChange, quizId }: AdminQuizP
                         <span className="size-5 rounded-md bg-white dark:bg-slate-800 border flex items-center justify-center font-bold text-[10px] shrink-0">
                           {optLabel}
                         </span>
-                        <span className="flex-1">{opt.text}</span>
+                        <span className="flex-1">{opt.content}</span>
                         {opt.isCorrect && (
                           <Check className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         )}

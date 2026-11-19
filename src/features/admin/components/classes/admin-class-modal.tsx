@@ -22,18 +22,13 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { GraduationCap, BookOpen, UserCheck } from 'lucide-react';
 import { adminClassesService } from '@/features/admin/services/admin-classes.service';
 import { useAdminSchools, useAdminSchoolSubjects } from '@/features/admin/hooks/use-admin-schools';
 import { useAdminUsers } from '@/features/admin/hooks/use-admin-users';
 import { classFormSchema, type ClassFormValues } from '@/features/admin/schemas/admin.schema';
 import { AdminClass } from '@/types/admin';
+import { AdminFormCombobox } from '../shared/admin-form-combobox';
 
 interface AdminClassModalProps {
   open: boolean;
@@ -53,13 +48,12 @@ export function AdminClassModal({
 
   // Load schools & teachers via custom hooks
   const { data: schoolsData } = useAdminSchools({ limit: 100 });
-  const { data: teachersData } = useAdminUsers({ limit: 100, role: 'teacher' });
 
   const form = useForm<ClassFormValues>({
     resolver: zodResolver(classFormSchema),
     defaultValues: {
-      name: '',
-      code: '',
+      title: '',
+      courseCode: '',
       schoolId: '',
       subjectId: '',
       teacherId: '',
@@ -70,31 +64,27 @@ export function AdminClassModal({
 
   const selectedSchoolId = form.watch('schoolId');
   const { subjects = [] } = useAdminSchoolSubjects(selectedSchoolId || null);
+  const { data: teachersData } = useAdminUsers({
+    limit: 100,
+    role: 'teacher',
+    schoolId: selectedSchoolId || undefined,
+  });
 
   useEffect(() => {
     if (targetClass) {
       form.reset({
-        name: targetClass.title || (targetClass as unknown as { name?: string }).name || '',
-        code: targetClass.courseCode || (targetClass as unknown as { code?: string }).code || '',
-        schoolId:
-          targetClass.school?.id ||
-          (targetClass as unknown as { schoolId?: string }).schoolId ||
-          '',
-        subjectId:
-          targetClass.subjectRef?.id ||
-          (targetClass as unknown as { subjectId?: string }).subjectId ||
-          '',
-        teacherId:
-          targetClass.teacher?.id ||
-          (targetClass as unknown as { teacherId?: string }).teacherId ||
-          '',
+        title: targetClass.title || '',
+        courseCode: targetClass.courseCode || '',
+        schoolId: targetClass.school?.id || '',
+        subjectId: targetClass.subjectRef?.id || '',
+        teacherId: targetClass.teacher?.id || '',
         maxStudents: targetClass.maxStudents ?? 50,
         isPrivate: targetClass.isPrivate,
       });
     } else {
       form.reset({
-        name: '',
-        code: '',
+        title: '',
+        courseCode: '',
         schoolId: '',
         subjectId: '',
         teacherId: '',
@@ -109,8 +99,7 @@ export function AdminClassModal({
     try {
       if (isEditing && targetClass) {
         await adminClassesService.updateClass(targetClass.id, {
-          name: values.name,
-          code: values.code || undefined,
+          title: values.title,
           teacherId: values.teacherId,
           maxStudents: values.maxStudents,
           isPrivate: values.isPrivate,
@@ -118,8 +107,8 @@ export function AdminClassModal({
         toast.success('Cập nhật lớp học thành công');
       } else {
         await adminClassesService.createClass({
-          name: values.name,
-          code: values.code || undefined,
+          title: values.title,
+          courseCode: values.courseCode?.trim() || undefined,
           schoolId: values.schoolId,
           subjectId: values.subjectId,
           teacherId: values.teacherId,
@@ -156,7 +145,7 @@ export function AdminClassModal({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3.5 py-2">
             <FormField
               control={form.control}
-              name="name"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-semibold">Tên lớp học *</FormLabel>
@@ -175,7 +164,7 @@ export function AdminClassModal({
             <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
-                name="code"
+                name="courseCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-semibold">Mã lớp</FormLabel>
@@ -214,33 +203,34 @@ export function AdminClassModal({
             </div>
 
             {!isEditing && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
                 <FormField
                   control={form.control}
                   name="schoolId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="min-w-0 w-full">
                       <FormLabel className="text-xs font-semibold">Trường học *</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={(val) => {
-                          field.onChange(val);
-                          form.setValue('subjectId', '');
-                        }}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="rounded-xl h-10 text-xs">
-                            <SelectValue placeholder="Chọn trường" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="rounded-xl">
-                          {schoolsData?.data?.map((sch) => (
-                            <SelectItem key={sch.id} value={sch.id}>
-                              {sch.shortname} - {sch.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <AdminFormCombobox
+                          options={
+                            schoolsData?.data?.map((sch) => ({
+                              value: sch.id,
+                              label: sch.name,
+                              badge: sch.shortname || undefined,
+                            })) || []
+                          }
+                          value={field.value}
+                          onChange={(val) => {
+                            field.onChange(val);
+                            form.setValue('subjectId', '');
+                            form.setValue('teacherId', '');
+                          }}
+                          placeholder="Chọn trường học..."
+                          searchPlaceholder="Tìm kiếm trường..."
+                          emptyText="Không tìm thấy trường học"
+                          icon={GraduationCap}
+                        />
+                      </FormControl>
                       <FormMessage className="text-[11px]" />
                     </FormItem>
                   )}
@@ -250,28 +240,24 @@ export function AdminClassModal({
                   control={form.control}
                   name="subjectId"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="min-w-0 w-full">
                       <FormLabel className="text-xs font-semibold">Môn học *</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!selectedSchoolId}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="rounded-xl h-10 text-xs">
-                            <SelectValue
-                              placeholder={selectedSchoolId ? 'Chọn môn học' : 'Chọn trường trước'}
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="rounded-xl">
-                          {subjects.map((sub) => (
-                            <SelectItem key={sub.id} value={sub.id}>
-                              {sub.code} - {sub.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <AdminFormCombobox
+                          options={subjects.map((sub) => ({
+                            value: sub.id,
+                            label: sub.name,
+                            badge: sub.code,
+                          }))}
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={!selectedSchoolId}
+                          placeholder={selectedSchoolId ? 'Chọn môn học...' : 'Chọn trường trước'}
+                          searchPlaceholder="Tìm kiếm môn học..."
+                          emptyText="Không có môn học thuộc trường này"
+                          icon={BookOpen}
+                        />
+                      </FormControl>
                       <FormMessage className="text-[11px]" />
                     </FormItem>
                   )}
@@ -283,22 +269,29 @@ export function AdminClassModal({
               control={form.control}
               name="teacherId"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="min-w-0 w-full">
                   <FormLabel className="text-xs font-semibold">Giảng viên phụ trách *</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="rounded-xl h-10 text-xs">
-                        <SelectValue placeholder="Chọn giảng viên chủ nhiệm" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rounded-xl">
-                      {teachersData?.data?.map((t) => (
-                        <SelectItem key={t.id} value={t.id}>
-                          {t.fullName} ({t.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <AdminFormCombobox
+                      options={
+                        teachersData?.data?.map((t) => ({
+                          value: t.id,
+                          label: t.fullName,
+                          badge: 'GV',
+                          sublabel: t.email,
+                        })) || []
+                      }
+                      value={field.value}
+                      onChange={field.onChange}
+                      disabled={!selectedSchoolId}
+                      placeholder={
+                        selectedSchoolId ? 'Chọn giảng viên chủ nhiệm...' : 'Chọn trường học trước'
+                      }
+                      searchPlaceholder="Tìm kiếm giảng viên theo tên, email..."
+                      emptyText="Không có giảng viên nào thuộc trường này"
+                      icon={UserCheck}
+                    />
+                  </FormControl>
                   <FormMessage className="text-[11px]" />
                 </FormItem>
               )}
@@ -337,7 +330,7 @@ export function AdminClassModal({
               <Button
                 type="submit"
                 disabled={loading}
-                className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                className="rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium"
               >
                 {loading ? 'Đang lưu...' : isEditing ? 'Cập nhật' : 'Khởi tạo'}
               </Button>

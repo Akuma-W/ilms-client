@@ -22,15 +22,16 @@ export function InfoClient({ initialClassData, relation }: InfoClientProps) {
   const isTeacher = Boolean(
     (relation?.roleIn === 'teacher' || classData?.teacherId === currentUser?.id) && currentUser,
   );
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
   const isJoined = Boolean(relation && relation.status === 'approved');
 
   return (
     <div className="w-full max-w-7xl mx-auto">
       {/* Case 1: Guest / Non-enrolled user */}
-      {!isJoined && !isTeacher && <GuestClassInfo classData={classData} relation={relation} />}
+      {!isJoined && !roleCanEdit && <GuestClassInfo classData={classData} relation={relation} />}
 
       {/* Case 2: Class Teacher */}
-      {isTeacher && currentUser && (
+      {roleCanEdit && currentUser && (
         <TeacherClassInfo
           classData={classData}
           userData={currentUser}
@@ -39,7 +40,7 @@ export function InfoClient({ initialClassData, relation }: InfoClientProps) {
       )}
 
       {/* Case 3: Enrolled Student */}
-      {isJoined && !isTeacher && currentUser && relation && (
+      {isJoined && !roleCanEdit && currentUser && relation && (
         <StudentClassInfo classData={classData} userData={currentUser} relation={relation} />
       )}
     </div>

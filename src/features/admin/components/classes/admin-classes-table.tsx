@@ -12,6 +12,8 @@ import {
   Users,
   Lock,
   Globe,
+  BookOpen,
+  X,
 } from 'lucide-react';
 import {
   Table,
@@ -38,22 +40,26 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DebouncedSearchBar } from '@/components/shared/debounced-search-bar';
 import { DataPagination } from '@/components/shared/data-pagination';
-import { AdminClass, AdminSchool } from '@/types/admin';
+import { AdminClass, AdminSchool, AdminSubject } from '@/types/admin';
 import { getClassArchiveBadgeConfig } from '@/features/admin/utils/admin-formatters';
+import { AdminCombobox } from '../shared/admin-combobox';
 
 interface AdminClassesTableProps {
   classes: AdminClass[];
   schools: AdminSchool[];
+  subjects?: AdminSubject[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
   search: string;
   selectedSchoolId?: string;
+  selectedSubjectId?: string;
   isArchivedFilter?: boolean;
   actionLoadingId: string | null;
   onSearchChange: (search: string) => void;
   onSchoolChange: (schoolId?: string) => void;
+  onSubjectChange?: (subjectId?: string) => void;
   onArchiveFilterChange: (isArchived?: boolean) => void;
   onPageChange: (page: number) => void;
   onOpenCreateModal: () => void;
@@ -65,16 +71,19 @@ interface AdminClassesTableProps {
 export function AdminClassesTable({
   classes,
   schools,
+  subjects = [],
   total,
   page,
   limit,
   totalPages,
   search,
   selectedSchoolId,
+  selectedSubjectId,
   isArchivedFilter,
   actionLoadingId,
   onSearchChange,
   onSchoolChange,
+  onSubjectChange,
   onArchiveFilterChange,
   onPageChange,
   onOpenCreateModal,
@@ -85,8 +94,8 @@ export function AdminClassesTable({
   return (
     <div className="space-y-4">
       {/* Search and Composite Filter Strip with Auto-expanding Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex flex-1 flex-wrap items-center gap-3 min-w-0">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex flex-1 flex-wrap items-center gap-2.5 min-w-0 w-full sm:w-auto">
           <DebouncedSearchBar
             value={search}
             onSearch={onSearchChange}
@@ -94,22 +103,37 @@ export function AdminClassesTable({
             className="flex-1 min-w-50"
           />
 
-          <Select
-            value={selectedSchoolId || 'all'}
-            onValueChange={(val) => onSchoolChange(val === 'all' ? undefined : val)}
-          >
-            <SelectTrigger className="w-48 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
-              <SelectValue placeholder="Lọc theo trường" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">Tất cả trường học</SelectItem>
-              {schools.map((s) => (
-                <SelectItem key={s.id} value={s.id}>
-                  {s.shortname} - {s.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Searchable School Combobox */}
+          <AdminCombobox
+            options={schools.map((s) => ({
+              value: s.id,
+              label: s.name,
+              badge: s.shortname || undefined,
+            }))}
+            value={selectedSchoolId}
+            onChange={onSchoolChange}
+            placeholder="Lọc theo trường"
+            searchPlaceholder="Tìm kiếm trường..."
+            allLabel="Tất cả trường học"
+            popoverWidth="w-80"
+          />
+
+          {/* Searchable Subject Combobox */}
+          {subjects.length > 0 && (
+            <AdminCombobox
+              options={subjects.map((sub) => ({
+                value: sub.id,
+                label: sub.name,
+                badge: sub.code,
+              }))}
+              value={selectedSubjectId}
+              onChange={onSubjectChange || (() => {})}
+              placeholder="Lọc theo môn"
+              searchPlaceholder="Tìm kiếm môn học..."
+              allLabel="Tất cả môn học"
+              popoverWidth="w-72"
+            />
+          )}
 
           <Select
             value={
@@ -119,7 +143,7 @@ export function AdminClassesTable({
               onArchiveFilterChange(val === 'all' ? undefined : val === 'archived')
             }
           >
-            <SelectTrigger className="w-40 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-36 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Trạng thái mở" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -132,12 +156,34 @@ export function AdminClassesTable({
 
         <Button
           onClick={onOpenCreateModal}
-          className="shrink-0 rounded-2xl h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-sm self-start sm:self-auto"
+          className="shrink-0 rounded-xl h-9 px-3.5 bg-violet-600 hover:bg-violet-700 text-white font-medium text-xs shadow-xs self-end sm:self-auto"
         >
-          <Plus className="size-4 mr-1.5" />
+          <Plus className="size-3.5 mr-1.5" />
           Tạo lớp học
         </Button>
       </div>
+
+      {/* Active Subject Filter Banner */}
+      {selectedSubjectId && (
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-xs text-muted-foreground">Đang lọc theo môn:</span>
+          <Badge
+            variant="secondary"
+            className="text-xs gap-1.5 bg-violet-100 text-violet-800 dark:bg-violet-950/60 dark:text-violet-300 border-violet-200 dark:border-violet-800"
+          >
+            <BookOpen className="size-3 text-violet-600" />
+            {subjects.find((s) => s.id === selectedSubjectId)?.name || selectedSubjectId}
+            <button
+              type="button"
+              onClick={() => onSubjectChange?.(undefined)}
+              className="ml-1 hover:text-rose-500 cursor-pointer"
+              title="Bỏ lọc môn"
+            >
+              <X className="size-3" />
+            </button>
+          </Badge>
+        </div>
+      )}
 
       {/* Classes Data Table */}
       <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 shadow-2xs overflow-hidden">

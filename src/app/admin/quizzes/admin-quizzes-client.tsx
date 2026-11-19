@@ -8,7 +8,7 @@ import { AdminQuiz } from '@/types/admin';
 import { AdminQuizzesTable } from '@/features/admin/components/quizzes/admin-quizzes-table';
 import { AdminQuizPreviewModal } from '@/features/admin/components/quizzes/admin-quiz-preview-modal';
 import { AdminQuizTakedownModal } from '@/features/admin/components/quizzes/admin-quiz-takedown-modal';
-import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
+import { AdminActionReasonModal } from '@/features/admin/components/shared/admin-action-reason-modal';
 
 export function AdminQuizzesClient() {
   const [page, setPage] = useState(1);
@@ -51,11 +51,11 @@ export function AdminQuizzesClient() {
     setDeleteOpen(true);
   };
 
-  const onConfirmForceDelete = async () => {
+  const onConfirmForceDelete = async (reason: string) => {
     if (!deleteQuiz) return;
     setIsDeleting(true);
     try {
-      const res = await adminQuizzesService.forceDeleteQuiz(deleteQuiz.id);
+      const res = await adminQuizzesService.forceDeleteQuiz(deleteQuiz.id, reason);
       if (res.success) {
         toast.success(res.message);
         setDeleteOpen(false);
@@ -90,8 +90,8 @@ export function AdminQuizzesClient() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Quản trị Đề thi & Kiểm duyệt Bản quyền
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-amber-950 dark:text-amber-100">
+          Quản lý Bài trắc nghiệm & Kiểm duyệt Bản quyền
         </h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
           Giám sát nội dung khảo thí toàn hệ thống, kiểm duyệt bản quyền và xử lý đề thi vi phạm
@@ -132,16 +132,18 @@ export function AdminQuizzesClient() {
         onSuccess={() => mutate()}
       />
 
-      {/* Universal ConfirmDeleteModal for Quiz Force Delete */}
-      <ConfirmDeleteModal
+      {/* Universal Action Reason Modal for Quiz Force Delete */}
+      <AdminActionReasonModal
         isOpen={deleteOpen}
-        onOpenChange={setDeleteOpen}
+        onClose={() => setDeleteOpen(false)}
         title="Gỡ bỏ cưỡng chế đề thi vi phạm"
-        itemName={deleteQuiz?.title}
-        itemTypeLabel="đề thi này"
-        description={`Bạn có chắc chắn muốn gỡ bỏ cưỡng chế đề thi "${deleteQuiz?.title}"? Hành động này sẽ xóa vĩnh viễn đề thi và toàn bộ lịch sử thi cử liên quan.`}
-        isDeleting={isDeleting}
-        deleteLabel="Xóa vĩnh viễn"
+        targetName={deleteQuiz?.title}
+        description="Lưu ý: Hành động này sẽ xóa vĩnh viễn đề thi, câu hỏi và toàn bộ kết quả thi liên quan khỏi hệ thống do vi phạm bản quyền."
+        placeholder="Nhập lý do xóa ép buộc (VD: Vi phạm bản quyền nghiêm trọng, nội dung không phù hợp...)"
+        actionLabel="Xác nhận xóa vĩnh viễn"
+        variant="danger"
+        requireReason={true}
+        isSubmitting={isDeleting}
         onConfirm={onConfirmForceDelete}
       />
     </div>

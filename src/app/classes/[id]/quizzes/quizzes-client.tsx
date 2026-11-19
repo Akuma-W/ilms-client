@@ -16,6 +16,7 @@ import { quizPublicationsService } from '@/features/quizzes/services/quiz-public
 import { getQuizDisplayStatus } from '@/features/quizzes/utils/quiz.utils';
 import type { QuizClassItem, QuizFilterTab } from '@/types/quiz';
 import type { Topic } from '@/types/topic';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface QuizzesClientProps {
   initialQuizzes: QuizClassItem[];
@@ -32,6 +33,9 @@ export function QuizzesClient({
   isTeacher,
   isArchived = false,
 }: QuizzesClientProps) {
+  const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const [quizzes, setQuizzes] = useState<QuizClassItem[]>(initialQuizzes);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTab, setFilterTab] = useState<QuizFilterTab>('all');
@@ -154,7 +158,7 @@ export function QuizzesClient({
         onSearchChange={handleSearchChange}
         searchPlaceholder="Tìm kiếm đề thi, chủ đề bài học..."
         actions={
-          isTeacher &&
+          roleCanEdit &&
           !isArchived && (
             <Button
               onClick={() => setIsPublishModalOpen(true)}
@@ -169,7 +173,7 @@ export function QuizzesClient({
 
       {/* SECTION 2: KPI Summary Strip */}
       <QuizKpiStrip
-        isTeacher={isTeacher}
+        isTeacher={roleCanEdit}
         totalQuizzes={quizzes.length}
         openCount={openCount}
         completedCount={completedCount}
@@ -209,7 +213,7 @@ export function QuizzesClient({
               ? `Không có bài thi nào khớp với từ khóa "${searchQuery}". Vui lòng thử lại với từ khóa khác.`
               : 'Hiện chưa có bài trắc nghiệm nào trong danh mục hoặc chủ đề này.'}
           </p>
-          {isTeacher && !isArchived && (
+          {roleCanEdit && !isArchived && (
             <Button
               type="button"
               onClick={() => setIsPublishModalOpen(true)}
@@ -228,7 +232,7 @@ export function QuizzesClient({
                 key={quiz.id}
                 quiz={quiz}
                 classId={classId}
-                isTeacher={isTeacher}
+                isTeacher={roleCanEdit}
                 isArchived={isArchived}
                 onEditPublication={
                   !isArchived

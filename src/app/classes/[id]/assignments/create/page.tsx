@@ -4,6 +4,7 @@ import { enrollmentServerService } from '@/features/classes/services/enrollment.
 import { classServerService } from '@/features/classes/services/class.server.service';
 import { topicsServerService } from '@/features/topics/services/topics.server.service';
 import { AssignmentForm } from '@/features/assignments/components/assignment-form';
+import { userServerService } from '@/features/user/services/user.server.service';
 
 export const metadata: Metadata = {
   title: 'Giao bài tập mới',
@@ -22,7 +23,8 @@ export default async function CreateAssignmentPage({
   const { topicId } = await searchParams;
 
   // Check teacher privileges (Must be teacher of THIS class)
-  const [relation, classData, topics] = await Promise.all([
+  const [user, relation, classData, topics] = await Promise.all([
+    userServerService.getMe(),
     enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
     classServerService.getClassData(classId).catch(() => null),
     topicsServerService.getTopics(classId).catch(() => []),
@@ -32,7 +34,7 @@ export default async function CreateAssignmentPage({
     relation?.roleIn === 'teacher' ||
     Boolean(classData && relation?.userId && classData.teacherId === relation.userId);
 
-  if (!isClassTeacher) {
+  if (!isClassTeacher || user?.role === 'admin') {
     redirect(`/classes/${classId}/assignments`);
   }
 

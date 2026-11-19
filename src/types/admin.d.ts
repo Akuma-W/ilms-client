@@ -103,13 +103,13 @@ export interface AdminClass {
 
 export interface AdminQuizOption {
   id: string;
-  text: string;
+  content: string;
   isCorrect: boolean;
 }
 
 export interface AdminQuizQuestion {
   id: string;
-  text: string;
+  content: string;
   points: number;
   orderIndex: number;
   options: AdminQuizOption[];
@@ -140,8 +140,11 @@ export interface AdminUser extends Omit<User, 'school' | 'createdAt' | 'updatedA
   status: UserStatus;
   schoolId?: string | null;
   school?: Pick<School, 'id' | 'name' | 'shortname'> | null;
+  statusReason?: string | null;
+  mustChangePassword?: boolean;
   createdAt?: string | null;
   updatedAt?: string | null;
+  temporaryPassword?: string;
 }
 
 export interface AdminActionResult {
@@ -165,33 +168,36 @@ export interface UpdateAdminSchoolInput {
   shortname?: string;
   address?: string;
   city?: string;
-  status?: 'active' | 'inactive';
+  status?: SchoolStatus | 'active' | 'deactivated' | 'archived';
 }
 
 export interface CreateAdminSubjectInput {
   name: string;
   code: string;
   schoolId: string;
+  credits?: number;
+  description?: string;
 }
 
 export interface UpdateAdminSubjectInput {
   name?: string;
   code?: string;
+  credits?: number;
+  description?: string;
 }
 
 export interface CreateAdminClassInput {
-  name: string;
-  code?: string;
+  title: string;
   schoolId: string;
   subjectId: string;
   teacherId: string;
+  courseCode?: string;
   maxStudents?: number;
   isPrivate?: boolean;
 }
 
 export interface UpdateAdminClassInput {
-  name?: string;
-  code?: string;
+  title?: string;
   teacherId?: string;
   maxStudents?: number;
   isPrivate?: boolean;
@@ -210,6 +216,7 @@ export interface UpdateAdminUserInput {
   fullName?: string;
   role?: Role;
   status?: UserStatus;
+  statusReason?: string;
   schoolId?: string;
   identityCode?: string;
 }

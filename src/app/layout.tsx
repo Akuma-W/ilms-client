@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { SWRProvider } from '@/components/providers/swr-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { BackendConnectionModal } from '@/components/common/backend-connection-modal';
+import { MustChangePasswordModal } from '@/features/auth/components/must-change-password-modal';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -39,6 +40,7 @@ export default function RootLayout({
           <TooltipProvider>
             {children}
             <BackendConnectionModal />
+            <MustChangePasswordModal />
           </TooltipProvider>
         </SWRProvider>
         <Toaster position="top-right" richColors theme="light" duration={2000} />

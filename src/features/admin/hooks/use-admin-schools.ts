@@ -5,7 +5,8 @@ export function useAdminSchools(params?: {
   page?: number;
   limit?: number;
   search?: string;
-  status?: 'active' | 'inactive';
+  city?: string;
+  status?: 'active' | 'deactivated' | 'archived';
 }) {
   const { data, error, isLoading, mutate } = useSWR(
     [
@@ -13,6 +14,7 @@ export function useAdminSchools(params?: {
       params?.page ?? 1,
       params?.limit ?? 10,
       params?.search ?? '',
+      params?.city ?? '',
       params?.status ?? '',
     ],
     () => adminSchoolService.getSchools(params),

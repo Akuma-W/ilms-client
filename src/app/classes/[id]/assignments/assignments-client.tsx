@@ -13,6 +13,7 @@ import { AssignmentCard } from '@/features/assignments/components/assignment-car
 import { assignmentsService } from '@/features/assignments/services/assignments.service';
 import type { Assignment, AssignmentFilterStatus } from '@/types/assignment';
 import type { Topic } from '@/types/topic';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface AssignmentsClientProps {
   classId: string;
@@ -31,6 +32,9 @@ export function AssignmentsClient({
   topics = [],
   isArchived = false,
 }: AssignmentsClientProps) {
+  const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTab, setCurrentTab] = useState<AssignmentFilterStatus>('all');
@@ -77,7 +81,7 @@ export function AssignmentsClient({
       const isPastDue = a.dueAt ? new Date(a.dueAt).getTime() < now : false;
       const userSub = studentId ? a.submissions?.find((s) => s.studentId === studentId) : undefined;
 
-      if (isTeacher) {
+      if (roleCanEdit) {
         if (currentTab === 'pending') return !isPastDue;
         if (currentTab === 'overdue') return isPastDue;
         return true;
@@ -93,7 +97,7 @@ export function AssignmentsClient({
 
       return true;
     });
-  }, [assignments, searchQuery, currentTab, isTeacher, studentId, topicMap]);
+  }, [assignments, searchQuery, currentTab, roleCanEdit, studentId, topicMap]);
 
   const handleDeleteAssignment = (assignment: Assignment) => {
     setDeleteModal({
@@ -124,7 +128,7 @@ export function AssignmentsClient({
     if (searchQuery.trim()) {
       return 'Vui lòng thử tìm kiếm lại với tiêu đề hoặc chủ đề khác.';
     }
-    if (isTeacher) {
+    if (roleCanEdit) {
       return 'Hãy bấm nút "Giao bài tập" ở trên để tạo đề bài đầu tiên cho lớp học.';
     }
     switch (currentTab) {
@@ -154,7 +158,7 @@ export function AssignmentsClient({
         onSearchChange={setSearchQuery}
         searchPlaceholder="Tìm kiếm bài tập..."
         actions={
-          isTeacher &&
+          roleCanEdit &&
           !isArchived && (
             <Button
               onClick={() => router.push(`/classes/${classId}/assignments/create`)}
@@ -172,7 +176,7 @@ export function AssignmentsClient({
         currentTab={currentTab}
         onChangeTab={setCurrentTab}
         assignments={assignments}
-        isTeacher={isTeacher}
+        isTeacher={roleCanEdit}
         studentId={studentId}
       />
 
@@ -198,7 +202,7 @@ export function AssignmentsClient({
               key={assignment.id}
               assignment={assignment}
               classId={classId}
-              isTeacher={isTeacher && !isArchived}
+              isTeacher={roleCanEdit && !isArchived}
               studentId={studentId}
               topicTitle={assignment.topicId ? topicMap.get(assignment.topicId) : undefined}
               onDelete={handleDeleteAssignment}

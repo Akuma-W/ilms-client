@@ -31,6 +31,7 @@ import { DebouncedSearchBar } from '@/components/shared/debounced-search-bar';
 import { DataPagination } from '@/components/shared/data-pagination';
 import { AdminQuiz } from '@/types/admin';
 import { getQuizStatusBadgeConfig } from '@/features/admin/utils/admin-formatters';
+import { cn } from '@/lib/utils';
 
 interface AdminQuizzesTableProps {
   quizzes: AdminQuiz[];
@@ -69,9 +70,9 @@ export function AdminQuizzesTable({
 }: AdminQuizzesTableProps) {
   return (
     <div className="space-y-4">
-      {/* Search and Filters Toolbar: Auto-expanding Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex flex-1 flex-wrap items-center gap-3 min-w-0">
+      {/* Search and Filters Toolbar: Responsive layout */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex flex-1 flex-wrap items-center gap-2.5 min-w-0 w-full sm:w-auto">
           <DebouncedSearchBar
             value={search}
             onSearch={onSearchChange}
@@ -85,7 +86,7 @@ export function AdminQuizzesTable({
               onVisibilityChange(val === 'all' ? undefined : (val as 'public' | 'private'))
             }
           >
-            <SelectTrigger className="w-40 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-36 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Phạm vi" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -101,7 +102,7 @@ export function AdminQuizzesTable({
               onStatusChange(val === 'all' ? undefined : (val as 'published' | 'draft'))
             }
           >
-            <SelectTrigger className="w-40 shrink-0 rounded-2xl h-11 border-border/80 text-xs">
+            <SelectTrigger className="w-36 shrink-0 rounded-xl h-9 border-border/80 text-xs">
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -211,15 +212,32 @@ export function AdminQuizzesTable({
                         <Eye className="size-4" />
                       </Button>
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onTakedown(quiz)}
-                        className="size-8 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                        title="Khóa công khai do vi phạm bản quyền"
-                      >
-                        <ShieldAlert className="size-4" />
-                      </Button>
+                      {(() => {
+                        const isLockedOrDraft =
+                          quiz.visibility === 'private' || quiz.status === 'draft';
+                        const tooltipText = isLockedOrDraft
+                          ? 'Đề thi đã ở chế độ riêng tư hoặc bản nháp (đã khóa)'
+                          : 'Khóa công khai do vi phạm bản quyền';
+                        return (
+                          <span
+                            title={tooltipText}
+                            className={cn('inline-block', isLockedOrDraft && 'cursor-not-allowed')}
+                          >
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={isLockedOrDraft}
+                              onClick={() => onTakedown(quiz)}
+                              className={cn(
+                                'size-8 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40',
+                                isLockedOrDraft && 'opacity-40 pointer-events-none',
+                              )}
+                            >
+                              <ShieldAlert className="size-4" />
+                            </Button>
+                          </span>
+                        );
+                      })()}
 
                       <Button
                         variant="ghost"

@@ -8,17 +8,13 @@ import { cn } from '@/lib/utils';
 interface ClassNavProps {
   classId: string;
   isJoined?: boolean;
+  isAdmin?: boolean;
 }
 
-/**
- * Modern, refined Classroom Tabs Navigation bar.
- * Connects seamlessly under ClassHero without rounded corners,
- * centered horizontally with distinctive contrast above the main content.
- */
-export function ClassNav({ classId, isJoined }: ClassNavProps) {
+export function ClassNav({ classId, isJoined, isAdmin }: ClassNavProps) {
   const pathname = usePathname();
 
-  const tabs = CLASSROOM_NAV_TABS.filter((tab) => !tab.joinedOnly || isJoined);
+  const tabs = CLASSROOM_NAV_TABS.filter((tab) => !tab.joinedOnly || isJoined || isAdmin);
 
   return (
     <div className="sticky top-16 z-30 w-full bg-muted/70 dark:bg-slate-900/85 backdrop-blur-md border-b border-border/80 transition-all shadow-xs">
@@ -61,6 +57,3 @@ export function ClassNav({ classId, isJoined }: ClassNavProps) {
     </div>
   );
 }
-
-// Backward-compatible alias
-export { ClassNav as StickyNav };

@@ -31,6 +31,7 @@ import { ClassQuizStudentsTable } from '@/features/quizzes/components/stats/clas
 import { EditPublicationModal } from '@/features/quizzes/components/edit-publication-modal';
 import { ClassStudentAttemptHistory } from '@/features/quizzes/components/class-student-attempt-history';
 import type { QuizAttempt, QuizClassStats, QuizPublication } from '@/types/quiz';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface ClassQuizPublicationClientProps {
   classId: string;
@@ -50,13 +51,16 @@ export function ClassQuizPublicationClient({
 }: ClassQuizPublicationClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const { data: stats, isLoading: isLoadingStats } = useSWR<QuizClassStats>(
     isTeacher ? ['class-quiz-stats', publicationId] : null,
     () => quizAttemptsService.getClassQuizStats(publicationId),
   );
 
   const { data: userAttempts = [] } = useSWR<QuizAttempt[]>(
-    !isTeacher && publication.quizId
+    !roleCanEdit && publication.quizId
       ? ['class-student-quiz-attempts', publication.quizId, publicationId]
       : null,
     () => quizAttemptsService.getUserAttempts(publication.quizId, publicationId),
@@ -129,7 +133,7 @@ export function ClassQuizPublicationClient({
               </Link>
             </Button>
           )}
-          {isTeacher && (
+          {roleCanEdit && (
             <>
               {!isArchived && (
                 <Button
@@ -216,7 +220,7 @@ export function ClassQuizPublicationClient({
       </div>
 
       {/* Teacher View: Full Class Performance Analytics */}
-      {isTeacher ? (
+      {roleCanEdit ? (
         <div className="space-y-6">
           <ClassQuizStatsKpi stats={stats} totalPoints={totalPoints} />
           <ClassQuizScoreChart attempts={stats?.students || []} totalPoints={totalPoints} />

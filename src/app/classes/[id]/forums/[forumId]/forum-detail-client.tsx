@@ -32,6 +32,8 @@ export function ForumDetailClient({
   isArchived = false,
 }: ForumDetailClientProps) {
   const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const router = useRouter();
   const [forum, setForum] = useState<Forum>(initialForum);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -211,7 +213,7 @@ export function ForumDetailClient({
         forum={forum}
         classId={classId}
         currentUser={currentUser}
-        isTeacher={isTeacher}
+        isTeacher={roleCanEdit}
         onEdit={!isArchived ? () => setIsEditModalOpen(true) : undefined}
         onDelete={
           !isArchived ? () => setDeleteModal({ isOpen: true, isDeleting: false }) : undefined
@@ -242,7 +244,7 @@ export function ForumDetailClient({
                 comment={comment}
                 forumId={forum.id}
                 currentUser={currentUser}
-                isTeacher={isTeacher}
+                isTeacher={roleCanEdit}
                 onTriggerReply={!isArchived ? handleTriggerReply : undefined}
                 onEditComment={!isArchived ? handleEditComment : undefined}
                 onDeleteComment={!isArchived ? handleDeleteComment : undefined}

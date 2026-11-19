@@ -1,5 +1,4 @@
 import { clientApiClient } from '@/lib/api/client-api-client';
-import { getMockSubjects } from '@/mocks/mock-subjects';
 import type { PaginatedResult } from '@/types/api';
 import type { QuerySubjectParams, Subject, SubjectClassItem } from '@/types/subject';
 
@@ -27,12 +26,11 @@ export const subjectsService = {
           'data' in raw &&
           Array.isArray((raw as PaginatedResult<Subject>).data)
         ) {
-          const typed = raw as PaginatedResult<Subject>;
-          if (typed.data.length > 0) return typed;
+          return raw as PaginatedResult<Subject>;
         }
 
         // Case 2: Result is directly an array Subject[]
-        if (Array.isArray(raw) && raw.length > 0) {
+        if (Array.isArray(raw)) {
           return {
             data: raw,
             meta: { page: 1, limit: raw.length, total: raw.length, totalPages: 1 },
@@ -44,22 +42,19 @@ export const subjectsService = {
           const list = Object.values(raw).filter((item): item is Subject =>
             Boolean(item && typeof item === 'object' && 'code' in item),
           );
-          if (list.length > 0) {
-            return {
-              data: list,
-              meta: { page: 1, limit: list.length, total: list.length, totalPages: 1 },
-            };
-          }
+          return {
+            data: list,
+            meta: { page: 1, limit: list.length, total: list.length, totalPages: 1 },
+          };
         }
       }
     } catch {
       // Fallback
     }
 
-    // Fallback UIT subjects if database has not seeded or offline
     return {
-      data: getMockSubjects(),
-      meta: { page: 1, limit: 10, total: getMockSubjects().length, totalPages: 1 },
+      data: [],
+      meta: { page: 1, limit: 10, total: 0, totalPages: 1 },
     };
   },
 

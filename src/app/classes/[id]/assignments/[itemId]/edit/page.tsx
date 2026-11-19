@@ -5,6 +5,7 @@ import { classServerService } from '@/features/classes/services/class.server.ser
 import { topicsServerService } from '@/features/topics/services/topics.server.service';
 import { assignmentsServerService } from '@/features/assignments/services/assignments.server.service';
 import { AssignmentForm } from '@/features/assignments/components/assignment-form';
+import { userServerService } from '@/features/user/services/user.server.service';
 
 export const metadata: Metadata = {
   title: 'Chỉnh sửa bài tập',
@@ -18,7 +19,8 @@ export default async function EditAssignmentPage({ params }: EditAssignmentPageP
   const { id: classId, itemId } = await params;
 
   // Check teacher privileges (Must be teacher of THIS class)
-  const [relation, classData, assignment, topics] = await Promise.all([
+  const [user, relation, classData, assignment, topics] = await Promise.all([
+    userServerService.getMe(),
     enrollmentServerService.getMyRelationInClass(classId).catch(() => null),
     classServerService.getClassData(classId).catch(() => null),
     assignmentsServerService.getAssignmentById(itemId).catch(() => null),
@@ -29,7 +31,7 @@ export default async function EditAssignmentPage({ params }: EditAssignmentPageP
     relation?.roleIn === 'teacher' ||
     Boolean(classData && relation?.userId && classData.teacherId === relation.userId);
 
-  if (!isClassTeacher) {
+  if (!isClassTeacher || user?.role === 'admin') {
     redirect(`/classes/${classId}/assignments`);
   }
 

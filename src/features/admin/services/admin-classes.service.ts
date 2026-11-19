@@ -21,9 +21,13 @@ export const adminClassesService = {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
     if (params?.limit) query.set('limit', String(params.limit));
-    if (params?.search) query.set('search', params.search);
-    if (params?.schoolId) query.set('schoolId', params.schoolId);
-    if (params?.subjectId) query.set('subjectId', params.subjectId);
+    if (params?.search?.trim()) query.set('search', params.search.trim());
+    if (params?.schoolId && params.schoolId !== 'all' && params.schoolId.trim() !== '') {
+      query.set('schoolId', params.schoolId.trim());
+    }
+    if (params?.subjectId && params.subjectId !== 'all' && params.subjectId.trim() !== '') {
+      query.set('subjectId', params.subjectId.trim());
+    }
     if (params?.isArchived !== undefined) query.set('isArchived', String(params.isArchived));
 
     const endpoint = `/admin/classes${query.toString() ? `?${query.toString()}` : ''}`;
@@ -39,15 +43,9 @@ export const adminClassesService = {
 
   // Creates classroom directly as administrator
   async createClass(input: CreateAdminClassInput): Promise<AdminClass> {
-    const payload = {
-      title: input.name,
-      subjectId: input.subjectId,
-      maxStudents: input.maxStudents,
-      isPrivate: input.isPrivate ?? false,
-    };
-    const res = await clientApiClient<AdminClass>('/classes', {
+    const res = await clientApiClient<AdminClass>('/admin/classes', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(input),
     });
     if (!res || res.success === false || !res.data) {
       throw new Error(res?.message || 'Không thể tạo lớp học mới');
@@ -55,32 +53,30 @@ export const adminClassesService = {
     return res.data;
   },
 
-  // Updates existing classroom attributes
+  // Updates existing classroom attributes as administrator
   async updateClass(id: string, input: UpdateAdminClassInput): Promise<AdminClass> {
-    const payload: Record<string, unknown> = {};
-    if (input.name) payload.title = input.name;
-    if (input.maxStudents !== undefined) payload.maxStudents = input.maxStudents;
-    if (input.isPrivate !== undefined) payload.isPrivate = input.isPrivate;
-
-    const res = await clientApiClient<AdminClass>(`/classes/${id}`, {
+    const res = await clientApiClient<AdminClass>(`/admin/classes/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(input),
     });
-    if (!res || res.success === false || !res.data) {
+    if (!res || res.success === false) {
       throw new Error(res?.message || 'Không thể cập nhật lớp học');
     }
-    return res.data;
+    return (res.data as AdminClass) || ({} as AdminClass);
   },
 
-  // Toggles archived state for classroom
-  async toggleArchiveClass(id: string): Promise<AdminClass> {
-    const res = await clientApiClient<AdminClass>(`/admin/classes/${id}/archive`, {
+  // Toggles archived state for classroom with bidirectional support
+  async toggleArchiveClass(id: string, currentlyArchived: boolean): Promise<AdminClass> {
+    const endpoint = currentlyArchived
+      ? `/admin/classes/${id}/unarchive`
+      : `/admin/classes/${id}/archive`;
+    const res = await clientApiClient<AdminClass>(endpoint, {
       method: 'PATCH',
     });
-    if (!res || res.success === false || !res.data) {
+    if (!res || res.success === false) {
       throw new Error(res?.message || 'Không thể thay đổi trạng thái lưu trữ');
     }
-    return res.data;
+    return (res.data as AdminClass) || ({} as AdminClass);
   },
 
   // Force deletes class if eligible

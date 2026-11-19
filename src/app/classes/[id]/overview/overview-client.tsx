@@ -19,6 +19,7 @@ import { referencesService } from '@/features/references/services/references.ser
 import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
 import type { Material } from '@/types/material';
 import type { Reference } from '@/types/reference';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface OverviewClientProps {
   classId: string;
@@ -34,6 +35,9 @@ export function OverviewClient({
   isArchived = false,
 }: OverviewClientProps) {
   const router = useRouter();
+  const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const [searchQuery, setSearchQuery] = useState('');
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
 
@@ -216,7 +220,7 @@ export function OverviewClient({
         onToggleExpandAll={toggleExpandAll}
         showExpandAll={topics.length > 0}
         actions={
-          isTeacher &&
+          roleCanEdit &&
           !isArchived && <CreateTopicModal classId={classId} onSuccess={() => mutate()} />
         }
       />
@@ -233,7 +237,7 @@ export function OverviewClient({
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
             {searchQuery
               ? 'Vui lòng thử tìm kiếm với từ khóa khác.'
-              : isTeacher && !isArchived
+              : roleCanEdit && !isArchived
                 ? 'Hãy bấm nút "Thêm chủ đề" để thiết lập lộ trình học tập cho sinh viên.'
                 : 'Giảng viên chưa đăng tải nội dung bài giảng cho học phần này.'}
           </p>
@@ -246,7 +250,7 @@ export function OverviewClient({
               topic={topic}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
-              isTeacher={isTeacher && !isArchived}
+              isTeacher={roleCanEdit && !isArchived}
               mode="overview"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}

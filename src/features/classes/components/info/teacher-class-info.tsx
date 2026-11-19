@@ -153,7 +153,12 @@ export function TeacherClassInfo({ classData, userData, onClassUpdated }: Teache
           <h3 className="font-bold text-foreground">Bảng quản trị lớp học</h3>
           <p className="text-sm text-muted-foreground">
             Bạn đang quản lý lớp với vai trò{' '}
-            <strong className="text-foreground font-semibold">Giảng viên phụ trách</strong>.
+            {userData.role === 'admin' ? (
+              <span className="text-red-600 font-semibold">Quản trị viên</span>
+            ) : (
+              <span className="text-foreground font-semibold">Giảng viên phụ trách</span>
+            )}
+            .
           </p>
         </div>
 

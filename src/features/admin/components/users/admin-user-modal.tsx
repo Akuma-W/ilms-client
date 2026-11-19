@@ -12,27 +12,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { adminUsersService } from '@/features/admin/services/admin-users.service';
 import { useAdminSchools } from '@/features/admin/hooks/use-admin-schools';
 import { userFormSchema, type UserFormValues } from '@/features/admin/schemas/admin.schema';
 import { AdminUser } from '@/types/admin';
+import { AdminUserCreatedSuccess } from './admin-user-created-success';
+import { AdminUserFormFields } from './admin-user-form-fields';
 
 interface AdminUserModalProps {
   open: boolean;
@@ -43,7 +30,13 @@ interface AdminUserModalProps {
 
 export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUserModalProps) {
   const isEditing = Boolean(user);
+  const isEditingAdmin = isEditing && user?.role === 'admin';
   const [loading, setLoading] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    email: string;
+    fullName: string;
+    temporaryPassword: string;
+  } | null>(null);
 
   const { data: schoolsData } = useAdminSchools({ limit: 100 });
 
@@ -56,6 +49,7 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
       role: 'student',
       schoolId: '',
       status: 'active',
+      statusReason: '',
       password: '',
     },
   });
@@ -69,6 +63,7 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
         role: user.role,
         schoolId: user.schoolId || '',
         status: user.status,
+        statusReason: user.statusReason || '',
         password: '',
       });
     } else {
@@ -79,10 +74,22 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
         role: 'student',
         schoolId: '',
         status: 'active',
+        statusReason: '',
         password: '',
       });
     }
   }, [user, open, form]);
+
+  const handleFinishCreation = () => {
+    setCreatedCredentials(null);
+    onOpenChange(false);
+    onSuccess();
+  };
+
+  const handleClose = () => {
+    setCreatedCredentials(null);
+    onOpenChange(false);
+  };
 
   const onSubmit = async (values: UserFormValues) => {
     setLoading(true);
@@ -92,12 +99,15 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
           fullName: values.fullName,
           role: values.role,
           status: values.status,
+          statusReason: values.status === 'active' ? '' : values.statusReason?.trim() || undefined,
           schoolId: values.schoolId || undefined,
           identityCode: values.identityCode || undefined,
         });
         toast.success('Cập nhật tài khoản người dùng thành công');
+        onOpenChange(false);
+        onSuccess();
       } else {
-        await adminUsersService.createUser({
+        const res = await adminUsersService.createUser({
           email: values.email,
           fullName: values.fullName,
           role: values.role,
@@ -105,10 +115,20 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
           identityCode: values.identityCode || undefined,
           password: values.password || undefined,
         });
-        toast.success('Khởi tạo tài khoản người dùng thành công');
+
+        if (res?.temporaryPassword) {
+          setCreatedCredentials({
+            email: res.email,
+            fullName: res.fullName,
+            temporaryPassword: res.temporaryPassword,
+          });
+          toast.success('Khởi tạo tài khoản thành công!');
+        } else {
+          toast.success('Khởi tạo tài khoản người dùng thành công');
+          onOpenChange(false);
+          onSuccess();
+        }
       }
-      onOpenChange(false);
-      onSuccess();
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Thao tác thất bại';
       toast.error(errorMsg);
@@ -118,193 +138,60 @@ export function AdminUserModal({ open, onOpenChange, user, onSuccess }: AdminUse
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-            {isEditing ? 'Cập nhật tài khoản người dùng' : 'Thêm người dùng mới'}
+            {createdCredentials
+              ? 'Khởi tạo tài khoản thành công'
+              : isEditing
+                ? 'Cập nhật tài khoản người dùng'
+                : 'Thêm người dùng mới'}
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-500">
-            {isEditing
-              ? 'Chỉnh sửa thông tin hồ sơ và phân quyền người dùng'
-              : 'Cấp phát tài khoản mới tham gia nền tảng KEIVerse'}
+            {createdCredentials
+              ? 'Lưu lại thông tin tài khoản và mật khẩu khởi tạo cho người dùng'
+              : isEditing
+                ? 'Chỉnh sửa thông tin hồ sơ và phân quyền người dùng'
+                : 'Cấp phát tài khoản mới tham gia nền tảng KEIVerse'}
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3.5 py-2">
-            {!isEditing && (
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold">Địa chỉ Email *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        {...field}
-                        placeholder="VD: student@university.edu.vn"
-                        className="rounded-xl h-10 text-sm"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-[11px]" />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-semibold">Họ và tên *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="VD: Nguyễn Văn A"
-                      className="rounded-xl h-10 text-sm"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="identityCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold">Mã định danh</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="VD: 2011001"
-                        className="rounded-xl h-10 text-sm font-mono"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-[11px]" />
-                  </FormItem>
-                )}
+        {createdCredentials ? (
+          <AdminUserCreatedSuccess
+            credentials={createdCredentials}
+            onFinish={handleFinishCreation}
+          />
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3.5 py-2">
+              <AdminUserFormFields
+                form={form}
+                isEditing={isEditing}
+                isEditingAdmin={isEditingAdmin}
+                schools={schoolsData?.data || []}
               />
 
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold">Vai trò *</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-xl h-10 text-xs">
-                          <SelectValue placeholder="Chọn vai trò" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="student">Sinh viên</SelectItem>
-                        <SelectItem value="teacher">Giảng viên</SelectItem>
-                        <SelectItem value="admin">Quản trị viên</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-[11px]" />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="schoolId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-semibold">Trường trực thuộc *</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="rounded-xl h-10 text-xs">
-                        <SelectValue placeholder="Chọn trường học" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rounded-xl">
-                      {schoolsData?.data?.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.shortname} - {s.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-
-            {isEditing && (
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold">Trạng thái tài khoản</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-xl h-10 text-xs">
-                          <SelectValue placeholder="Trạng thái" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="active">Hoạt động (Active)</SelectItem>
-                        <SelectItem value="locked">Bị khóa (Locked)</SelectItem>
-                        <SelectItem value="banned">Cấm truy cập (Banned)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-[11px]" />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {!isEditing && (
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold">Mật khẩu khởi tạo</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        {...field}
-                        placeholder="Để trống để tự tạo mật khẩu mạnh ngẫu nhiên"
-                        className="rounded-xl h-10 text-sm"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-[11px]" />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <DialogFooter className="pt-3 gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="rounded-xl"
-              >
-                Hủy
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium"
-              >
-                {loading ? 'Đang lưu...' : isEditing ? 'Cập nhật' : 'Tạo mới'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              <DialogFooter className="pt-3 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="rounded-xl"
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium"
+                >
+                  {loading ? 'Đang lưu...' : isEditing ? 'Cập nhật' : 'Tạo mới'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

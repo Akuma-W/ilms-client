@@ -29,6 +29,8 @@ export function ForumsClient({
   isArchived = false,
 }: ForumsClientProps) {
   const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const [forums, setForums] = useState<Forum[]>(initialForums);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTab, setFilterTab] = useState<ForumFilterTab>('all');
@@ -182,7 +184,7 @@ export function ForumsClient({
       />
 
       {/* Teacher Alert for Unanswered Questions */}
-      {isTeacher && unansweredCount > 0 && (
+      {roleCanEdit && unansweredCount > 0 && (
         <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-foreground font-medium">
             <HelpCircle className="size-4 text-amber-500 shrink-0" />
@@ -216,7 +218,7 @@ export function ForumsClient({
             Tất cả ({forums.length})
           </Button>
 
-          {isTeacher && (
+          {roleCanEdit && (
             <Button
               type="button"
               variant={filterTab === 'unanswered' ? 'default' : 'outline'}
@@ -281,7 +283,7 @@ export function ForumsClient({
                 forum={forum}
                 classId={classId}
                 currentUser={currentUser}
-                isTeacher={isTeacher}
+                isTeacher={roleCanEdit}
                 onEdit={!isArchived ? handleOpenEditModal : undefined}
                 onDelete={!isArchived ? handleDeleteRequest : undefined}
               />

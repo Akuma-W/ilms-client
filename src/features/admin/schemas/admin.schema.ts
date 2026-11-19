@@ -10,14 +10,14 @@ export const schoolFormSchema = z.object({
     .trim(),
   address: z.string().optional(),
   city: z.string().optional(),
-  status: z.enum(['active', 'inactive']).optional(),
+  status: z.enum(['active', 'deactivated', 'archived']).optional(),
 });
 
 export type SchoolFormValues = z.infer<typeof schoolFormSchema>;
 
 export const classFormSchema = z.object({
-  name: z.string().min(3, 'Tên lớp học phải có ít nhất 3 ký tự').trim(),
-  code: z.string().optional(),
+  title: z.string().min(3, 'Tên lớp học phải có ít nhất 3 ký tự').trim(),
+  courseCode: z.string().optional(),
   schoolId: z.string().min(1, 'Vui lòng chọn trường học'),
   subjectId: z.string().min(1, 'Vui lòng chọn môn học'),
   teacherId: z.string().min(1, 'Vui lòng chọn giảng viên phụ trách'),
@@ -34,6 +34,7 @@ export const userFormSchema = z.object({
   role: z.enum(['admin', 'teacher', 'student']),
   schoolId: z.string().min(1, 'Vui lòng chọn trường học'),
   status: z.enum(['active', 'locked', 'banned']).optional(),
+  statusReason: z.string().optional(),
   password: z.string().optional(),
 });
 

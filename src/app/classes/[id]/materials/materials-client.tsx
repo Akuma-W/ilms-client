@@ -18,6 +18,7 @@ import { referencesService } from '@/features/references/services/references.ser
 import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
 import type { Material, MaterialWithTopic } from '@/types/material';
 import type { Reference } from '@/types/reference';
+import { useCurrentUser } from '@/features/user/hooks/use-current-user';
 
 interface MaterialsClientProps {
   classId: string;
@@ -33,6 +34,9 @@ export function MaterialsClient({
   isTeacher,
   isArchived = false,
 }: MaterialsClientProps) {
+  const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const [searchQuery, setSearchQuery] = useState('');
   const [previewResource, setPreviewResource] = useState<UnifiedResource | null>(null);
 
@@ -199,7 +203,7 @@ export function MaterialsClient({
         onToggleExpandAll={toggleExpandAll}
         showExpandAll={topics.length > 0}
         actions={
-          isTeacher &&
+          roleCanEdit &&
           !isArchived && (
             <ResourceAddDropdown
               mode="materials"
@@ -239,7 +243,7 @@ export function MaterialsClient({
           <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
             {searchQuery
               ? 'Vui lòng thử tìm kiếm với từ khóa khác.'
-              : isTeacher && !isArchived
+              : roleCanEdit && !isArchived
                 ? 'Hãy bấm nút "Thêm tài liệu" để tải lên bài giảng hoặc tài liệu tham khảo cho sinh viên.'
                 : 'Giảng viên chưa đăng tải học liệu cho lớp học này.'}
           </p>
@@ -252,7 +256,7 @@ export function MaterialsClient({
               topic={topic}
               classId={classId}
               isExpanded={!!expandedTopics[topic.id]}
-              isTeacher={isTeacher && !isArchived}
+              isTeacher={roleCanEdit && !isArchived}
               mode="materials"
               onToggleExpand={() => toggleExpand(topic.id)}
               onAddResource={handleAddResource}

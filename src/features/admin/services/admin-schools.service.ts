@@ -5,7 +5,9 @@ import type {
   AdminSchool,
   AdminSubject,
   CreateAdminSchoolInput,
+  CreateAdminSubjectInput,
   UpdateAdminSchoolInput,
+  UpdateAdminSubjectInput,
 } from '@/types/admin';
 
 export const adminSchoolService = {
@@ -14,12 +16,14 @@ export const adminSchoolService = {
     page?: number;
     limit?: number;
     search?: string;
-    status?: 'active' | 'inactive';
+    city?: string;
+    status?: 'active' | 'deactivated' | 'archived';
   }): Promise<PaginatedResult<AdminSchool>> {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.search) query.set('search', params.search);
+    if (params?.city) query.set('city', params.city);
     if (params?.status) query.set('status', params.status);
 
     const endpoint = `/admin/schools${query.toString() ? `?${query.toString()}` : ''}`;
@@ -79,5 +83,40 @@ export const adminSchoolService = {
       return (res.data as { data: AdminSubject[] }).data;
     }
     return [];
+  },
+
+  // Creates curriculum subject belonging to school
+  async createSubject(input: CreateAdminSubjectInput): Promise<AdminSubject> {
+    const res = await clientApiClient<AdminSubject>('/subjects', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+    if (!res || res.success === false || !res.data) {
+      throw new Error(res?.message || 'Không thể tạo môn học mới');
+    }
+    return res.data;
+  },
+
+  // Updates curriculum subject attributes
+  async updateSubject(id: string, input: UpdateAdminSubjectInput): Promise<AdminSubject> {
+    const res = await clientApiClient<AdminSubject>(`/subjects/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+    if (!res || res.success === false || !res.data) {
+      throw new Error(res?.message || 'Không thể cập nhật môn học');
+    }
+    return res.data;
+  },
+
+  // Deletes curriculum subject if not linked to any classes
+  async deleteSubject(id: string): Promise<AdminActionResult> {
+    const res = await clientApiClient<AdminActionResult>(`/subjects/${id}`, {
+      method: 'DELETE',
+    });
+    return {
+      success: res.success,
+      message: res.message || 'Xóa môn học thành công',
+    };
   },
 };

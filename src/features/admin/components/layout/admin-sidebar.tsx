@@ -25,30 +25,45 @@ const ADMIN_NAV_ITEMS = [
     href: '/admin',
     icon: LayoutDashboard,
     exact: true,
+    activeClasses: 'bg-blue-600/20 text-blue-400 border-blue-500',
+    iconColor: 'text-blue-400',
+    pulseColor: 'bg-blue-400',
   },
   {
     title: 'Trường học & Môn',
     href: '/admin/schools',
     icon: GraduationCap,
     exact: false,
+    activeClasses: 'bg-emerald-600/20 text-emerald-400 border-emerald-500',
+    iconColor: 'text-emerald-400',
+    pulseColor: 'bg-emerald-400',
   },
   {
     title: 'Lớp học hệ thống',
     href: '/admin/classes',
     icon: BookOpen,
     exact: false,
+    activeClasses: 'bg-violet-600/20 text-violet-400 border-violet-500',
+    iconColor: 'text-violet-400',
+    pulseColor: 'bg-violet-400',
   },
   {
     title: 'Đề thi & Bản quyền',
     href: '/admin/quizzes',
     icon: FileQuestion,
     exact: false,
+    activeClasses: 'bg-amber-600/20 text-amber-400 border-amber-500',
+    iconColor: 'text-amber-400',
+    pulseColor: 'bg-amber-400',
   },
   {
     title: 'Quản lý người dùng',
     href: '/admin/users',
     icon: Users,
     exact: false,
+    activeClasses: 'bg-rose-600/20 text-rose-400 border-rose-500',
+    iconColor: 'text-rose-400',
+    pulseColor: 'bg-rose-400',
   },
 ];
 
@@ -113,19 +128,19 @@ export function AdminSidebar() {
                 'flex items-center gap-3 rounded-xl text-sm font-medium transition-all group',
                 collapsed ? 'justify-center p-3' : 'px-3.5 py-2.5',
                 active
-                  ? 'bg-blue-600/20 text-blue-400 font-semibold border-l-3 border-blue-500 shadow-inner'
+                  ? cn(item.activeClasses, 'font-semibold border-l-3 shadow-inner')
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60',
               )}
             >
               <Icon
                 className={cn(
                   'size-4.5 transition-colors shrink-0',
-                  active ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200',
+                  active ? item.iconColor : 'text-slate-400 group-hover:text-slate-200',
                 )}
               />
               {!collapsed && <span className="flex-1 truncate">{item.title}</span>}
               {!collapsed && active && (
-                <div className="size-1.5 rounded-full bg-blue-400 animate-pulse" />
+                <div className={cn('size-1.5 rounded-full animate-pulse', item.pulseColor)} />
               )}
             </Link>
           );

@@ -35,6 +35,8 @@ export function AssignmentDetailClient({
   isArchived = false,
 }: AssignmentDetailClientProps) {
   const { user: currentUser } = useCurrentUser();
+  const roleCanEdit = isTeacher || currentUser?.role === 'admin';
+
   const router = useRouter();
   const [assignment, setAssignment] = useState<Assignment | null>(initialAssignment || null);
   const [isLoading, setIsLoading] = useState(!initialAssignment && !!assignmentId);
@@ -166,7 +168,7 @@ export function AssignmentDetailClient({
         </div>
 
         {/* Teacher Actions */}
-        {isTeacher && !isArchived && (
+        {roleCanEdit && !isArchived && (
           <div className="flex items-center gap-2 self-end md:self-auto">
             <Button
               type="button"
@@ -193,7 +195,7 @@ export function AssignmentDetailClient({
       </div>
 
       {/* 2. Teacher View: Description card + Submissions management table */}
-      {isTeacher ? (
+      {roleCanEdit ? (
         <div className="space-y-6">
           {/* Assignment Description Card */}
           <div className="bg-card rounded-2xl border border-border p-6 space-y-4 shadow-xs">

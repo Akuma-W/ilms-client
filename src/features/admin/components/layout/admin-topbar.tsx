@@ -95,13 +95,14 @@ export function AdminTopbar({ user }: AdminTopbarProps) {
             <TooltipTrigger asChild>
               <Link
                 href="/classes"
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-white transition-colors"
+                className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-colors"
               >
-                <LogOut className="size-4" />
+                <LogOut className="size-3.5" />
+                <span className="hidden sm:inline">Rời quản trị</span>
               </Link>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="text-xs">
-              Rời khu vực quản trị
+              Quay lại giao diện lớp học người dùng
             </TooltipContent>
           </Tooltip>
         </div>
