@@ -19,8 +19,6 @@ export interface Class {
   courseCode: string;
   semester: string | null;
   isPrivate: boolean;
-  meetingUri?: string | null;
-  meetingSpaceId?: string | null;
   isArchived?: boolean;
   schoolId: string;
   teacherId: string;

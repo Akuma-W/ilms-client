@@ -49,8 +49,6 @@ export const MOCK_CURRENT_CLASS: ClassClient = {
   courseCode: 'CS003A',
   semester: 'Học kỳ 1 - 2026-2027',
   isPrivate: false,
-  meetingUri: 'https://meet.google.com/xyz-qwert-abc',
-  meetingSpaceId: 'spaces/123456789',
   isArchived: false,
   schoolId: MOCK_SCHOOL.id,
   teacherId: MOCK_TEACHER.id,

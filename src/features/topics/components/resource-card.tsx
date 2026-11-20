@@ -15,6 +15,7 @@ import {
   Pencil,
   Trash2,
   Globe,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -64,11 +65,19 @@ function ResourceBadges({ item }: { item: UnifiedResource }) {
   if (item.kind === 'material') {
     const badge = getMaterialBadgeConfig(item.data.materialType);
     return (
-      <span
-        className={`px-2 py-0.5 text-xs font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
-      >
-        {badge.label}
-      </span>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span
+          className={`px-2 py-0.5 text-xs font-medium rounded border ${badge.bg} ${badge.text} ${badge.border}`}
+        >
+          {badge.label}
+        </span>
+        {item.data.isCompleted && (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold rounded border bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+            <CheckCircle2 className="size-3" />
+            Đã hoàn thành
+          </span>
+        )}
+      </div>
     );
   }
   if (item.kind === 'reference') {
@@ -176,7 +185,9 @@ export function ResourceCard({
     } else if (item.kind === 'assignment') {
       router.push(`/classes/${classId}/assignments/${item.data.id}`);
     } else if (item.kind === 'quiz') {
-      router.push(`/classes/${classId}/quizzes/${item.data.id}`);
+      const pubId =
+        (item.data as { publicationId?: string; id: string }).publicationId || item.data.id;
+      router.push(`/classes/${classId}/quizzes/${pubId}`);
     }
   };
 

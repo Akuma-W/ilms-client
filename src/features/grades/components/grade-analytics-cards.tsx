@@ -10,10 +10,6 @@ interface GradeAnalyticsCardsProps {
   passingRate: number;
 }
 
-/**
- * Compact, low-profile analytics tiles displaying student count, class average, and pass rate.
- * Uses emerald, indigo, and galaxy primary palette accents.
- */
 export function GradeAnalyticsCards({
   totalStudents,
   averageScore,

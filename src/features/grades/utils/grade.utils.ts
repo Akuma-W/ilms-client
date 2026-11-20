@@ -99,5 +99,6 @@ export function getLetterGradeStyle(score: number | null | undefined): {
 // Formats score with 1-2 decimal places, or '—' if empty
 export function formatScore(score: number | null | undefined): string {
   if (score === null || score === undefined || isNaN(score)) return '—';
-  return Number.isInteger(score) ? score.toFixed(1) : score.toFixed(1);
+  const rounded = Math.round(score * 100) / 100;
+  return Number.isInteger(rounded) ? rounded.toFixed(1) : rounded.toString();
 }

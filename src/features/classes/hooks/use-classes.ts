@@ -26,20 +26,19 @@ export function useClasses({
 
   const { data, isLoading, error, mutate } = useSWR(
     key,
-    ([tab, search, page, limit, subjectId, role]) => {
-      return fetchClasses(
+    () =>
+      fetchClasses(
         tab as ClassTabs,
         {
-          search,
-          page: Number(page),
-          limit: Number(limit),
+          search: search || undefined,
+          page: Number(page) || 1,
+          limit: Number(limit) || 10,
           subjectId: subjectId || undefined,
         },
         role,
-      );
-    },
+      ),
     {
-      fallbackData: initialData,
+      fallbackData: initialData ?? undefined,
       revalidateOnMount: true,
       revalidateOnFocus: true,
     },

@@ -24,9 +24,11 @@ export default async function ClassDetailLayout({
     notFound();
   }
 
-  const isJoined = Boolean(
-    relation && (relation.status === 'approved' || relation.roleIn === 'teacher'),
+  const isTeacher = Boolean(
+    relation?.roleIn === 'teacher' ||
+    (classData && currentUser && classData.teacherId === currentUser.id),
   );
+  const isJoined = Boolean((relation && relation.status === 'approved') || isTeacher);
   const isAdmin = currentUser?.role === 'admin';
 
   return (

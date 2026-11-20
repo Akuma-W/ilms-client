@@ -74,26 +74,32 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
       weightPercent: number;
       orderIndex?: number;
       isDeleted?: boolean;
+      sourceType?: GradeCategory['sourceType'];
+      sourceId?: string | null;
+      config?: GradeCategory['config'];
     }[],
   ) => {
     for (const item of updated) {
       if (item.isDeleted && item.id) {
         await gradeCategoriesService.deleteCategory(classId, item.id);
       } else if (!item.id && !item.isDeleted) {
-        await gradeCategoriesService.createCategory(
-          classId,
-          item.name,
-          item.weightPercent,
-          item.orderIndex,
-        );
+        await gradeCategoriesService.createCategory(classId, {
+          name: item.name,
+          weight: item.weightPercent / 100,
+          orderIndex: item.orderIndex,
+          sourceType: item.sourceType,
+          sourceId: item.sourceId || undefined,
+          config: item.config || undefined,
+        });
       } else if (item.id && !item.isDeleted) {
-        await gradeCategoriesService.updateCategory(
-          classId,
-          item.id,
-          item.name,
-          item.weightPercent,
-          item.orderIndex,
-        );
+        await gradeCategoriesService.updateCategory(classId, item.id, {
+          name: item.name,
+          weight: item.weightPercent / 100,
+          orderIndex: item.orderIndex,
+          sourceType: item.sourceType,
+          sourceId: item.sourceId || undefined,
+          config: item.config || undefined,
+        });
       }
     }
     const res = await gradesService.getClassGradeMatrix(classId);
@@ -136,14 +142,20 @@ export function GradesClient({ classId, isTeacher, isArchived = false }: GradesC
       {/* Main View Presentation */}
       {roleCanEdit ? (
         <TeacherGradesView
+          classId={classId}
           categories={categories}
           rows={matrixRows}
           onSaveBatch={handleSaveBatch}
           onSaveCategories={handleSaveCategories}
+          onRefresh={async () => {
+            const res = await gradesService.getClassGradeMatrix(classId);
+            setCategories(res.categories);
+            setMatrixRows(res.rows);
+          }}
           isArchived={isArchived}
         />
       ) : studentRecord ? (
-        <StudentGradesView record={studentRecord} />
+        <StudentGradesView record={studentRecord} classId={classId} />
       ) : (
         <div className="py-12 text-center text-sm text-muted-foreground">
           Chưa có dữ liệu bảng điểm cho tài khoản này.

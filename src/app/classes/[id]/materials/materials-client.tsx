@@ -270,7 +270,12 @@ export function MaterialsClient({
               onEditResource={handleEditResource}
               onDeleteResource={handleDeleteResource}
               onDeleteTopic={handleDeleteTopic}
-              onPreviewResource={(item) => setPreviewResource(item)}
+              onPreviewResource={(item) => {
+                setPreviewResource(item);
+                if (item.kind === 'material' && currentUser?.role === 'student') {
+                  materialsService.trackMaterialProgress(item.data.id, true).catch(() => {});
+                }
+              }}
             />
           ))}
         </div>

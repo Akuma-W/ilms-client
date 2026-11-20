@@ -1,8 +1,10 @@
 'use client';
 
-import { Award, BookOpen, CheckCircle2, Clock, FileText, HelpCircle, XCircle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { Award, BookOpen, Clock, FileText, HelpCircle, Info } from 'lucide-react';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -12,157 +14,36 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatScore, getGpa4 } from '../utils/grade.utils';
+import { StudentGradeStats } from './student-grade-stats';
+import { StudentAttendanceCard } from './student-attendance-card';
+import { GradeBreakdownModal } from './grade-breakdown-modal';
 import type { StudentGradeRecord } from '@/types/grade';
 
 interface StudentGradesViewProps {
   record: StudentGradeRecord;
+  classId?: string;
 }
 
-/**
- * Personal gradebook for an enrolled student using compact, low-profile stat tiles,
- * Vietnamese MOET 4.0 GPA scale conversion, and index numbered shadcn tables.
- */
-export function StudentGradesView({ record }: StudentGradesViewProps) {
-  const gradedItemsCount = record.detailedItems.filter((i) => i.status === 'graded').length;
-  const hasScore = record.finalScore !== null && record.finalScore !== undefined;
+export function StudentGradesView({ record, classId }: StudentGradesViewProps) {
+  const [breakdownModal, setBreakdownModal] = useState<{
+    isOpen: boolean;
+    categoryId: string;
+    categoryName: string;
+  }>({
+    isOpen: false,
+    categoryId: '',
+    categoryName: '',
+  });
 
   return (
     <div className="space-y-6">
-      {/* 4 Compact, Low-Profile Analytics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Card 1: Final Score */}
-        <Card
-          className={`shadow-2xs transition-all p-0 gap-3 ${
-            !hasScore
-              ? 'border border-border/80 bg-card/60'
-              : record.isPassed
-                ? 'border border-emerald-500/30 bg-emerald-500/5'
-                : 'border border-rose-500/30 bg-rose-500/5'
-          }`}
-        >
-          <CardHeader className="p-3 pb-1 sm:p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Điểm tổng kết
-              </span>
-              <Award
-                className={`size-4 ${
-                  !hasScore
-                    ? 'text-muted-foreground'
-                    : record.isPassed
-                      ? 'text-emerald-500'
-                      : 'text-rose-500'
-                }`}
-              />
-            </div>
-            <div className="pt-0 flex items-baseline gap-2">
-              <span
-                className={`text-xl sm:text-2xl font-bold ${
-                  !hasScore
-                    ? 'text-muted-foreground'
-                    : record.isPassed
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-rose-600 dark:text-rose-400'
-                }`}
-              >
-                {formatScore(record.finalScore)}
-              </span>
-              <span className="text-xs text-muted-foreground">/ 10</span>
-              {hasScore && record.gpa4 !== null && (
-                <span className="text-xs font-mono font-medium text-primary ml-auto">
-                  GPA: {record.gpa4.toFixed(1)} / 4.0
-                </span>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-3.5 pt-0">
-            <span className="text-xs font-medium text-foreground/80">
-              Xếp loại: {record.letterGrade || '—'}
-            </span>
-          </CardContent>
-        </Card>
+      {/* 4 Compact Analytics Cards */}
+      <StudentGradeStats record={record} />
 
-        {/* Card 2: Completion Rate */}
-        <Card className="p-0 gap-3 border border-blue-500/30 bg-blue-500/5 shadow-2xs transition-all">
-          <CardHeader className="p-3 sm:p-3.5 pb-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Tiến độ học tập
-              </span>
-              <BookOpen className="size-4 text-blue-500" />
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 pt-0.5">
-              {record.completionRate}%
-            </p>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-3.5 pt-0">
-            <span className="text-xs text-muted-foreground">Đã nộp bài tập & tham gia quiz</span>
-          </CardContent>
-        </Card>
+      {/* Attendance Summary Card (4 Pillars) */}
+      {record.attendanceSummary && <StudentAttendanceCard summary={record.attendanceSummary} />}
 
-        {/* Card 3: Course Status */}
-        <Card
-          className={`shadow-2xs transition-all p-0 gap-3 ${
-            !hasScore
-              ? 'border border-border/80 bg-card/60'
-              : record.isPassed
-                ? 'border border-emerald-500/30 bg-emerald-500/5'
-                : 'border border-rose-500/30 bg-rose-500/5'
-          }`}
-        >
-          <CardHeader className="p-3 sm:p-3.5 pb-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Kết quả học phần
-              </span>
-              {!hasScore ? (
-                <Clock className="size-4 text-muted-foreground" />
-              ) : record.isPassed ? (
-                <CheckCircle2 className="size-4 text-emerald-500" />
-              ) : (
-                <XCircle className="size-4 text-rose-500" />
-              )}
-            </div>
-            <p className="text-xl sm:text-2xl font-bold pt-0.5">
-              {!hasScore ? (
-                <span className="text-muted-foreground font-normal text-lg">Đang cập nhật</span>
-              ) : record.isPassed ? (
-                <span className="text-emerald-600 dark:text-emerald-400">Đạt yêu cầu</span>
-              ) : (
-                <span className="text-rose-600 dark:text-rose-400">Chưa đạt</span>
-              )}
-            </p>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-3.5 pt-0">
-            <span className="text-xs text-muted-foreground">
-              {hasScore ? 'Chuẩn đầu ra: ≥ 5.0' : 'Chưa có điểm tổng kết'}
-            </span>
-          </CardContent>
-        </Card>
-
-        {/* Card 4: Graded Items */}
-        <Card className="p-0 gap-3 border border-amber-500/30 bg-amber-500/5 shadow-2xs transition-all">
-          <CardHeader className="p-3 sm:p-3.5 pb-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Đầu điểm đã có
-              </span>
-              <Clock className="size-4 text-amber-500" />
-            </div>
-            <p className="text-xl sm:text-2xl font-bold text-foreground pt-0.5">
-              {gradedItemsCount}{' '}
-              <span className="text-xs font-normal text-muted-foreground">
-                / {record.detailedItems.length} hoạt động
-              </span>
-            </p>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-3.5 pt-0">
-            <span className="text-xs text-muted-foreground">Bài tập và kiểm tra định kỳ</span>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Table 1: Category Breakdown with STT and GPA 4.0 Scale */}
+      {/* Table 1: Category Breakdown */}
       <Card className="border border-border/80 bg-card/90 shadow-xs overflow-hidden">
         <CardHeader className="p-4 sm:p-5 border-b border-border/50">
           <div className="flex items-center gap-2">
@@ -172,7 +53,8 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
             </CardTitle>
           </div>
           <CardDescription className="text-xs">
-            Bảng điểm phân bổ theo quy định môn học (tổng trọng số 100%)
+            Bảng điểm phân bổ theo quy định môn học (tổng trọng số 100%). Nhấn vào từng mục để xem
+            chi tiết bài thành phần.
           </CardDescription>
         </CardHeader>
         <Table>
@@ -193,6 +75,9 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
               <TableHead className="py-3 px-4 text-center font-bold text-foreground">
                 Điểm hệ 4 (GPA)
               </TableHead>
+              <TableHead className="py-3 px-4 text-center font-bold text-foreground w-24">
+                Chi tiết
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -201,7 +86,7 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
               return (
                 <TableRow
                   key={cat.categoryId}
-                  className="border-b border-border/50 hover:bg-muted/30"
+                  className="border-b border-border/50 hover:bg-muted/30 transition-colors"
                 >
                   <TableCell className="py-3 px-3 text-center text-xs sm:text-sm text-muted-foreground font-mono">
                     {idx + 1}
@@ -217,6 +102,27 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
                   </TableCell>
                   <TableCell className="py-3 px-4 text-center font-mono font-medium text-sm sm:text-base text-primary">
                     {gpaScore !== null ? gpaScore.toFixed(1) : '—'}
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-center">
+                    {classId && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setBreakdownModal({
+                            isOpen: true,
+                            categoryId: cat.categoryId,
+                            categoryName: cat.categoryName,
+                          })
+                        }
+                        className="h-7 px-2 text-xs text-muted-foreground hover:text-primary gap-1"
+                        title="Xem chi tiết các bài thành phần"
+                      >
+                        <Info className="size-3.5" />
+                        <span className="hidden sm:inline">Xem</span>
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               );
@@ -237,12 +143,15 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
               <TableCell className="py-3.5 px-4 text-center font-mono font-semibold text-base sm:text-lg text-primary">
                 {record.gpa4 !== null && record.gpa4 !== undefined ? record.gpa4.toFixed(1) : '—'}
               </TableCell>
+              <TableCell className="py-3.5 px-4 text-center font-mono text-xs text-muted-foreground">
+                —
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Card>
 
-      {/* Table 2: Detailed Assessment Items with STT */}
+      {/* Table 2: Detailed Assessment Items */}
       <Card className="border border-border/80 bg-card/90 shadow-xs overflow-hidden">
         <CardHeader className="p-4 sm:p-5 border-b border-border/50">
           <div className="flex items-center gap-2">
@@ -252,7 +161,7 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
             </CardTitle>
           </div>
           <CardDescription className="text-xs">
-            Danh sách điểm số từng bài tập, quiz và nhận xét chi tiết từ giảng viên
+            Danh sách điểm số từng bài tập, quiz đã được quy đổi chuẩn thang điểm 10
           </CardDescription>
         </CardHeader>
         <Table>
@@ -266,7 +175,7 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
                 Phân loại
               </TableHead>
               <TableHead className="py-3 px-4 text-center font-bold text-foreground">
-                Điểm tối đa
+                Thang điểm
               </TableHead>
               <TableHead className="py-3 px-4 text-center font-bold text-foreground">
                 Điểm đạt được
@@ -311,10 +220,23 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
                   </Badge>
                 </TableCell>
                 <TableCell className="py-3 px-4 text-center font-mono text-xs sm:text-sm font-normal text-muted-foreground">
-                  {item.maxScore}
+                  <span>{item.maxScore}</span>
+                  {item.originalMaxScore && item.originalMaxScore !== item.maxScore && (
+                    <span className="block text-[10px] text-muted-foreground/75">
+                      (Thang gốc: {item.originalMaxScore})
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="py-3 px-4 text-center font-medium text-sm sm:text-base text-foreground">
-                  {formatScore(item.earnedScore)}
+                  <div>{formatScore(item.earnedScore)}</div>
+                  {item.rawScore !== null &&
+                    item.rawScore !== undefined &&
+                    item.originalMaxScore &&
+                    item.originalMaxScore !== item.maxScore && (
+                      <span className="block text-[10px] font-mono font-normal text-muted-foreground">
+                        ({item.rawScore}/{item.originalMaxScore})
+                      </span>
+                    )}
                 </TableCell>
                 <TableCell className="py-3 px-4 text-center">
                   {item.status === 'graded' && (
@@ -341,6 +263,17 @@ export function StudentGradesView({ record }: StudentGradesViewProps) {
           </TableBody>
         </Table>
       </Card>
+
+      {/* Breakdown Modal */}
+      {classId && (
+        <GradeBreakdownModal
+          classId={classId}
+          categoryId={breakdownModal.categoryId}
+          categoryName={breakdownModal.categoryName}
+          isOpen={breakdownModal.isOpen}
+          onOpenChange={(open) => setBreakdownModal((prev) => ({ ...prev, isOpen: open }))}
+        />
+      )}
     </div>
   );
 }

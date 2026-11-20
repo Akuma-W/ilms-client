@@ -8,6 +8,7 @@ export interface Material {
   externalUrl: string | null;
   topicId: string;
   createdAt: string;
+  isCompleted?: boolean;
 }
 
 export interface CreateMaterialPayload {

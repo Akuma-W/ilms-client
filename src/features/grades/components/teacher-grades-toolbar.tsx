@@ -1,6 +1,16 @@
 'use client';
 
-import { AlertTriangle, Check, Download, Edit3, RotateCcw, Search, Sliders } from 'lucide-react';
+import {
+  AlertTriangle,
+  Award,
+  Check,
+  Download,
+  Edit3,
+  Loader2,
+  RotateCcw,
+  Search,
+  Sparkles,
+} from 'lucide-react';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,33 +18,29 @@ import { Input } from '@/components/ui/input';
 interface TeacherGradesToolbarProps {
   isEditing: boolean;
   searchTerm: string;
-  categoryCount: number;
   isSaving: boolean;
-  hasCategoriesHandler: boolean;
+  isAutoCalculating?: boolean;
   hasInvalidScore?: boolean;
   isArchived?: boolean;
   onSearchChange: (term: string) => void;
-  onOpenCategories: () => void;
+  onOpenAttendanceSummary?: () => void;
+  onAutoCalculateAll?: () => void;
   onExportCsv: () => void;
   onStartEdit: () => void;
   onCancelEdit: () => void;
   onSaveGrades: () => void;
 }
 
-/**
- * Top control toolbar for teacher grade matrix with search, category modal trigger,
- * CSV export, invalid score guard, and stabilized edit/save button group.
- */
 export function TeacherGradesToolbar({
   isEditing,
   searchTerm,
-  categoryCount,
   isSaving,
-  hasCategoriesHandler,
+  isAutoCalculating = false,
   hasInvalidScore = false,
   isArchived = false,
   onSearchChange,
-  onOpenCategories,
+  onOpenAttendanceSummary,
+  onAutoCalculateAll,
   onExportCsv,
   onStartEdit,
   onCancelEdit,
@@ -58,13 +64,13 @@ export function TeacherGradesToolbar({
             ? 'Lớp học đã được lưu trữ. Bảng điểm ở chế độ chỉ đọc.'
             : isEditing
               ? 'Đang ở chế độ chỉnh sửa điểm trực tiếp. Cột Tổng kết tự động tính toán lại theo thời gian thực.'
-              : 'Bảng điểm ở chế độ chỉ đọc. Nhấn "Sửa điểm" để bắt đầu cập nhật.'}
+              : 'Bảng điểm ở chế độ xem. Bấm vào tiêu đề cột để xem cấu hình hoặc dùng các nút chức năng bên phải.'}
         </CardDescription>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Search Input */}
-        <div className="relative w-full sm:w-56 shrink-0">
+        <div className="relative w-full sm:w-48 shrink-0">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Tìm họ tên, MSSV..."
@@ -74,31 +80,54 @@ export function TeacherGradesToolbar({
           />
         </div>
 
-        {/* Manage Categories Button */}
-        {!isArchived && hasCategoriesHandler && (
+        {/* 1. Nút Thống kê Chuyên cần */}
+        {onOpenAttendanceSummary && (
           <Button
+            type="button"
             variant="outline"
             size="sm"
-            onClick={onOpenCategories}
-            className="h-9 text-xs rounded-xl gap-1.5 font-medium border-primary/30 text-primary hover:bg-primary/5"
+            onClick={onOpenAttendanceSummary}
+            className="h-9 text-xs rounded-xl gap-1.5 font-medium border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+            title="Xem báo cáo thống kê chuyên cần và tiến độ 4 thành phần"
           >
-            <Sliders className="size-3.5" />
-            <span>Loại điểm ({categoryCount})</span>
+            <Award className="size-3.5" />
+            <span className="hidden sm:inline">Thống kê Chuyên cần</span>
           </Button>
         )}
 
-        {/* Export CSV Button */}
+        {/* 2. Nút Tính điểm Tự động */}
+        {!isArchived && onAutoCalculateAll && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isEditing || isAutoCalculating}
+            onClick={onAutoCalculateAll}
+            className="h-9 text-xs rounded-xl gap-1.5 font-medium border-purple-500/30 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10"
+            title="Tự động tính toán và cập nhật toàn bộ các cột điểm tự động (chuyên cần, bài tập, quiz)"
+          >
+            {isAutoCalculating ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="size-3.5" />
+            )}
+            <span>{isAutoCalculating ? 'Đang tính...' : 'Tính điểm Tự động'}</span>
+          </Button>
+        )}
+
+        {/* 3. Nút Xuất CSV */}
         <Button
           variant="outline"
           size="sm"
           onClick={onExportCsv}
-          className="h-9 text-xs rounded-xl gap-1.5 font-medium"
+          className="h-9 text-xs rounded-xl gap-1.5 font-medium border-border"
+          title="Xuất bảng điểm ra file CSV"
         >
           <Download className="size-3.5" />
-          <span>Xuất CSV</span>
+          <span className="hidden sm:inline">Xuất CSV</span>
         </Button>
 
-        {/* Action Buttons: Stabilized group */}
+        {/* 4. Nút Sửa điểm / Lưu / Hủy */}
         <div className="flex items-center gap-1.5">
           {isArchived ? (
             <span className="text-xs text-muted-foreground italic px-2 py-1">Lớp đã lưu trữ</span>
@@ -108,6 +137,7 @@ export function TeacherGradesToolbar({
               size="sm"
               onClick={onStartEdit}
               className="h-9 text-xs rounded-xl gap-1.5 font-medium shadow-xs"
+              title="Chỉnh sửa điểm trực tiếp trên bảng"
             >
               <Edit3 className="size-3.5" />
               <span>Sửa điểm</span>
@@ -120,6 +150,7 @@ export function TeacherGradesToolbar({
                 onClick={onCancelEdit}
                 disabled={isSaving}
                 className="h-9 text-xs rounded-xl gap-1.5 font-medium"
+                title="Hủy bỏ các thay đổi chưa lưu"
               >
                 <RotateCcw className="size-3.5" />
                 <span>Hủy</span>
@@ -130,6 +161,7 @@ export function TeacherGradesToolbar({
                 onClick={onSaveGrades}
                 disabled={isSaving || hasInvalidScore}
                 className="h-9 text-xs rounded-xl gap-1.5 font-medium shadow-xs bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white"
+                title="Lưu lại bảng điểm"
               >
                 <Check className="size-3.5" />
                 <span>{isSaving ? 'Đang lưu...' : 'Lưu bảng điểm'}</span>

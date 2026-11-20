@@ -148,29 +148,29 @@ export default function ClassesClient({ initialData, initialParams }: ClassesCli
       >
         <div className="overflow-x-auto no-scrollbar">
           <TabsList className="bg-transparent h-auto">
-            {CLASSES_FILTER_TABS.map((tab) => {
-              if (user?.role !== 'teacher' && tab.value === 'created') return;
-              return (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className={cn(
-                    'p-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
-                    'text-gray-400 hover:text-gray-600 active:text-primary',
-                    'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary',
-                  )}
-                >
-                  {tab.label}
-                </TabsTrigger>
-              );
-            })}
+            {CLASSES_FILTER_TABS.filter(
+              (tabItem) => !(user?.role !== 'teacher' && tabItem.value === 'created'),
+            ).map((tabItem) => (
+              <TabsTrigger
+                key={tabItem.value}
+                value={tabItem.value}
+                className={cn(
+                  'p-4 bg-transparent rounded-none font-bold text-base transition-all duration-200 cursor-pointer',
+                  'text-gray-400 hover:text-gray-600 active:text-primary',
+                  'data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary',
+                )}
+              >
+                {tabItem.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </div>
 
         {/* Class List */}
         <TabsContent value={tab} className="mt-0">
           <ClassList
-            initialData={initialData}
+            key={tab}
+            initialData={tab === (initialParams.tab || ClassTabs.DISCOVERY) ? initialData : null}
             params={listParams}
             onPageChange={handlePageChange}
           />

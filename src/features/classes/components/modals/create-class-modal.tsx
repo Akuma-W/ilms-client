@@ -84,7 +84,7 @@ export function CreateClassModal() {
       });
 
       if (data?.id) {
-        router.push(`/classes/${data.id}/info`);
+        router.push(`/classes/${data.id}/overview`);
       }
       handleOpenChange(false);
     } catch (error) {

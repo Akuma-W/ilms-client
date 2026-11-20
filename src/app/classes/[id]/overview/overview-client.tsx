@@ -16,6 +16,7 @@ import { ClassTabToolbar } from '@/features/classes/components/layout/class-tab-
 import { topicsService } from '@/features/topics/services/topics.service';
 import { materialsService } from '@/features/materials/services/materials.service';
 import { referencesService } from '@/features/references/services/references.service';
+import { OverviewMeetingBanner } from '@/features/meetings/components/overview-meeting-banner';
 import type { ResourceCreationType, Topic, UnifiedResource } from '@/types/topic';
 import type { Material } from '@/types/material';
 import type { Reference } from '@/types/reference';
@@ -208,6 +209,9 @@ export function OverviewClient({
 
   return (
     <div className="w-full space-y-6">
+      {/* 0. Live or Upcoming Virtual Meeting Session Banner */}
+      <OverviewMeetingBanner classId={classId} isTeacher={roleCanEdit} isArchived={isArchived} />
+
       {/* 1. Topic Header Toolbar (Unified ClassTabToolbar) */}
       <ClassTabToolbar
         title="Tổng quan Chủ đề bài giảng"
@@ -264,7 +268,12 @@ export function OverviewClient({
               onEditResource={handleEditResource}
               onDeleteResource={handleDeleteResource}
               onDeleteTopic={handleDeleteTopic}
-              onPreviewResource={(item) => setPreviewResource(item)}
+              onPreviewResource={(item) => {
+                setPreviewResource(item);
+                if (item.kind === 'material' && currentUser?.role === 'student') {
+                  materialsService.trackMaterialProgress(item.data.id, true).catch(() => {});
+                }
+              }}
             />
           ))}
         </div>

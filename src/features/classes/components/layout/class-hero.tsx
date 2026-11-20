@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, ArrowLeft, Video, ExternalLink, Copy, Check, Star } from 'lucide-react';
+import useSWR from 'swr';
+import { Calendar, ArrowLeft, Copy, Check, Star, Video } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Class } from '@/types/class';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { enrollmentService } from '@/features/classes/services/enrollment.service';
+import { meetingsService } from '@/features/meetings/services/meetings.service';
 import { getClassTheme, getSubjectTheme } from '@/lib/ui/utils';
 import { cn } from '@/lib/utils';
 
@@ -16,14 +18,17 @@ interface ClassHeroProps {
   classData: Class;
 }
 
-/**
- * Seamless Classroom Hero banner without rounded corners,
- * integrating Google Meet direct connection, Star/Favorite toggle, and course code copy.
- */
 export function ClassHero({ classData }: ClassHeroProps) {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [isStarred, setIsStarred] = useState(classData.enrollment?.isStarred ?? false);
+
+  const { data: meetings = [] } = useSWR(
+    classData.id ? `classes/${classData.id}/live-status` : null,
+    () => meetingsService.getClassMeetings(classData.id),
+    { refreshInterval: 15000, revalidateOnFocus: true },
+  );
+  const liveMeeting = meetings.find((m) => m.isLive && !m.endTime);
 
   const classTheme = getClassTheme(classData);
   const subjectTheme = getSubjectTheme(classData.subject);
@@ -76,7 +81,7 @@ export function ClassHero({ classData }: ClassHeroProps) {
       </div>
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-7 relative z-10 space-y-4">
-        {/* Top bar: Back Navigation & Actions (Star + Google Meet) */}
+        {/* Top bar: Back Navigation & Actions (Live Meeting + Star) */}
         <div className="flex items-center justify-between gap-4">
           <Button
             variant="ghost"
@@ -89,6 +94,18 @@ export function ClassHero({ classData }: ClassHeroProps) {
           </Button>
 
           <div className="flex items-center gap-2 shrink-0">
+            {liveMeeting && (
+              <Button
+                size="sm"
+                onClick={() => router.push(`/meetings/${liveMeeting.id}`)}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs h-9 px-3 gap-1.5 shadow-xs animate-pulse rounded-lg"
+              >
+                <span className="size-2 rounded-full bg-white animate-ping" />
+                <Video className="size-3.5" />
+                <span>Phòng học [LIVE]</span>
+              </Button>
+            )}
+
             {/* Star / Favorite Class Action Button */}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -118,44 +135,6 @@ export function ClassHero({ classData }: ClassHeroProps) {
                 {isStarred ? 'Đã lưu vào danh sách yêu thích' : 'Lưu lớp vào mục yêu thích'}
               </TooltipContent>
             </Tooltip>
-
-            {/* Google Meet Connection */}
-            {classData.meetingUri && (
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className={cn(
-                  'group rounded-lg text-sm h-9 px-3.5 font-medium shadow-xs shrink-0 transition-all border',
-                  'bg-background/60 dark:bg-card/90 hover:bg-background/90 dark:hover:bg-card',
-                  'border-border/80',
-                  classTheme.border,
-                )}
-              >
-                <a href={classData.meetingUri} target="_blank" rel="noopener noreferrer">
-                  <Video
-                    className={cn(
-                      'size-4 mr-2 transition-transform group-hover:scale-110',
-                      classTheme.icon,
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      'text-foreground transition-colors font-medium',
-                      classTheme.hoverText,
-                    )}
-                  >
-                    Phòng học Google Meet
-                  </span>
-                  <ExternalLink
-                    className={cn(
-                      'size-3.5 ml-1.5 opacity-60 group-hover:opacity-100 transition-all',
-                      classTheme.hoverText,
-                    )}
-                  />
-                </a>
-              </Button>
-            )}
           </div>
         </div>
 

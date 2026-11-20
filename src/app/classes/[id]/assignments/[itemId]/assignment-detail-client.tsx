@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Clock, Edit3, FileText, Loader2, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Edit3,
+  FileText,
+  Loader2,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ConfirmDeleteModal } from '@/components/common/confirm-delete-modal';
@@ -11,6 +20,7 @@ import { StudentSubmissionStatusCard } from '@/features/assignments/components/s
 import { StudentSubmissionWorkCard } from '@/features/assignments/components/student-submission/student-submission-work-card';
 import { TeacherSubmissionsTable } from '@/features/assignments/components/teacher-submissions-table';
 import { assignmentsService } from '@/features/assignments/services/assignments.service';
+import { gradeCalculationsService } from '@/features/grades/services/grade-calculations.service';
 import {
   formatAssignmentDate,
   getDeadlineInfo,
@@ -42,6 +52,7 @@ export function AssignmentDetailClient({
   const [isLoading, setIsLoading] = useState(!initialAssignment && !!assignmentId);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -70,6 +81,20 @@ export function AssignmentDetailClient({
         description: error instanceof Error ? error.message : 'Vui lòng thử lại sau',
       });
       setIsDeleting(false);
+    }
+  };
+
+  const handleQuickSync = async () => {
+    try {
+      setIsSyncing(true);
+      const res = await gradeCalculationsService.syncGrades(classId);
+      toast.success('Đã đồng bộ điểm bài tập vào sổ điểm thành công!', {
+        description: res.message,
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Lỗi khi đồng bộ điểm');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -170,6 +195,18 @@ export function AssignmentDetailClient({
         {/* Teacher Actions */}
         {roleCanEdit && !isArchived && (
           <div className="flex items-center gap-2 self-end md:self-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleQuickSync}
+              disabled={isSyncing}
+              className="gap-1.5 text-sm h-9 rounded-xl font-medium border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10"
+              title="Đồng bộ điểm bài tập này vào sổ điểm lớp học"
+            >
+              <RefreshCw className={`size-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>Đồng bộ sổ điểm</span>
+            </Button>
             <Button
               type="button"
               variant="outline"

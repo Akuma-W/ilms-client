@@ -1,3 +1,4 @@
+import { Layers } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -13,13 +14,15 @@ interface GradeMatrixRowProps {
   isEditing: boolean;
   draftScores?: Record<string, number | null>;
   onScoreChange?: (studentId: string, categoryId: string, val: number | null) => void;
+  onOpenBreakdown?: (
+    categoryId: string,
+    categoryName: string,
+    studentId: string,
+    studentName: string,
+  ) => void;
   computedFinalScore?: number | null;
 }
 
-/**
- * Single table row rendering in the teacher grade matrix using shadcn TableCell.
- * Supports read-only presentation, visual validation on bounds [0, 10], and real-time recalculation.
- */
 export function GradeMatrixRow({
   row,
   categories,
@@ -27,6 +30,7 @@ export function GradeMatrixRow({
   isEditing,
   draftScores,
   onScoreChange,
+  onOpenBreakdown,
   computedFinalScore,
 }: GradeMatrixRowProps) {
   const finalScore =
@@ -73,33 +77,76 @@ export function GradeMatrixRow({
 
         if (isEditing) {
           return (
-            <TableCell key={cat.id} className="py-2 px-2 text-center w-28">
-              <Input
-                type="number"
-                min={0}
-                max={10}
-                step={0.1}
-                value={currentScore ?? ''}
-                onChange={(e) => {
-                  const val = e.target.value === '' ? null : parseFloat(e.target.value);
-                  onScoreChange?.(row.studentId, cat.id, isNaN(val as number) ? null : val);
-                }}
-                className={cn(
-                  'w-20 mx-auto text-center h-8.5 text-sm font-medium rounded-lg transition-colors',
-                  isInvalid
-                    ? 'border-rose-500 bg-rose-500/10 text-rose-600 focus-visible:ring-rose-500 font-bold dark:border-rose-500 dark:bg-rose-950/30 dark:text-rose-400'
-                    : 'border-primary/40 focus-visible:ring-primary',
-                )}
-                placeholder="—"
-                title={isInvalid ? 'Điểm số phải từ 0 đến 10' : undefined}
-              />
+            <TableCell key={cat.id} className="py-2 px-1 text-center w-36">
+              <div className="flex items-center justify-center gap-1">
+                {/* Quick -0.25 button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = currentScore ?? 0;
+                    const next = Math.max(0, parseFloat((base - 0.25).toFixed(2)));
+                    onScoreChange?.(row.studentId, cat.id, next);
+                  }}
+                  className="size-6.5 rounded-md border border-border bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground text-xs flex items-center justify-center transition-colors font-bold cursor-pointer"
+                  title="Giảm 0.25 điểm"
+                >
+                  -
+                </button>
+
+                <Input
+                  type="number"
+                  min={0}
+                  max={10}
+                  step={0.25}
+                  value={currentScore ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                    onScoreChange?.(row.studentId, cat.id, isNaN(val as number) ? null : val);
+                  }}
+                  className={cn(
+                    'w-15 text-center h-8 text-xs font-semibold rounded-lg transition-colors p-1',
+                    isInvalid
+                      ? 'border-rose-500 bg-rose-500/10 text-rose-600 focus-visible:ring-rose-500 font-bold'
+                      : 'border-primary/40 focus-visible:ring-primary',
+                  )}
+                  placeholder="—"
+                  title={isInvalid ? 'Điểm số phải từ 0 đến 10' : undefined}
+                />
+
+                {/* Quick +0.25 button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = currentScore ?? 0;
+                    const next = Math.min(10, parseFloat((base + 0.25).toFixed(2)));
+                    onScoreChange?.(row.studentId, cat.id, next);
+                  }}
+                  className="size-6.5 rounded-md border border-border bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground text-xs flex items-center justify-center transition-colors font-bold cursor-pointer"
+                  title="Cộng 0.25 điểm"
+                >
+                  +
+                </button>
+              </div>
             </TableCell>
           );
         }
 
         return (
-          <TableCell key={cat.id} className="py-3 px-4 text-center font-medium text-sm w-28">
-            {formatScore(currentScore)}
+          <TableCell key={cat.id} className="py-3 px-3 text-center font-medium text-sm w-32">
+            <div className="inline-flex items-center justify-center gap-1.5">
+              <span>{formatScore(currentScore)}</span>
+
+              {onOpenBreakdown && (
+                <button
+                  type="button"
+                  onClick={() => onOpenBreakdown(cat.id, cat.name, row.studentId, row.studentName)}
+                  className="text-muted-foreground hover:text-purple-600 dark:hover:text-purple-400 p-0.5 rounded transition-colors cursor-pointer"
+                  title="Xem phân rã điểm thành phần"
+                >
+                  <Layers className="size-3" />
+                </button>
+              )}
+            </div>
           </TableCell>
         );
       })}

@@ -97,7 +97,7 @@ export function FindClassModal({ trigger }: FindClassModalProps) {
 
   const handleNavigate = (id: string) => {
     handleOpenChange(false);
-    router.push(`/classes/${id}/info`);
+    router.push(`/classes/${id}`);
   };
 
   return (

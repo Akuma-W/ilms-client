@@ -213,10 +213,10 @@ export function StudentClassInfo({ classData, userData, relation }: StudentClass
             </p>
           </div>
 
-          {/* Google Meet Attendance */}
+          {/* Online Meeting Attendance */}
           <div className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 space-y-1">
             <div className="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
-              <span>Chuyên cần Meet</span>
+              <span>Họp trực tuyến</span>
               <Video className="size-4" />
             </div>
             <p className="text-2xl font-black text-foreground">

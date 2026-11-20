@@ -13,12 +13,14 @@ import {
   Eye,
   HelpCircle,
   Play,
+  RefreshCw,
   RotateCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { quizAttemptsService } from '@/features/quizzes/services/quiz-attempts.service';
+import { gradeCalculationsService } from '@/features/grades/services/grade-calculations.service';
 import {
   exportClassQuizCsv,
   formatQuizDateTime,
@@ -41,7 +43,6 @@ interface ClassQuizPublicationClientProps {
   isArchived?: boolean;
 }
 
-// Detailed class quiz publication dashboard with analytics and student history
 export function ClassQuizPublicationClient({
   classId,
   publicationId,
@@ -50,6 +51,7 @@ export function ClassQuizPublicationClient({
   isArchived = false,
 }: ClassQuizPublicationClientProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const { user: currentUser } = useCurrentUser();
   const roleCanEdit = isTeacher || currentUser?.role === 'admin';
@@ -86,6 +88,20 @@ export function ClassQuizPublicationClient({
     }
     exportClassQuizCsv(stats.students, publication.quiz?.title, classId);
     toast.success('Đã tải xuống bảng điểm CSV của lớp!');
+  };
+
+  const handleSyncGrades = async () => {
+    try {
+      setIsSyncing(true);
+      const res = await gradeCalculationsService.syncGrades(classId);
+      toast.success('Đã đồng bộ điểm thi vào sổ điểm thành công!', {
+        description: res.message,
+      });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi khi đồng bộ điểm');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (
@@ -146,6 +162,17 @@ export function ClassQuizPublicationClient({
                   <span>Chỉnh sửa đợt thi</span>
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncGrades}
+                disabled={isSyncing}
+                className="text-xs h-8 gap-1.5 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10"
+                title="Đồng bộ điểm thi cao nhất của sinh viên vào sổ điểm"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>Đồng bộ sổ điểm</span>
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -262,7 +289,7 @@ export function ClassQuizPublicationClient({
                       <Link
                         href={`/classes/${classId}/quizzes/${publicationId}/attempts/${latestAttempt.id}`}
                       >
-                        <ExternalLink className="w-4 h-4" />
+                        <ExternalLink className="w-4 h-4 mr-1.5" />
                         <span>Xem lại bài làm chi tiết</span>
                       </Link>
                     </Button>
@@ -270,7 +297,7 @@ export function ClassQuizPublicationClient({
                   {isOpen && !isArchived && (
                     <Button asChild variant="outline" size="default" className="gap-1.5">
                       <Link href={`/classes/${classId}/quizzes/${publicationId}/take`}>
-                        <RotateCcw className="w-4 h-4" />
+                        <RotateCcw className="w-4 h-4 mr-1.5" />
                         <span>Làm lại bài thi</span>
                       </Link>
                     </Button>
@@ -301,8 +328,7 @@ export function ClassQuizPublicationClient({
                     className="text-sm font-semibold rounded-xl bg-linear-to-r from-rose-600 to-indigo-600 hover:from-rose-700 hover:to-indigo-700 text-white shadow-md px-8"
                   >
                     <Link href={`/classes/${classId}/quizzes/${publicationId}/take`}>
-                      <Play className="w-4 h-4 mr-2 fill-white" />
-                      Bắt đầu làm bài thi ngay
+                      <Play className="w-4 h-4 mr-2 fill-white" /> Bắt đầu làm bài thi ngay
                     </Link>
                   </Button>
                 ) : isClosed ? (

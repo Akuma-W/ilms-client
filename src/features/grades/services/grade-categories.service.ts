@@ -5,9 +5,12 @@ import {
   getMockCategories,
   updateMockCategory,
 } from '@/mocks/classes/mock-grades';
-import type { GradeCategory } from '@/types/grade';
+import type {
+  CreateGradeCategoryInput,
+  GradeCategory,
+  UpdateGradeCategoryInput,
+} from '@/types/grade';
 
-// Service managing grade categories and weights for classroom grading structure
 export const gradeCategoriesService = {
   // Retrieves all grade categories and weights for a class
   async getCategories(classId: string): Promise<GradeCategory[]> {
@@ -26,18 +29,23 @@ export const gradeCategoriesService = {
   // Creates a new grade category with weight percentage and order index
   async createCategory(
     classId: string,
-    name: string,
-    weightPercent: number,
+    input: CreateGradeCategoryInput | string,
+    weightPercent?: number,
     orderIndex?: number,
   ): Promise<{ success: boolean; data: GradeCategory; message: string }> {
+    const payload =
+      typeof input === 'string'
+        ? {
+            name: input,
+            weight: (weightPercent || 10) / 100,
+            ...(orderIndex !== undefined && { orderIndex }),
+          }
+        : input;
+
     try {
       const res = await clientApiClient<GradeCategory>(`/classes/${classId}/grades/categories`, {
         method: 'POST',
-        body: JSON.stringify({
-          name,
-          weight: weightPercent / 100,
-          ...(orderIndex !== undefined && { orderIndex }),
-        }),
+        body: JSON.stringify(payload),
       });
       if (res.success !== false && res.data) {
         return {
@@ -50,7 +58,9 @@ export const gradeCategoriesService = {
       // Fallback
     }
 
-    const newCat = addMockCategory(name, weightPercent, orderIndex);
+    const name = typeof input === 'string' ? input : input.name;
+    const weight = typeof input === 'string' ? weightPercent || 10 : input.weight * 100;
+    const newCat = addMockCategory(name, weight, orderIndex);
     return {
       success: true,
       data: newCat,
@@ -58,29 +68,36 @@ export const gradeCategoriesService = {
     };
   },
 
-  // Updates an existing grade category
+  // Updates an existing grade category with optional source linkage and strategy
   async updateCategory(
     classId: string,
     categoryId: string,
-    name: string,
-    weightPercent: number,
+    input: UpdateGradeCategoryInput | string,
+    weightPercent?: number,
     orderIndex?: number,
   ): Promise<{ success: boolean; message: string }> {
+    const payload =
+      typeof input === 'string'
+        ? {
+            name: input,
+            weight: (weightPercent || 10) / 100,
+            ...(orderIndex !== undefined && { orderIndex }),
+          }
+        : input;
+
     try {
       await clientApiClient(`/classes/${classId}/grades/categories/${categoryId}`, {
         method: 'PUT',
-        body: JSON.stringify({
-          name,
-          weight: weightPercent / 100,
-          ...(orderIndex !== undefined && { orderIndex }),
-        }),
+        body: JSON.stringify(payload),
       });
       return { success: true, message: 'Cập nhật loại điểm thành công!' };
     } catch {
       // Fallback
     }
 
-    updateMockCategory(categoryId, name, weightPercent, orderIndex);
+    const name = typeof input === 'string' ? input : input.name || '';
+    const weight = typeof input === 'string' ? weightPercent || 10 : (input.weight || 0.1) * 100;
+    updateMockCategory(categoryId, name, weight, orderIndex);
     return { success: true, message: 'Cập nhật loại điểm thành công!' };
   },
 

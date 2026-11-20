@@ -2,27 +2,27 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { TeacherGradesPagination } from './teacher-grades-pagination';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { GradeMatrixRow } from './grade-matrix-row';
 import { GradeAnalyticsCards } from './grade-analytics-cards';
+import { GradeStructureRibbon } from './grade-structure-ribbon';
 import { CategoryManagementModal } from './category-management-modal';
 import { TeacherGradesToolbar } from './teacher-grades-toolbar';
-import { calculateFinalScore } from '../utils/grade.utils';
+import { SyncGradesModal } from './sync-grades-modal';
+import { AttendanceSummaryDrawer } from './attendance-summary-drawer';
+import { GradeBreakdownModal } from './grade-breakdown-modal';
+import { CalculateAttendanceModal } from './calculate-attendance-modal';
+import { TeacherGradesTableHeader } from './teacher-grades-table-header';
+import { gradeCalculationsService } from '../services/grade-calculations.service';
 import { exportGradesToCsv } from '../utils/export.utils';
 import { sortGradeRows, type GradeSortField, type GradeSortOrder } from '../utils/grade-sort.utils';
+import { useGradeMatrix } from '../hooks/use-grade-matrix';
 import type { ClassGradeMatrixRow, GradeCategory } from '@/types/grade';
+import { DataPagination } from '@/components/shared/data-pagination';
 
 interface TeacherGradesViewProps {
+  classId?: string;
   categories: GradeCategory[];
   rows: ClassGradeMatrixRow[];
   onSaveBatch: (
@@ -35,83 +35,92 @@ interface TeacherGradesViewProps {
       weightPercent: number;
       orderIndex?: number;
       isDeleted?: boolean;
+      sourceType?: GradeCategory['sourceType'];
+      sourceId?: string | null;
+      config?: GradeCategory['config'];
     }[],
   ) => Promise<void>;
+  onRefresh?: () => Promise<void>;
   className?: string;
   isArchived?: boolean;
 }
 
 const ITEMS_PER_PAGE = 10;
 
-/**
- * Teacher grade matrix view with compact analytics cards, inline spreadsheet editing,
- * sortable headers, input validation bounds [0, 10], and CSV export.
- */
 export function TeacherGradesView({
+  classId = '',
   categories,
   rows,
   onSaveBatch,
   onSaveCategories,
+  onRefresh,
   className = 'lop-hoc',
   isArchived = false,
 }: TeacherGradesViewProps) {
-  const [isEditing, setIsEditing] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [syncTargetCategoryId, setSyncTargetCategoryId] = useState<string>('all');
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+  const [attendanceTargetCategoryId, setAttendanceTargetCategoryId] = useState<string>('');
+  const [isAttendanceDrawerOpen, setIsAttendanceDrawerOpen] = useState(false);
+
+  const [breakdownModal, setBreakdownModal] = useState({
+    isOpen: false,
+    categoryId: '',
+    categoryName: '',
+    studentId: '',
+    studentName: '',
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAutoCalculating, setIsAutoCalculating] = useState(false);
   const [sortField, setSortField] = useState<GradeSortField>('index');
   const [sortOrder, setSortOrder] = useState<GradeSortOrder>('asc');
 
-  // Categories ordered by sequence index
   const sortedCategories = [...categories].sort(
     (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0),
   );
 
-  // Initialize draft scores map: studentId -> { categoryId -> score }
-  const [draftScores, setDraftScores] = useState<Record<string, Record<string, number | null>>>(
-    () => {
-      const initial: Record<string, Record<string, number | null>> = {};
-      rows.forEach((r) => {
-        initial[r.studentId] = { ...r.scores };
-      });
-      return initial;
-    },
-  );
+  // Custom hook for matrix state, real-time recalculation & SWR automatic data sync
+  const {
+    isEditing,
+    setIsEditing,
+    draftScores,
+    handleScoreChange,
+    resetDraft,
+    hasInvalidScore,
+    getComputedFinalScore,
+  } = useGradeMatrix({ rows, categories: sortedCategories });
 
-  // Validate all entered draft scores strictly between 0 and 10
-  const hasInvalidScore = Object.values(draftScores).some((scoresMap) =>
-    Object.values(scoresMap).some(
-      (score) => score !== null && score !== undefined && (score < 0 || score > 10),
-    ),
-  );
-
-  // Sort direction handler
   const handleSort = (field: GradeSortField) => {
     if (sortField === field) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortField(field);
-      setSortOrder(field === 'finalScore' ? 'desc' : 'asc');
+      const isTextOrIndex =
+        field === 'index' ||
+        field === 'code' ||
+        field === 'studentCode' ||
+        field === 'name' ||
+        field === 'studentName';
+      setSortOrder(isTextOrIndex ? 'asc' : 'desc');
     }
     setPage(1);
   };
 
-  // Filter students by search term
   const filteredRows = rows.filter((r) => {
-    const nameMatch = r.studentName.toLowerCase().includes(searchTerm.toLowerCase());
-    const codeMatch = r.studentCode.toLowerCase().includes(searchTerm.toLowerCase());
-    return nameMatch || codeMatch;
+    const term = searchTerm.toLowerCase();
+    return r.studentName.toLowerCase().includes(term) || r.studentCode.toLowerCase().includes(term);
   });
 
-  // Apply sorting
   const sortedRows = sortGradeRows(
     filteredRows,
     sortField,
     sortOrder,
     isEditing ? draftScores : undefined,
   );
-
   const totalPages = Math.ceil(sortedRows.length / ITEMS_PER_PAGE) || 1;
   const safePage = Math.min(Math.max(1, page), totalPages);
   const paginatedRows = sortedRows.slice(
@@ -119,12 +128,9 @@ export function TeacherGradesView({
     safePage * ITEMS_PER_PAGE,
   );
 
-  // Overall classroom analytics: compute only on students with graded records
   const totalStudents = rows.length;
   const gradedRows = rows.filter((r) => r.finalScore !== null && r.finalScore !== undefined);
-  const passingStudents = gradedRows.filter(
-    (r) => r.finalScore !== null && r.finalScore >= 5.0,
-  ).length;
+  const passingStudents = gradedRows.filter((r) => (r.finalScore ?? 0) >= 5.0).length;
   const averageClassScore =
     gradedRows.length > 0
       ? (gradedRows.reduce((sum, r) => sum + (r.finalScore ?? 0), 0) / gradedRows.length).toFixed(2)
@@ -132,46 +138,37 @@ export function TeacherGradesView({
   const passingRate =
     gradedRows.length > 0 ? Math.round((passingStudents / gradedRows.length) * 100) : 0;
 
-  const handleScoreChange = (studentId: string, categoryId: string, score: number | null) => {
-    setDraftScores((prev) => ({
-      ...prev,
-      [studentId]: {
-        ...(prev[studentId] || {}),
-        [categoryId]: score,
-      },
-    }));
-  };
-
-  const handleCancelEdit = () => {
-    const initial: Record<string, Record<string, number | null>> = {};
-    rows.forEach((r) => {
-      initial[r.studentId] = { ...r.scores };
-    });
-    setDraftScores(initial);
-    setIsEditing(false);
-    toast.info('Đã hủy các thay đổi chưa lưu.');
-  };
-
   const handleSaveGrades = async () => {
     if (hasInvalidScore) {
       toast.error('Có điểm không hợp lệ! Vui lòng chỉ nhập điểm trong khoảng từ 0 đến 10.');
       return;
     }
-
     setIsSaving(true);
     try {
       const updates: { studentId: string; categoryId: string; score: number }[] = [];
+      const rowMap = new Map(rows.map((r) => [r.studentId, r]));
+
       Object.entries(draftScores).forEach(([studentId, scoresMap]) => {
+        const originalRow = rowMap.get(studentId);
         Object.entries(scoresMap).forEach(([categoryId, score]) => {
           if (score !== null && !isNaN(score)) {
-            updates.push({ studentId, categoryId, score });
+            const originalScore = originalRow?.scores[categoryId] ?? null;
+            if (originalScore === null || Math.abs(originalScore - score) >= 0.001) {
+              updates.push({ studentId, categoryId, score });
+            }
           }
         });
       });
 
+      if (updates.length === 0) {
+        setIsEditing(false);
+        toast.info('Không có thay đổi điểm nào cần lưu.');
+        return;
+      }
+
       await onSaveBatch(updates);
       setIsEditing(false);
-      toast.success('Bảng điểm đã được cập nhật thành công!');
+      toast.success(`Đã cập nhật thành công ${updates.length} điểm!`);
     } catch {
       toast.error('Không thể lưu bảng điểm. Vui lòng thử lại!');
     } finally {
@@ -179,20 +176,40 @@ export function TeacherGradesView({
     }
   };
 
-  const renderSortIndicator = (field: GradeSortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="size-3 text-muted-foreground/50 inline-block ml-1" />;
+  const handleAutoCalculateAll = async () => {
+    if (!classId) return;
+    setIsAutoCalculating(true);
+    try {
+      const syncRes = await gradeCalculationsService.syncGrades(classId);
+      const hasAttendance = sortedCategories.some((c) => c.sourceType === 'attendance');
+      if (hasAttendance) {
+        await gradeCalculationsService.calculateAttendance(classId);
+      }
+      toast.success(syncRes.message || 'Tính điểm tự động toàn bộ lớp thành công!', {
+        description: 'Bảng điểm và các cột tự động đã được làm mới.',
+      });
+      await onRefresh?.();
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi khi tính điểm tự động');
+    } finally {
+      setIsAutoCalculating(false);
     }
-    return sortOrder === 'asc' ? (
-      <ArrowUp className="size-3 text-primary inline-block ml-1" />
-    ) : (
-      <ArrowDown className="size-3 text-primary inline-block ml-1" />
-    );
+  };
+
+  const handleConfigureColumn = (cat: GradeCategory) => {
+    if (cat.sourceType === 'attendance') {
+      setAttendanceTargetCategoryId(cat.id);
+      setIsAttendanceModalOpen(true);
+    } else if (cat.sourceType === 'assignment' || cat.sourceType === 'quiz') {
+      setSyncTargetCategoryId(cat.id);
+      setIsSyncModalOpen(true);
+    } else {
+      setIsCategoryModalOpen(true);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* 3 Compact Analytics Cards */}
       <GradeAnalyticsCards
         totalStudents={totalStudents}
         averageScore={averageClassScore}
@@ -200,101 +217,67 @@ export function TeacherGradesView({
         passingRate={passingRate}
       />
 
-      {/* Main Grade Matrix Card */}
-      <Card className="border border-border/80 bg-card/90 shadow-xs overflow-hidden">
-        {/* Controls Toolbar */}
+      {/* Grade Structure Ribbon (Placed on top of grade matrix, default collapsed) */}
+      <GradeStructureRibbon
+        categories={sortedCategories}
+        isArchived={isArchived}
+        onOpenManagement={() => setIsCategoryModalOpen(true)}
+      />
+
+      <Card className="rounded-2xl border border-border/80 shadow-xs overflow-hidden bg-card">
         <TeacherGradesToolbar
           isEditing={isEditing}
           searchTerm={searchTerm}
-          categoryCount={sortedCategories.length}
           isSaving={isSaving}
-          hasCategoriesHandler={Boolean(onSaveCategories)}
+          isAutoCalculating={isAutoCalculating}
           hasInvalidScore={hasInvalidScore}
           isArchived={isArchived}
-          onSearchChange={(val) => {
-            setSearchTerm(val);
-            setPage(1);
-          }}
-          onOpenCategories={() => setIsCategoryModalOpen(true)}
-          onExportCsv={() => exportGradesToCsv(sortedCategories, rows, className)}
-          onStartEdit={() => !isArchived && setIsEditing(true)}
-          onCancelEdit={handleCancelEdit}
+          onSearchChange={setSearchTerm}
+          onOpenAttendanceSummary={() => setIsAttendanceDrawerOpen(true)}
+          onAutoCalculateAll={handleAutoCalculateAll}
+          onExportCsv={() => exportGradesToCsv(sortedCategories, sortedRows, className)}
+          onStartEdit={() => setIsEditing(true)}
+          onCancelEdit={resetDraft}
           onSaveGrades={handleSaveGrades}
         />
 
-        {/* Matrix Table with primary theme accent and sortable headers */}
         <Table>
-          <TableHeader className="bg-primary/5 dark:bg-primary/10 border-b border-primary/20">
-            <TableRow className="border-b border-primary/20 text-xs font-bold uppercase tracking-wider">
-              <TableHead
-                className="py-3 px-3 text-center w-14 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
-                onClick={() => handleSort('index')}
-              >
-                <span>STT</span>
-                {renderSortIndicator('index')}
-              </TableHead>
-              <TableHead
-                className="py-3 px-4 w-28 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
-                onClick={() => handleSort('code')}
-              >
-                <span>MSSV</span>
-                {renderSortIndicator('code')}
-              </TableHead>
-              <TableHead
-                className="py-3 px-4 min-w-45 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
-                onClick={() => handleSort('name')}
-              >
-                <span>Sinh viên</span>
-                {renderSortIndicator('name')}
-              </TableHead>
-              {sortedCategories.map((cat) => (
-                <TableHead
-                  key={cat.id}
-                  className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
-                  onClick={() => handleSort(cat.id)}
-                >
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center">
-                      <span className="font-bold text-foreground">{cat.name}</span>
-                      {renderSortIndicator(cat.id)}
-                    </div>
-                    <span className="text-[11px] font-mono text-primary font-semibold">
-                      {Math.round(cat.weight > 1 ? cat.weight : cat.weight * 100)}%
-                    </span>
-                  </div>
-                </TableHead>
-              ))}
-              <TableHead
-                className="py-3 px-3 text-center w-28 min-w-25 font-bold text-foreground cursor-pointer select-none hover:bg-primary/10 transition-colors"
-                onClick={() => handleSort('finalScore')}
-              >
-                <div className="flex flex-col items-center">
-                  <div className="flex items-center">
-                    <span className="font-bold text-primary">Tổng kết</span>
-                    {renderSortIndicator('finalScore')}
-                  </div>
-                  <span className="text-[11px] font-mono text-muted-foreground">Hệ 10</span>
-                </div>
-              </TableHead>
-              <TableHead className="py-3 px-4 text-center w-36 min-w-32.5 font-bold text-foreground">
-                Xếp loại
-              </TableHead>
-            </TableRow>
-          </TableHeader>
+          <TeacherGradesTableHeader
+            categories={sortedCategories}
+            classId={classId}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            isArchived={isArchived}
+            onSort={handleSort}
+            onConfigureColumn={handleConfigureColumn}
+            onColumnSync={(catId) => {
+              setSyncTargetCategoryId(catId);
+              setIsSyncModalOpen(true);
+            }}
+            onColumnAttendance={(catId) => {
+              setAttendanceTargetCategoryId(catId);
+              setIsAttendanceModalOpen(true);
+            }}
+          />
+
           <TableBody>
             {paginatedRows.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5 + sortedCategories.length}
+                  colSpan={sortedCategories.length + 5}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Không tìm thấy sinh viên nào phù hợp với từ khóa.
+                  {searchTerm
+                    ? 'Không tìm thấy sinh viên nào phù hợp.'
+                    : 'Chưa có sinh viên trong lớp học.'}
                 </TableCell>
               </TableRow>
             ) : (
               paginatedRows.map((row, idx) => {
-                const studentDraft = draftScores[row.studentId] || row.scores;
-                const computedScore = calculateFinalScore(sortedCategories, studentDraft);
+                const studentDraft = draftScores[row.studentId];
+                const computedScore = isEditing
+                  ? getComputedFinalScore(row.studentId)
+                  : row.finalScore;
 
                 return (
                   <GradeMatrixRow
@@ -305,6 +288,15 @@ export function TeacherGradesView({
                     isEditing={isEditing}
                     draftScores={studentDraft}
                     onScoreChange={handleScoreChange}
+                    onOpenBreakdown={(categoryId, categoryName, studentId, studentName) =>
+                      setBreakdownModal({
+                        isOpen: true,
+                        categoryId,
+                        categoryName,
+                        studentId,
+                        studentName,
+                      })
+                    }
                     computedFinalScore={computedScore}
                   />
                 );
@@ -313,24 +305,65 @@ export function TeacherGradesView({
           </TableBody>
         </Table>
 
-        {/* Pagination Footer */}
-        <TeacherGradesPagination
-          safePage={safePage}
-          totalPages={totalPages}
-          totalItems={sortedRows.length}
-          itemsPerPage={ITEMS_PER_PAGE}
-          onPageChange={setPage}
-        />
+        <div className="p-4 border-t border-border/50">
+          <DataPagination
+            page={safePage}
+            totalPages={totalPages}
+            totalItems={sortedRows.length}
+            limit={ITEMS_PER_PAGE}
+            onPageChange={setPage}
+          />
+        </div>
       </Card>
 
-      {/* Category Management Modal */}
       {onSaveCategories && !isArchived && (
         <CategoryManagementModal
+          classId={classId}
           isOpen={isCategoryModalOpen}
           onOpenChange={setIsCategoryModalOpen}
           categories={sortedCategories}
           onSaveCategories={onSaveCategories}
         />
+      )}
+
+      {classId && (
+        <>
+          <CalculateAttendanceModal
+            classId={classId}
+            categories={sortedCategories}
+            isOpen={isAttendanceModalOpen}
+            onOpenChange={setIsAttendanceModalOpen}
+            onSuccess={onRefresh}
+            defaultCategoryId={attendanceTargetCategoryId}
+            onChangeCalculationType={() => setIsCategoryModalOpen(true)}
+          />
+
+          <SyncGradesModal
+            classId={classId}
+            categories={sortedCategories}
+            isOpen={isSyncModalOpen}
+            onOpenChange={setIsSyncModalOpen}
+            onSuccess={onRefresh}
+            defaultCategoryId={syncTargetCategoryId}
+            onChangeCalculationType={() => setIsCategoryModalOpen(true)}
+          />
+
+          <AttendanceSummaryDrawer
+            classId={classId}
+            isOpen={isAttendanceDrawerOpen}
+            onOpenChange={setIsAttendanceDrawerOpen}
+          />
+
+          <GradeBreakdownModal
+            classId={classId}
+            categoryId={breakdownModal.categoryId}
+            categoryName={breakdownModal.categoryName}
+            studentId={breakdownModal.studentId}
+            studentName={breakdownModal.studentName}
+            isOpen={breakdownModal.isOpen}
+            onOpenChange={(open) => setBreakdownModal((prev) => ({ ...prev, isOpen: open }))}
+          />
+        </>
       )}
     </div>
   );

@@ -6,10 +6,6 @@ import type { Topic } from '@/types/topic';
 
 let localMaterials: Material[] = [...MOCK_MATERIALS];
 
-/**
- * Client-side materials service for Browser Components (CSR, SWR, Mutations).
- * Encapsulates try/catch and fallback to mock data when API errors or fails.
- */
 export const materialsService = {
   getInitialMaterials(topicId?: string): Material[] {
     if (topicId) {
@@ -121,5 +117,21 @@ export const materialsService = {
 
     localMaterials = localMaterials.filter((m) => m.id !== id);
     return { success: true, message: 'Xóa bài giảng thành công' };
+  },
+
+  async trackMaterialProgress(materialId: string, isCompleted: boolean = true) {
+    try {
+      const res = await clientApiClient<{ isCompleted: boolean }>(
+        `/materials/${materialId}/progress`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ isCompleted }),
+        },
+      );
+      return res;
+    } catch {
+      // Ignore background tracking failure
+    }
+    return { success: true, data: { isCompleted: true } };
   },
 };

@@ -153,3 +153,25 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* LiveKit local participant highlight */
+[data-lk-local-participant='true'],
+[data-lk-local-participant='true'].lk-participant-tile,
+.lk-participant-tile[data-lk-local-participant='true'],
+.lk-video-conference [data-lk-local-participant='true'],
+.lk-focus-layout [data-lk-local-participant='true'],
+.lk-grid-layout [data-lk-local-participant='true'] {
+  border: 2.5px solid #a855f7 !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.45) !important;
+  border-radius: var(--radius-lg, 0.75rem) !important;
+}
+
+[data-lk-local-participant='true'] .lk-participant-name::after,
+.lk-participant-tile[data-lk-local-participant='true'] .lk-participant-name::after,
+.lk-video-conference [data-lk-local-participant='true'] .lk-participant-name::after,
+.lk-focus-layout [data-lk-local-participant='true'] .lk-participant-name::after,
+.lk-grid-layout [data-lk-local-participant='true'] .lk-participant-name::after {
+  content: ' (Bạn)';
+  color: #c084fc;
+  font-weight: 700;
+}
